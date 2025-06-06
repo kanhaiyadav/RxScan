@@ -1,16 +1,21 @@
-import { Link } from "expo-router";
-import { Text, View } from "react-native";
+import { Link, useRouter } from "expo-router";
+import { Text, Pressable, View} from "react-native";
 
 export default function Index() {
+
+  const router = useRouter();
+  const handlePress = () => {
+    router.push('/onboarding');
+  }
+  
   return (
-    <View className="flex-1 items-center justify-center bg-white dark:bg-gray-900">
+    <View className="flex-1 items-center justify-center bg-primary">
       <Text className="text-5xl text-red-500">Welcome</Text>
-      <Link href={'/onboarding'} className="mt-4 text-blue-500">
-        Go to Onboarding
-      </Link>
-      <Link href={'/movie/[id]'} className="mt-4 text-blue-500">
-        Go to Movie
-      </Link>
+
+      
+      <Pressable className="px-4 py-2 bg-orange-300 text-black font-semibold rounded-[6px] my-4" onPress={handlePress}>
+        <Text className="text-xl">Profile</Text>
+      </Pressable>
     </View>
   );
 }
