@@ -57,7 +57,7 @@ const WelcomePage = ({ slide }: {
   const router = useRouter()
 
   return (
-    <View className='bg-primary/5 flex-1 w-screen px-4 relative'>
+    <View className='bg-primary-500/5 flex-1 w-screen px-4 relative'>
       {/* SVG Background */}
       <BackgroundSVG />
 
@@ -82,12 +82,12 @@ const WelcomePage = ({ slide }: {
 
             <Pressable onPress={() => {
               if (slide === 3) {
-                router.push('/(auth))' as any)
+                router.push('/(auth)/signin' as any)
                 return;
               }
               router.push(`/(welcome)/${slide + 1}` as any)
             }}
-              className='w-full p-4 py-[12px] bg-primary rounded-full mt-6 shadow-[4px_4px_0_10px_rgb(0,0,0)]'
+              className='w-full p-4 py-[12px] bg-primary-500 rounded-full mt-6 shadow-[4px_4px_0_10px_rgb(0,0,0)]'
             >
               <Text className="text-primary-foreground font-semibold text-center text-lg">
                 {slide === 3 ? 'Get Started' : 'Next'}
@@ -99,7 +99,7 @@ const WelcomePage = ({ slide }: {
               Array.from({ length: 3 }, (_, index) => (
                 <View
                   key={index}
-                  className={`w-3 h-3 mx-1 rounded-full ${slide === index+1 ? 'bg-primary' : 'bg-gray-300'}`}
+                  className={`w-3 h-3 mx-1 rounded-full ${slide === index+1 ? 'bg-primary-500' : 'bg-gray-300'}`}
                 />
               ))
             }
