@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/logo.jpg",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.rxscan"
     },
     "web": {
       "bundler": "metro",
