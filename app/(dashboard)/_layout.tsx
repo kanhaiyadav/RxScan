@@ -1,163 +1,123 @@
-import { Tabs } from "expo-router";
-import { images } from "@/constants/images";
-import { Image, ImageBackground, Text, View, Animated } from "react-native";
-import { icons } from "@/constants/icons";
-import { useEffect, useRef } from "react";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { View, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-const ActiveTabBar = ({ icon, text, active }: {
-  icon: any;
-  text: string;
-  active: boolean;
-}) => {
-  if (active) {
-    return (
-      <ImageBackground
-        source={images.highlight}
-        className="w-full min-w-[112px] flex flex-row flex-1 items-center justify-center gap-2 rounded-full min-h-[55px] mt-[20px] overflow-hidden"
+export default function TabLayout() {
+  return (
+    <SafeAreaView
+      edges={['bottom']} // Only apply safe area to the bottom
+      style={{ flex: 1, backgroundColor: '#FFFFFF' }} // Set background if needed
+      className='pt-[30px]'
+    >
+      <Tabs
+        initialRouteName='index'
+        screenOptions={{
+          animation: 'shift',
+          tabBarActiveTintColor: '#14B8A6',
+          tabBarInactiveTintColor: '#9CA3AF',
+          tabBarStyle: {
+            backgroundColor: '#FFFFFF',
+            borderTopWidth: 1,
+            borderTopColor: '#E5E7EB',
+            height: Platform.OS === 'android' ? 80 : 70, // extra height for Android nav bar
+            paddingBottom: Platform.OS === 'android' ? 20 : 10, // adjust padding for Android
+            paddingTop: 10,
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: -2,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 8,
+          },
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: '600',
+            marginTop: 5,
+          },
+          headerShown: false,
+        }}
       >
-        <Image source={icon} tintColor={'#151312'} />
-        <Text>
-          {text}
-        </Text>
-      </ImageBackground>
-    )
-  }
-  else {
-    return (
-      <View className="size-full justify-center items-center mt-4 rounded-full">
-        <Image source={icon} tintColor={'#A8B5DB'} className="size-5" />
-      </View>
-    )
-  }
-}
-
-// Custom animated wrapper component for tab screens
-export const AnimatedTabScreen = ({ children }: { children: React.ReactNode }) => {
-  const slideAnim = useRef(new Animated.Value(-100)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-
-  useFocusEffect(
-    useCallback(() => {
-      // Reset animation values
-      slideAnim.setValue(-100);
-      opacityAnim.setValue(0);
-
-      // Start slide-from-top animation
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacityAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      return () => {
-        // Cleanup if needed
-      };
-    }, [slideAnim, opacityAnim])
-  );
-
-  return (
-    <Animated.View
-      style={{
-        flex: 1,
-        transform: [{ translateY: slideAnim }],
-        opacity: opacityAnim,
-      }}
-    >
-      {children}
-    </Animated.View>
-  );
-};
-
-export default function _Layout() {
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarShowLabel: false,
-        tabBarItemStyle: {
-          width: "100%",
-          height: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-        },
-        animation: "fade",
-        tabBarStyle: {
-          backgroundColor: "#0f0d23",
-          borderRadius: 50,
-          marginHorizontal: 20,
-          marginBottom: 18,
-          height: 57,
-          position: "absolute",
-          overflow: "hidden",
-          borderWidth: 1,
-          borderColor: "0f0d23"
-        }
-      }}
-    >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <ActiveTabBar
-              icon={icons.home}
-              text="Home"
-              active={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "Search",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <ActiveTabBar
-              icon={icons.search}
-              text="Search"
-              active={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="saved"
-        options={{
-          title: "Saved",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <ActiveTabBar
-              icon={icons.save}
-              text="Saved"
-              active={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <ActiveTabBar
-              icon={icons.person}
-              text="Profile"
-              active={focused}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ color, focused }) => (
+              <View className={`rounded-full ${focused ? 'bg-teal-50' : ''}`}>
+                <Ionicons
+                  name={focused ? 'home' : 'home-outline'}
+                  size={24}
+                  color={color}
+                />
+              </View>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="prescription"
+          options={{
+            title: 'Prescriptions',
+            tabBarIcon: ({ color, focused }) => (
+              <View className={`rounded-full ${focused ? 'bg-teal-50' : ''}`}>
+                <Ionicons
+                  name={focused ? 'document-text' : 'document-text-outline'}
+                  size={24}
+                  color={color}
+                />
+              </View>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="scan"
+          options={{
+            title: 'Scan',
+            tabBarIcon: ({ color, focused }) => (
+              <View className={`w-[60px] h-[60px] mb-[-10px] flex items-center justify-center rounded-full ${focused ? 'bg-teal-500' : 'bg-teal-500'} shadow-lg`}>
+                <Ionicons
+                  name="camera"
+                  size={30}
+                  color="white"
+                />
+              </View>
+            ),
+            tabBarLabel: () => null, // Hide label for center button
+          }}
+        />
+        <Tabs.Screen
+          name="reminder"
+          options={{
+            title: 'Reminders',
+            tabBarIcon: ({ color, focused }) => (
+              <View className={`rounded-full ${focused ? 'bg-teal-50' : ''}`}>
+                <Ionicons
+                  name={focused ? 'alarm' : 'alarm-outline'}
+                  size={24}
+                  color={color}
+                />
+              </View>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: 'Profile',
+            tabBarIcon: ({ color, focused }) => (
+              <View className={`rounded-full ${focused ? 'bg-teal-50' : ''}`}>
+                <Ionicons
+                  name={focused ? 'person' : 'person-outline'}
+                  size={24}
+                  color={color}
+                />
+              </View>
+            ),
+          }}
+        />
+      </Tabs>
+    </SafeAreaView>
   );
 }

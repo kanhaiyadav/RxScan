@@ -45,7 +45,7 @@ const SignIn = () => {
             </Pressable>
           </Link>
         </View>
-        <Button size='xl' className='h-[50px]'>
+        <Button size='xl' className='h-[50px]' onPress={() => router.push('/(dashboard)')}>
           <Text className='text-lg text-primary-foreground'>Sign In</Text>
         </Button>
         <View className='flex flex-row items-center gap-1 w-fit m-auto mt-[-10px]'>
