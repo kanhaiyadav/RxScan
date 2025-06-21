@@ -9,6 +9,7 @@ import {
   TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function PrescriptionsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,29 +60,37 @@ export default function PrescriptionsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" />
+      <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
       {/* Header */}
-      <View className="bg-white px-6 py-4 border-b border-gray-100">
-        <View className="flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-gray-900">Prescriptions</Text>
-          <TouchableOpacity className="bg-teal-50 p-3 rounded-full elevation-sm">
-            <Ionicons name="add" size={24} color="#14B8A6" />
-          </TouchableOpacity>
-        </View>
+      <LinearGradient
+        colors={['#00ffc8', '#80f7ed']} // teal-500 to teal-600
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ elevation: 3 }}
+        className='border-b border-gray-200'
+      >
+        <View className="px-6 py-4">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-2xl font-bold text-gray-900">Prescriptions</Text>
+            <TouchableOpacity className="bg-white p-3 rounded-full elevation-sm">
+              <Ionicons name="add" size={24} color="#14B8A6" />
+            </TouchableOpacity>
+          </View>
 
-        {/* Search Bar */}
-        <View className="mt-4 bg-gray-50 rounded-xl flex-row items-center px-4 py-3 elevation">
-          <Ionicons name="search" size={20} color="#9CA3AF" />
-          <TextInput
-            className="flex-1 ml-3 text-gray-900"
-            placeholder="Search prescriptions..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#9CA3AF"
-          />
+          {/* Search Bar */}
+          <View className="mt-4 bg-gray-50 rounded-xl flex-row items-center px-4 py-3 elevation">
+            <Ionicons name="search" size={20} color="#9CA3AF" />
+            <TextInput
+              className="flex-1 ml-3 text-gray-900"
+              placeholder="Search prescriptions..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
         </View>
-      </View>
+      </LinearGradient>
 
       {/* Filter Tabs */}
       <View className="bg-white px-6 py-4 border-b border-black/15">
@@ -91,14 +100,14 @@ export default function PrescriptionsScreen() {
               <TouchableOpacity
                 key={filter}
                 className={`px-4 py-2 rounded-full elevation-sm ${activeFilter === filter
-                    ? 'bg-teal-500'
-                    : 'bg-gray-100'
+                  ? 'bg-teal-500'
+                  : 'bg-gray-100'
                   }`}
                 onPress={() => setActiveFilter(filter)}
               >
                 <Text className={`font-medium ${activeFilter === filter
-                    ? 'text-white'
-                    : 'text-gray-600'
+                  ? 'text-white'
+                  : 'text-gray-600'
                   }`}>
                   {filter}
                 </Text>

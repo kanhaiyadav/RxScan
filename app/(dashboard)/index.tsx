@@ -66,43 +66,47 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" />
+      <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
       {/* Header */}
-      <View className="bg-white px-6 py-4 border-b border-gray-100" style={{ elevation: 3 }}>
-        <View className="flex-row items-center justify-between">
-          <View>
-            <Text className="text-2xl font-bold text-gray-900">Welcome back!</Text>
-            <Text className="text-gray-600 mt-1">Let&apos;s keep you healthy today</Text>
+      <LinearGradient
+        colors={['#00ffc8', '#80f7ed']} // teal-500 to teal-600
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ elevation: 3 }}
+        className='border-b border-gray-200'
+      >
+        <View className="bg-transparent px-6 py-4 ">
+          <View className="flex-row items-center justify-between">
+            <View>
+              <Text className="text-2xl font-bold text-gray-900">Welcome back!</Text>
+              <Text className="text-gray-600 mt-1">Let&apos;s keep you healthy today</Text>
+            </View>
+            <TouchableOpacity className="bg-white p-3 rounded-full elevation-sm">
+              <Ionicons name="notifications" size={24} color="#14B8A6" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity className="bg-primary-100 p-3 rounded-full elevation-sm">
-            <Ionicons name="notifications" size={24} color="#14B8A6" />
-          </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Health Stats Card */}
-        <View>
-          <LinearGradient
-            colors={['#b6f7f0', '#80f7e1']} // teal-500 to teal-600
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="mx-6 mt-6 p-6"
-            style={{ borderRadius: 16, elevation: 2 }}
-          >
-            <Text className="text-black text-lg font-semibold mb-4">Your Health Summary</Text>
-            <View className="flex-row justify-between">
-              <View className="bg-white/30 rounded-xl p-4 flex-1 mr-2 border-[1px] border-black/5">
-                <Text className="text-black/80 text-sm">Prescriptions</Text>
-                <Text className="text-black text-2xl font-bold">12</Text>
-              </View>
-              <View className="bg-white/40 rounded-xl p-4 flex-1 ml-2 border-[1px] border-black/5">
-                <Text className="text-black/80 text-sm">Active Meds</Text>
-                <Text className="text-black text-2xl font-bold">5</Text>
-              </View>
+        <View className='p-6'>
+          <Text className="text-black text-lg font-semibold mb-4">Your Health Summary</Text>
+          <View className="flex-row justify-between">
+            <View className="bg-white p-4 flex-1 mr-2"
+            style={{borderRadius: 8, elevation: 2}}
+            >
+              <Text className="text-black/80 text-sm">Prescriptions</Text>
+              <Text className="text-black text-2xl font-bold">12</Text>
             </View>
-          </LinearGradient>
+            <View className="bg-white p-4 flex-1 ml-2"
+            style={{borderRadius: 8, elevation: 2}}
+            >
+              <Text className="text-black/80 text-sm">Active Meds</Text>
+              <Text className="text-black text-2xl font-bold">5</Text>
+            </View>
+          </View>
         </View>
 
         {/* Quick Actions */}

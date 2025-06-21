@@ -143,23 +143,27 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" />
+      <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
       {/* Header */}
-      <View className="bg-white px-6 py-4 border-b border-gray-200">
-        <Text className="text-2xl font-bold text-gray-900">Profile</Text>
-      </View>
+      <LinearGradient
+        colors={['#00ffc8', '#80f7ed']} // teal-500 to teal-600
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ elevation: 3 }}
+        className='border-b border-gray-200'
+      >
+
+        <View className="px-6 py-4">
+          <Text className="text-2xl font-bold text-gray-900">Profile</Text>
+        </View>
+      </LinearGradient>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* User Info Card */}
-        <View>
-          <LinearGradient
-            colors={['#7de7db', '#19dca5']} // teal-500 to teal-600
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="mx-6 mt-6 p-6"
-            style={{ borderRadius: 16, elevation: 3 }}
-          >
+        <View className='m-6 p-6 bg-white'
+          style={{ borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 2 }}
+        >
             <View className="flex-row items-center">
               <View className="bg-black/20 w-16 h-16 rounded-full items-center justify-center mr-4">
                 <Ionicons name="person" size={32} color="white" />
@@ -173,11 +177,12 @@ export default function ProfileScreen() {
                 <Ionicons name="create" size={20} color="white" />
               </TouchableOpacity>
             </View>
-          </LinearGradient>
         </View>
 
         {/* Health Summary */}
-        <View className="mx-6 mt-6 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <View className="mx-6 bg-white p-5"
+          style={{ borderRadius: 16, elevation: 2}}
+        >
           <Text className="text-lg font-semibold text-gray-900 mb-4">Health Summary</Text>
           <View className="flex-row justify-between">
             <View className="items-center flex-1">

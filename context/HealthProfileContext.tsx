@@ -8,7 +8,7 @@ export interface Medication {
 
 export interface HealthProfile {
   allergies: string[];
-  conditions: string[];
+  medicalConditions: string[];
   currentMedications: Medication[];
   dietaryRestrictions: string[];
   additionalNotes: string;
@@ -28,14 +28,14 @@ interface HealthProfileContextType {
 
 const initialHealthProfile: HealthProfile = {
   allergies: [],
-  conditions: [],
+  medicalConditions: [],
   currentMedications: [],
   dietaryRestrictions: [],
   additionalNotes: '',
   step: 1
 };
 
-const HealthProfileContext = createContext<HealthProfileContextType | undefined>(undefined);
+export const HealthProfileContext = createContext<HealthProfileContextType | undefined>(undefined);
 
 export const HealthProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [healthProfile, setHealthProfile] = useState<HealthProfile>(initialHealthProfile);

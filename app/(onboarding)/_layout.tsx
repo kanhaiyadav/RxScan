@@ -3,11 +3,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHealthProfile } from '@/context/HealthProfileContext';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as NavigationBar from 'expo-navigation-bar';
+import { useEffect } from 'react';
 
 export default function OnboardingLayout() {
   
   const router = useRouter();
   const { healthProfile } = useHealthProfile();
+
+  useEffect(() => {
+    // Make navigation bar transparent
+    NavigationBar.setBackgroundColorAsync('transparent');
+
+    // Optionally make navigation bar buttons dark or light depending on your UI
+    NavigationBar.setButtonStyleAsync('dark'); // or 'light'
+  }, []);
   
   return (
     <SafeAreaView

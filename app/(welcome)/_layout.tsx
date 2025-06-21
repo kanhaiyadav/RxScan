@@ -37,7 +37,7 @@ const WelcomeLayout = () => {
   const [index, setIndex] = React.useState(1);
 
   return (
-    <View className='bg-primary-500/5 flex-1 w-screen px-4 relative'>
+    <View className='bg-primary-500/5 flex-1 w-screen px-4 pb-[20px] relative'>
       {/* SVG Background */}
       <BackgroundSVG />
       <SafeAreaView className='flex-1 flex flex-col'>

@@ -1,12 +1,13 @@
 import { Stack } from "expo-router";
 import "@/app\\globals.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { HealthProfileProvider } from "@/context/HealthProfileContext";
 import { StatusBar } from "react-native";
+import { UserHealthProvider } from "@/context/UserHealthContext";
+
 
 export default function RootLayout() {
   return (
-      <HealthProfileProvider>
+      <UserHealthProvider>
         <StatusBar
           barStyle="dark-content"
           backgroundColor="transparent"
@@ -44,6 +45,6 @@ export default function RootLayout() {
             />
           </Stack>
         </GluestackUIProvider>
-      </HealthProfileProvider>
+      </UserHealthProvider>
   );
 }

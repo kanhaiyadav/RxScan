@@ -9,6 +9,7 @@ import {
   Switch
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function RemindersScreen() {
   const [activeTab, setActiveTab] = useState('Today');
@@ -82,24 +83,33 @@ export default function RemindersScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" />
+      <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
       {/* Header */}
-      <View className="bg-white px-6 py-4 border-b border-gray-200">
-        <View className="flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-gray-900">Medicine Reminders</Text>
-          <TouchableOpacity className="bg-primary-100 p-3 rounded-full elevation-sm">
-            <Ionicons name="add" size={24} color="#14B8A6" />
-          </TouchableOpacity>
+      <LinearGradient
+        colors={['#00ffc8', '#80f7ed']} // teal-500 to teal-600
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ elevation: 3 }}
+        className='border-b border-gray-200'
+      >
+
+        <View className="px-6 py-4">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-2xl font-bold text-gray-900">Medicine Reminders</Text>
+            <TouchableOpacity className="bg-primary-100 p-3 rounded-full elevation-sm">
+              <Ionicons name="add" size={24} color="#14B8A6" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </LinearGradient>
 
       {/* Stats Cards */}
       <View className="flex-row mx-6 mt-6 gap-4">
         <View className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
         >
           <View className="flex-row items-center">
-            <View className="bg-green-100 w-10 h-10 rounded-full items-center justify-center">
+            <View className="bg-white w-10 h-10 rounded-full items-center justify-center">
               <Ionicons name="checkmark" size={20} color="#10B981" />
             </View>
             <View className="ml-3">

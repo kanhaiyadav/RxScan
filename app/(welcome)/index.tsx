@@ -1,11 +1,14 @@
 import React from 'react'
-import { View, Image, Text } from 'react-native'
+import { View, Image, Text, StatusBar } from 'react-native'
 import slide1 from "@/assets/images/slide1.png";
 
 const index = () => {
 
   return (
     <View className='flex-1 flex'>
+      <StatusBar
+      hidden
+      />
       <View className='flex-1 items-center justify-center'>
         <View className='w-full mt-[100px]'
           style={{
