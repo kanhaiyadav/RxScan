@@ -1,12 +1,13 @@
-import { Stack } from "expo-router";
 import "@/app\\globals.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { AuthProvider } from "@/context/AuthContext";
+import { Stack } from "expo-router";
 import { StatusBar } from "react-native";
 import { UserHealthProvider } from "@/context/UserHealthContext";
 
-
 export default function RootLayout() {
   return (
+    <AuthProvider>
       <UserHealthProvider>
         <StatusBar
           barStyle="dark-content"
@@ -46,5 +47,6 @@ export default function RootLayout() {
           </Stack>
         </GluestackUIProvider>
       </UserHealthProvider>
+    </AuthProvider>
   );
 }
