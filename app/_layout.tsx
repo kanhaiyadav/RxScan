@@ -1,11 +1,14 @@
-import { Stack } from "expo-router";
-import "@/app\\globals.css";
+// app/_layout.tsx
+import "@/app/globals.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { AuthProvider } from "@/context/AuthContext";
 import { HealthProfileProvider } from "@/context/HealthProfileContext";
+import { Stack } from "expo-router";
 import { StatusBar } from "react-native";
 
 export default function RootLayout() {
   return (
+    <AuthProvider>
       <HealthProfileProvider>
         <StatusBar
           barStyle="dark-content"
@@ -14,6 +17,12 @@ export default function RootLayout() {
         />
         <GluestackUIProvider mode="light">
           <Stack>
+            <Stack.Screen
+              name="index"
+              options={{
+                headerShown: false,
+              }}
+            />
             <Stack.Screen
               name="(welcome)"
               options={{
@@ -45,5 +54,6 @@ export default function RootLayout() {
           </Stack>
         </GluestackUIProvider>
       </HealthProfileProvider>
+    </AuthProvider>
   );
 }
