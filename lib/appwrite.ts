@@ -21,7 +21,7 @@ class AppwriteService {
     this.client = new Client();
     this.client
       .setEndpoint(APPWRITE_ENDPOINT)
-      .setProject(APPWRITE_PROJECT_ID);
+      .setProject(APPWRITE_PROJECT_ID)
 
     this.account = new Account(this.client);
     this.databases = new Databases(this.client);

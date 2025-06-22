@@ -13,7 +13,7 @@ export default function Index() {
       if (user) {
         router.replace("/(dashboard)");
       } else {
-        router.replace("/(auth)");
+        router.replace("/(auth)/signin");
       }
     }
   }, [user, isLoading, router]);

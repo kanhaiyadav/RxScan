@@ -7,6 +7,7 @@ interface User {
   email: string;
   name: string;
   emailVerification: boolean;
+  registration: string;
 }
 
 interface AuthContextType {
