@@ -1,24 +1,15 @@
 import { Stack, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useHealthProfile } from '@/context/HealthProfileContext';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as NavigationBar from 'expo-navigation-bar';
-import { useEffect } from 'react';
+import { useUserHealth } from '@/context/UserHealthContext';
 
 export default function OnboardingLayout() {
-  
+
   const router = useRouter();
-  const { healthProfile } = useHealthProfile();
+  const { state } = useUserHealth();
+  const step = state?.step || 1;
 
-  useEffect(() => {
-    // Make navigation bar transparent
-    NavigationBar.setBackgroundColorAsync('transparent');
-
-    // Optionally make navigation bar buttons dark or light depending on your UI
-    NavigationBar.setButtonStyleAsync('dark'); // or 'light'
-  }, []);
-  
   return (
     <SafeAreaView
       edges={['bottom']} // Only apply safe area to the bottom
@@ -39,25 +30,25 @@ export default function OnboardingLayout() {
         <View className="bg-white rounded-2xl p-4 shadow-sm">
           <View className="flex-row justify-between items-center mb-2">
             <Text className="text-gray-600 text-sm">Step 1 of 4</Text>
-            <Text className="text-emerald-500 text-sm font-medium">{healthProfile.step * 25}%</Text>
+            <Text className="text-emerald-500 text-sm font-medium">{step * 25}%</Text>
           </View>
           <View className="bg-gray-200 rounded-full h-2">
             <View className="bg-emerald-400 rounded-full h-2"
-              style={{ width: `${healthProfile.step * 25}%` }}
+              style={{ width: `${step * 25}%` }}
             />
           </View>
         </View>
       </View>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="index" />
-          <Stack.Screen name="step2" />
-          <Stack.Screen name="step3" />
-          <Stack.Screen name="step4" />
-        </Stack>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="step2" />
+        <Stack.Screen name="step3" />
+        <Stack.Screen name="step4" />
+      </Stack>
     </SafeAreaView>
   );
 }

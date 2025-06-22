@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useHealthProfile } from '@/context/HealthProfileContext';
+import { useUserHealth } from '@/context/UserHealthContext';
 
 const CONDITION_OPTIONS = [
   'Diabetes (Type 1)',
@@ -34,14 +34,14 @@ const CONDITION_OPTIONS = [
 ];
 
 export default function Step2() {
-  const { healthProfile, updateConditions, updateStep } = useHealthProfile();
+  const { healthProfile, updateMedicalConditions, updateStep } = useUserHealth();
   const [searchText, setSearchText] = useState('');
-  const [selectedConditions, setSelectedConditions] = useState<string[]>(healthProfile.conditions);
+  const [selectedConditions, setSelectedConditions] = useState<string[]>(healthProfile?.medicalConditions || []);
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    setSelectedConditions(healthProfile.conditions);
-  }, [healthProfile.conditions]);
+    setSelectedConditions(healthProfile?.medicalConditions || []);
+  }, [healthProfile?.medicalConditions]);
 
   const filteredOptions = CONDITION_OPTIONS.filter(option =>
     option.toLowerCase().includes(searchText.toLowerCase())
@@ -68,7 +68,7 @@ export default function Step2() {
   };
 
   const handleNext = () => {
-    updateConditions(selectedConditions);
+    updateMedicalConditions(selectedConditions);
     updateStep();
     router.push('/step3');
   };

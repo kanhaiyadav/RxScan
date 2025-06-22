@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Modal } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useHealthProfile, Medication } from '@/context/HealthProfileContext';
+import { useUserHealth } from '@/context/UserHealthContext';
 
 const MEDICATION_OPTIONS = [
   'Metformin', 'Atorvastatin', 'Amlodipine', 'Omeprazole', 'Levothyroxine',
@@ -30,8 +30,8 @@ interface MedicationLocal {
 }
 
 export default function Step3() {
-  const { healthProfile, updateMedications, updateStep } = useHealthProfile();
-  const [medications, setMedications] = useState<MedicationLocal[]>(healthProfile.currentMedications);
+  const { healthProfile, updateCurrentMedications, updateStep } = useUserHealth();
+  const [medications, setMedications] = useState<MedicationLocal[]>(healthProfile?.currentMedications || []);
   const [showModal, setShowModal] = useState(false);
   const [currentMed, setCurrentMed] = useState({ name: '', dosage: '', frequency: '' });
   const [searchText, setSearchText] = useState('');
@@ -40,8 +40,8 @@ export default function Step3() {
   const [activeField, setActiveField] = useState<'name' | 'dosage' | 'frequency' | null>(null);
 
   useEffect(() => {
-    setMedications(healthProfile.currentMedications);
-  }, [healthProfile.currentMedications]);
+    setMedications(healthProfile?.currentMedications || []);
+  }, [healthProfile?.currentMedications]);
 
   const filteredMedications = MEDICATION_OPTIONS.filter(med =>
     med.toLowerCase().includes(searchText.toLowerCase())
@@ -89,7 +89,7 @@ export default function Step3() {
   };
 
   const handleNext = () => {
-    updateMedications(medications);
+    updateCurrentMedications(medications);
     updateStep();
     router.push('/step4');
   };

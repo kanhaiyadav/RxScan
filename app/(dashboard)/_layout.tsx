@@ -3,21 +3,8 @@ import React, { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as NavigationBar from 'expo-navigation-bar';
-import { StatusBar } from 'react-native';
 
 export default function TabLayout() {
-
-  useEffect(() => {
-    // Configure navigation bar for Android only
-    if (Platform.OS === 'android') {
-      // Make navigation bar transparent
-      NavigationBar.setBackgroundColorAsync('transparent');
-
-      // Set navigation bar buttons style
-      NavigationBar.setButtonStyleAsync('dark'); // or 'light'
-    }
-  }, []);
 
   return (
     <SafeAreaView

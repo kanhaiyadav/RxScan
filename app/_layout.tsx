@@ -15,7 +15,15 @@ export default function RootLayout() {
         // translucent={true}
         />
         <GluestackUIProvider mode="light">
-          <Stack>
+          <Stack initialRouteName="index">
+            <Stack.Screen
+              name="index"
+              options={{
+                headerShown: false,
+                // Hide this screen from stack navigation
+                presentation: 'transparentModal'
+              }}
+            />
             <Stack.Screen
               name="(welcome)"
               options={{
@@ -34,7 +42,7 @@ export default function RootLayout() {
               name="(dashboard)"
               options={{
                 headerShown: false,
-                animation: "ios_from_right",
+                animation: "fade",
               }}
             />
             <Stack.Screen

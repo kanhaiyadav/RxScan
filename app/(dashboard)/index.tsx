@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as NavigationBar from 'expo-navigation-bar';
 
 export default function HomeScreen() {
   const quickActions = [
@@ -64,6 +65,10 @@ export default function HomeScreen() {
     }
   ];
 
+  useEffect(() => {
+      NavigationBar.setVisibilityAsync("hidden"); // or 'light'
+  }, []);
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
@@ -117,7 +122,7 @@ export default function HomeScreen() {
               <TouchableOpacity
                 key={action.id}
                 className="bg-white rounded-2xl p-4 w-[48%] mb-4 border border-gray-100 elevation-sm"
-                onPress={() => router.push('/(welcome)' as any)}
+                onPress={() => router.push('/(onboarding)' as any)}
               >
                 <View className={`${action.color} w-12 h-12 rounded-xl items-center justify-center mb-3`}>
                   <Ionicons name={action.icon as any} size={24} color="white" />

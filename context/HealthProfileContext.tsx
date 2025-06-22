@@ -8,7 +8,7 @@ export interface Medication {
 
 export interface HealthProfile {
   allergies: string[];
-  medicalConditions: string[];
+  conditions: string[];
   currentMedications: Medication[];
   dietaryRestrictions: string[];
   additionalNotes: string;
@@ -28,7 +28,7 @@ interface HealthProfileContextType {
 
 const initialHealthProfile: HealthProfile = {
   allergies: [],
-  medicalConditions: [],
+  conditions: [],
   currentMedications: [],
   dietaryRestrictions: [],
   additionalNotes: '',

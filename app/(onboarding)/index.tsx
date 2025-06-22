@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useHealthProfile } from '@/context/HealthProfileContext';
+import { useUserHealth } from '@/context/UserHealthContext';
 
 const ALLERGY_OPTIONS = [
   'Penicillin',
@@ -29,14 +29,14 @@ const ALLERGY_OPTIONS = [
 ];
 
 export default function Step1() {
-  const { healthProfile, updateAllergies, updateStep } = useHealthProfile();
+  const { healthProfile, updateAllergies, updateStep } = useUserHealth();
   const [searchText, setSearchText] = useState('');
-  const [selectedAllergies, setSelectedAllergies] = useState<string[]>(healthProfile.allergies);
+  const [selectedAllergies, setSelectedAllergies] = useState<string[]>(healthProfile?.allergies || []);
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    setSelectedAllergies(healthProfile.allergies);
-  }, [healthProfile.allergies]);
+    setSelectedAllergies(healthProfile?.allergies || []);
+  }, [healthProfile?.allergies]);
 
   const filteredOptions = ALLERGY_OPTIONS.filter(option =>
     option.toLowerCase().includes(searchText.toLowerCase())

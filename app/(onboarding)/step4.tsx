@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useHealthProfile } from '@/context/HealthProfileContext';
+import { useUserHealth } from '@/context/UserHealthContext';
 
 const DIETARY_RESTRICTION_OPTIONS = [
   'Alcohol Avoidance',
@@ -29,17 +29,17 @@ const DIETARY_RESTRICTION_OPTIONS = [
 ];
 
 export default function Step4() {
-  const { healthProfile, updateDietaryRestrictions, updateAdditionalNotes } = useHealthProfile();
+  const { healthProfile, updateDietaryRestrictions, updateAdditionalNotes } = useUserHealth();
   const [searchText, setSearchText] = useState('');
-  const [selectedRestrictions, setSelectedRestrictions] = useState<string[]>(healthProfile.dietaryRestrictions);
+  const [selectedRestrictions, setSelectedRestrictions] = useState<string[]>(healthProfile?.dietaryRestrictions || []);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [additionalNotes, setAdditionalNotes] = useState(healthProfile.additionalNotes);
+  const [additionalNotes, setAdditionalNotes] = useState(healthProfile?.additionalNotes);
 
   useEffect(() => {
-    setSelectedRestrictions(healthProfile.dietaryRestrictions);
-    setAdditionalNotes(healthProfile.additionalNotes);
-    
-  }, [healthProfile.dietaryRestrictions, healthProfile.additionalNotes]);
+    setSelectedRestrictions(healthProfile?.dietaryRestrictions || []);
+    setAdditionalNotes(healthProfile?.additionalNotes || '');
+
+  }, [healthProfile?.dietaryRestrictions, healthProfile?.additionalNotes]);
 
   const filteredOptions = DIETARY_RESTRICTION_OPTIONS.filter(option =>
     option.toLowerCase().includes(searchText.toLowerCase())
@@ -68,13 +68,13 @@ export default function Step4() {
   const handleComplete = () => {
     // Update the context with final data
     updateDietaryRestrictions(selectedRestrictions);
-    updateAdditionalNotes(additionalNotes.trim());
+    updateAdditionalNotes(additionalNotes?.trim() || '');
 
     // The complete health profile data
     const completeHealthData = {
       ...healthProfile,
       dietaryRestrictions: selectedRestrictions,
-      additionalNotes: additionalNotes.trim()
+      additionalNotes: additionalNotes?.trim() || ''
     };
 
     console.log('Complete Health Profile Data:', completeHealthData);

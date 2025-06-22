@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export interface UserHealthProfile {
   allergies: string[];
   medicalConditions: string[];
-  currentMedications: string[];
+  currentMedications: MedicationLocal[];
   dietaryRestrictions: string[];
   emergencyContacts?: {
     name: string;
@@ -15,12 +15,14 @@ export interface UserHealthProfile {
   dateOfBirth?: string;
   weight?: number;
   height?: number;
+  additionalNotes?: string;
 }
 
 interface UserHealthState {
   healthProfile: UserHealthProfile | null;
   isLoading: boolean;
   isOnboardingComplete: boolean;
+  step: number; // Track the current step in the onboarding process
 }
 
 type UserHealthAction =
@@ -28,17 +30,20 @@ type UserHealthAction =
   | { type: 'SET_HEALTH_PROFILE'; payload: UserHealthProfile }
   | { type: 'UPDATE_ALLERGIES'; payload: string[] }
   | { type: 'UPDATE_CONDITIONS'; payload: string[] }
-  | { type: 'UPDATE_MEDICATIONS'; payload: string[] }
+  | { type: 'UPDATE_MEDICATIONS'; payload: MedicationLocal[] }
   | { type: 'UPDATE_DIETARY_RESTRICTIONS'; payload: string[] }
   | { type: 'ADD_EMERGENCY_CONTACT'; payload: { name: string; phone: string; relationship: string } }
   | { type: 'REMOVE_EMERGENCY_CONTACT'; payload: number }
+  | { type: 'UPDATE_ADDITIONAL_NOTES'; payload: string }
   | { type: 'SET_ONBOARDING_COMPLETE'; payload: boolean }
-  | { type: 'RESET_PROFILE' };
+  | { type: 'RESET_PROFILE' }
+  | { type: 'UPDATE_STEP'; payload: number };
 
 const initialState: UserHealthState = {
   healthProfile: null,
   isLoading: true,
   isOnboardingComplete: false,
+  step: 1, // Initialize the step to 1
 };
 
 const userHealthReducer = (state: UserHealthState, action: UserHealthAction): UserHealthState => {
@@ -108,17 +113,34 @@ const userHealthReducer = (state: UserHealthState, action: UserHealthAction): Us
           ? { ...state.healthProfile, emergencyContacts: filteredContacts }
           : null,
       };
+    
+    case 'UPDATE_ADDITIONAL_NOTES':
+      return {
+        ...state,
+        healthProfile: state.healthProfile
+          ? { ...state.healthProfile, additionalNotes: action.payload }
+          : null,
+      };
 
     case 'SET_ONBOARDING_COMPLETE':
       return { ...state, isOnboardingComplete: action.payload };
 
     case 'RESET_PROFILE':
       return { ...initialState, isLoading: false };
+    
+    case 'UPDATE_STEP':
+      return { ...state, step: action.payload };
 
     default:
       return state;
   }
 };
+
+interface MedicationLocal {
+  name: string;
+  dosage: string;
+  frequency: string;
+}
 
 interface UserHealthContextType {
   state: UserHealthState;
@@ -128,10 +150,12 @@ interface UserHealthContextType {
   setHealthProfile: (profile: UserHealthProfile) => Promise<void>;
   updateAllergies: (allergies: string[]) => Promise<void>;
   updateMedicalConditions: (conditions: string[]) => Promise<void>;
-  updateCurrentMedications: (medications: string[]) => Promise<void>;
+  updateCurrentMedications: (medications: MedicationLocal[]) => Promise<void>;
   updateDietaryRestrictions: (restrictions: string[]) => Promise<void>;
   addEmergencyContact: (contact: { name: string; phone: string; relationship: string }) => Promise<void>;
   removeEmergencyContact: (index: number) => Promise<void>;
+  updateAdditionalNotes: (notes: string) => Promise<void>;
+  updateStep: (step?: number) => Promise<void>;
   resetProfile: () => Promise<void>;
   loadProfile: () => Promise<void>;
 }
@@ -215,7 +239,7 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
   };
 
   // Update current medications
-  const updateCurrentMedications = async (medications: string[]) => {
+  const updateCurrentMedications = async (medications: MedicationLocal[]) => {
     if (!state.healthProfile) return;
 
     const updatedProfile = { ...state.healthProfile, currentMedications: medications };
@@ -276,6 +300,33 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
     }
   };
 
+  // Update additional notes (if applicable)
+  const updateAdditionalNotes = async (notes: string) => {
+    if (!state.healthProfile) return;
+    const updatedProfile = { ...state.healthProfile, additionalNotes: notes };
+    try {
+      await saveProfile(updatedProfile);
+      dispatch({ type: 'UPDATE_ADDITIONAL_NOTES', payload: notes });
+    } catch (error) {
+      console.error('Error updating additional notes:', error);
+      throw error;
+    }
+  };
+
+  // Update the current step in the onboarding process
+  const updateStep = async (step?: number) => {
+    try {
+      if (step) {
+        dispatch({ type: 'UPDATE_STEP', payload: step });
+      } else {
+        dispatch({ type: 'UPDATE_STEP', payload: state.step + 1 });
+      }
+    } catch (error) {
+      console.error('Error updating step:', error);
+      throw error;
+    }
+  };
+
   // Reset profile (for logout or data clearing)
   const resetProfile = async () => {
     try {
@@ -304,6 +355,8 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
     updateDietaryRestrictions,
     addEmergencyContact,
     removeEmergencyContact,
+    updateAdditionalNotes,
+    updateStep,
     resetProfile,
     loadProfile,
   };
