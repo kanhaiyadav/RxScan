@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useUserHealth } from '@/context/UserHealthContext';
+import { UserHealthProfile, useUserHealth } from '@/context/UserHealthContext';
 
 const ALLERGY_OPTIONS = [
   'Penicillin',
@@ -29,7 +29,7 @@ const ALLERGY_OPTIONS = [
 ];
 
 export default function Step1() {
-  const { healthProfile, updateAllergies, updateStep } = useUserHealth();
+  const { healthProfile, updateAllergies,setHealthProfile, updateStep } = useUserHealth();
   const [searchText, setSearchText] = useState('');
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>(healthProfile?.allergies || []);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -38,8 +38,10 @@ export default function Step1() {
     setSelectedAllergies(healthProfile?.allergies || []);
   }, [healthProfile?.allergies]);
 
+  // Filter options based on search text and exclude already selected allergies
   const filteredOptions = ALLERGY_OPTIONS.filter(option =>
-    option.toLowerCase().includes(searchText.toLowerCase())
+    option.toLowerCase().includes(searchText.toLowerCase()) &&
+    !selectedAllergies.includes(option)
   );
 
   const handleSelectAllergy = (allergy: string) => {
@@ -62,16 +64,30 @@ export default function Step1() {
     }
   };
 
-  const handleNext = () => {
-    updateAllergies(selectedAllergies);
+  const handleNext = async () => {
+    console.log('Selected Allergies:', selectedAllergies);
+    await updateAllergies(selectedAllergies);
+    // Now healthProfile should be available in the next render
+    console.log(healthProfile);
     updateStep();
     router.push('/step2');
   };
 
+  const handleSkipAllergies = () => {
+    setSelectedAllergies([]);
+    updateAllergies([]);
+    updateStep();
+    router.push('/step2');
+  };
+
+  const handleSearchChange = (text: string) => {
+    setSearchText(text);
+    setShowDropdown(text.length > 0 || filteredOptions.length > 0);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* Header with gradient background */}
-      <ScrollView className="flex-1 px-6">
+      <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="handled">
         <View className="mb-6">
           <Text className="text-2xl font-bold text-gray-800 mb-2">Drug Allergies</Text>
           <Text className="text-gray-600">
@@ -80,44 +96,81 @@ export default function Step1() {
         </View>
 
         {/* Search Input */}
-        <View className="relative mb-4">
-          <TextInput
-            value={searchText}
-            onChangeText={setSearchText}
-            onFocus={() => setShowDropdown(true)}
-            placeholder="Search or type allergy..."
-            className="border border-gray-200 rounded-xl px-4 py-4 text-gray-800 bg-gray-50"
-          />
-          <Ionicons
-            name="search"
-            size={20}
-            color="#9CA3AF"
-            className="absolute right-4 top-4"
-          />
+        <View className="relative mb-4" style={{ zIndex: 1000 }}>
+          <View className="relative">
+            <TextInput
+              value={searchText}
+              onChangeText={handleSearchChange}
+              onFocus={() => setShowDropdown(true)}
+              placeholder="Search or type allergy..."
+              className="border border-gray-200 rounded-xl px-4 py-4 pr-12 text-gray-800 bg-gray-50"
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+            <View className="absolute right-4 top-4">
+              <Ionicons
+                name="search"
+                size={20}
+                color="#9CA3AF"
+              />
+            </View>
+          </View>
 
           {/* Dropdown */}
-          {showDropdown && (
-            <View className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-48 z-10">
-              <ScrollView>
+          {showDropdown && (searchText.length > 0 || filteredOptions.length > 0) && (
+            <View
+              className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 shadow-lg"
+              style={{
+                zIndex: 1001,
+                maxHeight: 200,
+                elevation: 1, // For Android shadow
+                shadowColor: '#000', // For iOS shadow
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+              }}
+            >
+              <ScrollView
+                nestedScrollEnabled={true}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}
+              >
                 {filteredOptions.map((option, index) => (
                   <TouchableOpacity
                     key={index}
-                    onPress={() => handleSelectAllergy(option)}
-                    className="px-4 py-3 border-b border-gray-100 last:border-b-0"
+                    onPress={() => {
+                      handleSelectAllergy(option)
+                      setShowDropdown(false);
+                    }}
+                    className="px-4 py-3 border-b border-gray-100"
+                    activeOpacity={0.7}
                   >
                     <Text className="text-gray-800">{option}</Text>
                   </TouchableOpacity>
                 ))}
-                {searchText.trim() && !filteredOptions.some(option =>
-                  option.toLowerCase() === searchText.toLowerCase()
-                ) && (
+
+                {/* Custom allergy option */}
+                {searchText.trim() &&
+                  !filteredOptions.some(option =>
+                    option.toLowerCase() === searchText.toLowerCase()
+                  ) &&
+                  !selectedAllergies.some(allergy =>
+                    allergy.toLowerCase() === searchText.toLowerCase()
+                  ) && (
                     <TouchableOpacity
                       onPress={handleAddCustomAllergy}
-                      className="px-4 py-3 bg-emerald-50"
+                      className="px-4 py-3 bg-emerald-50 border-b border-gray-100"
+                      activeOpacity={0.7}
                     >
                       <Text className="text-emerald-600">+ Add &quot;{searchText}&quot;</Text>
                     </TouchableOpacity>
                   )}
+
+                {filteredOptions.length === 0 && searchText.length > 0 && (
+                  <View className="px-4 py-3">
+                    <Text className="text-gray-500 text-center">No matching allergies found</Text>
+                  </View>
+                )}
               </ScrollView>
             </View>
           )}
@@ -142,7 +195,7 @@ export default function Step1() {
         </View>
 
         {/* Skip option */}
-        <TouchableOpacity className="items-center mb-6">
+        <TouchableOpacity className="items-center mb-6" onPress={handleSkipAllergies}>
           <Text className="text-emerald-500 font-medium">I don&apos;t have any known allergies</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -157,13 +210,15 @@ export default function Step1() {
         </TouchableOpacity>
       </View>
 
-      {/* Overlay to close dropdown */}
-      {showDropdown && (
+      {/* Backdrop to close dropdown */}
+      {/* {showDropdown && (
         <TouchableOpacity
-          onPress={() => setShowDropdown(false)}
-          className="absolute inset-0 bg-transparent z-5"
+          // onPress={() => setShowDropdown(false)}
+          className="absolute inset-0"
+          style={{ zIndex: 999 }}
+          activeOpacity={1}
         />
-      )}
+      )} */}
     </SafeAreaView>
   );
 }

@@ -210,14 +210,30 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
     }
   };
 
+  const ensureProfileExists = (): UserHealthProfile => {
+    if (state.healthProfile) {
+      return state.healthProfile;
+    }
+
+    // Create a default profile if none exists
+    const defaultProfile: UserHealthProfile = {
+      allergies: [],
+      medicalConditions: [],
+      currentMedications: [],
+      dietaryRestrictions: [],
+    };
+
+    return defaultProfile;
+  };
+
   // Update allergies
   const updateAllergies = async (allergies: string[]) => {
-    if (!state.healthProfile) return;
+    const currentProfile = ensureProfileExists();
+    const updatedProfile = { ...currentProfile, allergies };
 
-    const updatedProfile = { ...state.healthProfile, allergies };
     try {
       await saveProfile(updatedProfile);
-      dispatch({ type: 'UPDATE_ALLERGIES', payload: allergies });
+      dispatch({ type: 'SET_HEALTH_PROFILE', payload: updatedProfile });
     } catch (error) {
       console.error('Error updating allergies:', error);
       throw error;
@@ -226,12 +242,12 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
 
   // Update medical conditions
   const updateMedicalConditions = async (conditions: string[]) => {
-    if (!state.healthProfile) return;
+    const currentProfile = ensureProfileExists();
+    const updatedProfile = { ...currentProfile, medicalConditions: conditions };
 
-    const updatedProfile = { ...state.healthProfile, medicalConditions: conditions };
     try {
       await saveProfile(updatedProfile);
-      dispatch({ type: 'UPDATE_CONDITIONS', payload: conditions });
+      dispatch({ type: 'SET_HEALTH_PROFILE', payload: updatedProfile });
     } catch (error) {
       console.error('Error updating medical conditions:', error);
       throw error;
@@ -240,12 +256,12 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
 
   // Update current medications
   const updateCurrentMedications = async (medications: MedicationLocal[]) => {
-    if (!state.healthProfile) return;
+    const currentProfile = ensureProfileExists();
+    const updatedProfile = { ...currentProfile, currentMedications: medications };
 
-    const updatedProfile = { ...state.healthProfile, currentMedications: medications };
     try {
       await saveProfile(updatedProfile);
-      dispatch({ type: 'UPDATE_MEDICATIONS', payload: medications });
+      dispatch({ type: 'SET_HEALTH_PROFILE', payload: updatedProfile });
     } catch (error) {
       console.error('Error updating current medications:', error);
       throw error;
@@ -254,12 +270,12 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
 
   // Update dietary restrictions
   const updateDietaryRestrictions = async (restrictions: string[]) => {
-    if (!state.healthProfile) return;
+    const currentProfile = ensureProfileExists();
+    const updatedProfile = { ...currentProfile, dietaryRestrictions: restrictions };
 
-    const updatedProfile = { ...state.healthProfile, dietaryRestrictions: restrictions };
     try {
       await saveProfile(updatedProfile);
-      dispatch({ type: 'UPDATE_DIETARY_RESTRICTIONS', payload: restrictions });
+      dispatch({ type: 'SET_HEALTH_PROFILE', payload: updatedProfile });
     } catch (error) {
       console.error('Error updating dietary restrictions:', error);
       throw error;
@@ -268,16 +284,15 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
 
   // Add emergency contact
   const addEmergencyContact = async (contact: { name: string; phone: string; relationship: string }) => {
-    if (!state.healthProfile) return;
-
+    const currentProfile = ensureProfileExists();
     const updatedProfile = {
-      ...state.healthProfile,
-      emergencyContacts: [...(state.healthProfile.emergencyContacts || []), contact],
+      ...currentProfile,
+      emergencyContacts: [...(currentProfile.emergencyContacts || []), contact],
     };
 
     try {
       await saveProfile(updatedProfile);
-      dispatch({ type: 'ADD_EMERGENCY_CONTACT', payload: contact });
+      dispatch({ type: 'SET_HEALTH_PROFILE', payload: updatedProfile });
     } catch (error) {
       console.error('Error adding emergency contact:', error);
       throw error;
@@ -286,14 +301,13 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
 
   // Remove emergency contact
   const removeEmergencyContact = async (index: number) => {
-    if (!state.healthProfile) return;
-
-    const updatedContacts = state.healthProfile.emergencyContacts?.filter((_, i) => i !== index) || [];
-    const updatedProfile = { ...state.healthProfile, emergencyContacts: updatedContacts };
+    const currentProfile = ensureProfileExists();
+    const updatedContacts = currentProfile.emergencyContacts?.filter((_, i) => i !== index) || [];
+    const updatedProfile = { ...currentProfile, emergencyContacts: updatedContacts };
 
     try {
       await saveProfile(updatedProfile);
-      dispatch({ type: 'REMOVE_EMERGENCY_CONTACT', payload: index });
+      dispatch({ type: 'SET_HEALTH_PROFILE', payload: updatedProfile });
     } catch (error) {
       console.error('Error removing emergency contact:', error);
       throw error;
@@ -302,11 +316,12 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
 
   // Update additional notes (if applicable)
   const updateAdditionalNotes = async (notes: string) => {
-    if (!state.healthProfile) return;
-    const updatedProfile = { ...state.healthProfile, additionalNotes: notes };
+    const currentProfile = ensureProfileExists();
+    const updatedProfile = { ...currentProfile, additionalNotes: notes };
+
     try {
       await saveProfile(updatedProfile);
-      dispatch({ type: 'UPDATE_ADDITIONAL_NOTES', payload: notes });
+      dispatch({ type: 'SET_HEALTH_PROFILE', payload: updatedProfile });
     } catch (error) {
       console.error('Error updating additional notes:', error);
       throw error;

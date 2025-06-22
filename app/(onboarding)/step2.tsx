@@ -1,9 +1,9 @@
 // app/(onboarding)/step2.tsx
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
-import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useUserHealth } from '@/context/UserHealthContext';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const CONDITION_OPTIONS = [
   'Diabetes (Type 1)',
@@ -75,7 +75,10 @@ export default function Step2() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1 px-6">
+      <ScrollView
+        className="flex-1 px-6"
+        keyboardShouldPersistTaps="always"
+      >
         <View className="mb-6">
           <Text className="text-2xl font-bold text-gray-800 mb-2">Medical Conditions</Text>
           <Text className="text-gray-600">
@@ -87,7 +90,10 @@ export default function Step2() {
         <View className="relative mb-4">
           <TextInput
             value={searchText}
-            onChangeText={setSearchText}
+            onChangeText={(text) => {
+              setSearchText(text);
+              setShowDropdown(true);
+            }}
             onFocus={() => setShowDropdown(true)}
             placeholder="Search or type medical condition..."
             className="border border-gray-200 rounded-xl px-4 py-4 text-gray-800 bg-gray-50"
@@ -100,14 +106,29 @@ export default function Step2() {
           />
 
           {/* Dropdown */}
-          {showDropdown && (
-            <View className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-48 z-10">
-              <ScrollView>
+          {showDropdown && (searchText.length > 0 || filteredOptions.length > 0) && (
+            <View className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-48"
+              style={{
+                zIndex: 1001,
+                maxHeight: 200,
+                elevation: 1, // For Android shadow
+                shadowColor: '#000', // For iOS shadow
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+              }}
+            >
+              <ScrollView
+                nestedScrollEnabled={true}
+                keyboardShouldPersistTaps="always"
+                showsVerticalScrollIndicator={true}
+              >
                 {filteredOptions.map((option, index) => (
                   <TouchableOpacity
                     key={index}
                     onPress={() => handleSelectCondition(option)}
                     className="px-4 py-3 border-b border-gray-100 last:border-b-0"
+                    activeOpacity={0.7}
                   >
                     <Text className="text-gray-800">{option}</Text>
                   </TouchableOpacity>
@@ -118,8 +139,9 @@ export default function Step2() {
                     <TouchableOpacity
                       onPress={handleAddCustomCondition}
                       className="px-4 py-3 bg-emerald-50"
+                      activeOpacity={0.7}
                     >
-                    <Text className="text-emerald-600">+ Add &quot;{searchText}&quot;</Text>
+                      <Text className="text-emerald-600">+ Add &quot;{searchText}&quot;</Text>
                     </TouchableOpacity>
                   )}
               </ScrollView>
@@ -161,13 +183,6 @@ export default function Step2() {
         </TouchableOpacity>
       </View>
 
-      {/* Overlay to close dropdown */}
-      {showDropdown && (
-        <TouchableOpacity
-          onPress={() => setShowDropdown(false)}
-          className="absolute inset-0 bg-transparent z-5"
-        />
-      )}
     </SafeAreaView>
   );
 }

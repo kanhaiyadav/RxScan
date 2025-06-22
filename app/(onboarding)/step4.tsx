@@ -1,9 +1,10 @@
 // app/(onboarding)/step4.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useUserHealth } from '@/context/UserHealthContext';
+import appwriteService from '@/lib/appwrite';
 
 const DIETARY_RESTRICTION_OPTIONS = [
   'Alcohol Avoidance',
@@ -29,20 +30,21 @@ const DIETARY_RESTRICTION_OPTIONS = [
 ];
 
 export default function Step4() {
-  const { healthProfile, updateDietaryRestrictions, updateAdditionalNotes } = useUserHealth();
+  const { healthProfile, updateDietaryRestrictions, updateAdditionalNotes, setHealthProfile } = useUserHealth();
   const [searchText, setSearchText] = useState('');
   const [selectedRestrictions, setSelectedRestrictions] = useState<string[]>(healthProfile?.dietaryRestrictions || []);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [additionalNotes, setAdditionalNotes] = useState(healthProfile?.additionalNotes);
+  const [additionalNotes, setAdditionalNotes] = useState(healthProfile?.additionalNotes || '');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setSelectedRestrictions(healthProfile?.dietaryRestrictions || []);
     setAdditionalNotes(healthProfile?.additionalNotes || '');
-
   }, [healthProfile?.dietaryRestrictions, healthProfile?.additionalNotes]);
 
   const filteredOptions = DIETARY_RESTRICTION_OPTIONS.filter(option =>
-    option.toLowerCase().includes(searchText.toLowerCase())
+    option.toLowerCase().includes(searchText.toLowerCase()) &&
+    !selectedRestrictions.includes(option)
   );
 
   const handleSelectRestriction = (restriction: string) => {
@@ -65,30 +67,104 @@ export default function Step4() {
     }
   };
 
-  const handleComplete = () => {
-    // Update the context with final data
-    updateDietaryRestrictions(selectedRestrictions);
-    updateAdditionalNotes(additionalNotes?.trim() || '');
+  const handleComplete = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Update local state first
+      await updateDietaryRestrictions(selectedRestrictions);
+      await updateAdditionalNotes(additionalNotes?.trim() || '');
 
-    // The complete health profile data
-    const completeHealthData = {
-      ...healthProfile,
-      dietaryRestrictions: selectedRestrictions,
-      additionalNotes: additionalNotes?.trim() || ''
-    };
+      // Create the complete health profile data
+      const completeHealthData = {
+        ...healthProfile,
+        allergies: healthProfile?.allergies || [],
+        medicalConditions: healthProfile?.medicalConditions || [],
+        currentMedications: healthProfile?.currentMedications || [],
+        dietaryRestrictions: selectedRestrictions,
+        additionalNotes: additionalNotes?.trim() || ''
+      };
 
-    console.log('Complete Health Profile Data:', completeHealthData);
+      console.log('Complete Health Profile Data:', completeHealthData);
 
-    // Here you would typically save to AsyncStorage or send to your backend
-    // await AsyncStorage.setItem('healthProfile', JSON.stringify(completeHealthData));
+      // Get current user
+      const currentUser = await appwriteService.getCurrentUser();
+      
+      if (!currentUser) { 
+        Alert.alert(
+          'Authentication Error',
+          'Please log in to save your health profile.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                // Navigate to login screen
+                router.replace('/login');
+              }
+            }
+          ]
+        );
+        return;
+      }
 
-    // Navigate to main app or dashboard
-    router.replace('/(dashboard)');
+      // Save to Appwrite database
+      const savedProfile = await appwriteService.createOrUpdateHealthProfile(
+        currentUser.$id,
+        completeHealthData
+      );
+
+      console.log('Health profile saved to Appwrite:', savedProfile);
+
+      // Update the context with the complete profile
+      await setHealthProfile(completeHealthData);
+
+      // Show success message
+      Alert.alert(
+        'Profile Complete!',
+        'Your health profile has been successfully saved.',
+        [
+          {
+            text: 'Continue',
+            onPress: () => {
+              // Navigate to main app or dashboard
+              router.replace('/dashboard'); // Adjust this route as needed
+            }
+          }
+        ]
+      );
+
+    } catch (error) {
+      console.error('Error saving health profile:', error);
+      
+      // Show error message
+      Alert.alert(
+        'Error',
+        'There was an error saving your health profile. Please try again.',
+        [
+          {
+            text: 'Retry',
+            onPress: handleComplete
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel'
+          }
+        ]
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSkipRestrictions = async () => {
+    setSelectedRestrictions([]);
+    await updateDietaryRestrictions([]);
+    // Don't auto-complete, let user decide
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1 px-6">
+      <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="always">
         <View className="mb-6">
           <Text className="text-2xl font-bold text-gray-800 mb-2">Dietary Restrictions</Text>
           <Text className="text-gray-600">
@@ -97,44 +173,81 @@ export default function Step4() {
         </View>
 
         {/* Search Input */}
-        <View className="relative mb-4">
-          <TextInput
-            value={searchText}
-            onChangeText={setSearchText}
-            onFocus={() => setShowDropdown(true)}
-            placeholder="Search or type dietary restriction..."
-            className="border border-gray-200 rounded-xl px-4 py-4 text-gray-800 bg-gray-50"
-          />
-          <Ionicons
-            name="search"
-            size={20}
-            color="#9CA3AF"
-            className="absolute right-4 top-4"
-          />
+        <View className="relative mb-4" style={{ zIndex: 1000 }}>
+          <View className="relative">
+            <TextInput
+              value={searchText}
+              onChangeText={(text) => {
+                setSearchText(text);
+                setShowDropdown(true);
+              }}
+              onFocus={() => setShowDropdown(true)}
+              placeholder="Search or type dietary restriction..."
+              className="border border-gray-200 rounded-xl px-4 py-4 pr-12 text-gray-800 bg-gray-50"
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+            <View className="absolute right-4 top-4">
+              <Ionicons
+                name="search"
+                size={20}
+                color="#9CA3AF"
+              />
+            </View>
+          </View>
 
           {/* Dropdown */}
-          {showDropdown && (
-            <View className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-48 z-10">
-              <ScrollView>
+          {showDropdown && (searchText.length > 0 || filteredOptions.length > 0) && (
+            <View
+              className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 shadow-lg"
+              style={{
+                zIndex: 1001,
+                maxHeight: 200,
+                elevation: 1,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+              }}
+            >
+              <ScrollView
+                nestedScrollEnabled={true}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}
+              >
                 {filteredOptions.map((option, index) => (
                   <TouchableOpacity
                     key={index}
                     onPress={() => handleSelectRestriction(option)}
-                    className="px-4 py-3 border-b border-gray-100 last:border-b-0"
+                    className="px-4 py-3 border-b border-gray-100"
+                    activeOpacity={0.7}
                   >
                     <Text className="text-gray-800">{option}</Text>
                   </TouchableOpacity>
                 ))}
-                {searchText.trim() && !filteredOptions.some(option =>
-                  option.toLowerCase() === searchText.toLowerCase()
-                ) && (
+
+                {/* Custom restriction option */}
+                {searchText.trim() &&
+                  !filteredOptions.some(option =>
+                    option.toLowerCase() === searchText.toLowerCase()
+                  ) &&
+                  !selectedRestrictions.some(restriction =>
+                    restriction.toLowerCase() === searchText.toLowerCase()
+                  ) && (
                     <TouchableOpacity
                       onPress={handleAddCustomRestriction}
-                      className="px-4 py-3 bg-emerald-50"
+                      className="px-4 py-3 bg-orange-50 border-b border-gray-100"
+                      activeOpacity={0.7}
                     >
-                    <Text className="text-emerald-600">+ Add &quot;{searchText}&quot;</Text>
+                      <Text className="text-orange-600">+ Add &quot;{searchText}&quot;</Text>
                     </TouchableOpacity>
                   )}
+
+                {filteredOptions.length === 0 && searchText.length > 0 && (
+                  <View className="px-4 py-3">
+                    <Text className="text-gray-500 text-center">No matching restrictions found</Text>
+                  </View>
+                )}
               </ScrollView>
             </View>
           )}
@@ -176,8 +289,8 @@ export default function Step4() {
         </View>
 
         {/* Skip option */}
-        <TouchableOpacity className="items-center mb-6">
-          <Text className="text-emerald-500 font-medium">I don&apos;t have any dietary restrictions</Text>
+        <TouchableOpacity className="items-center mb-6" onPress={handleSkipRestrictions}>
+          <Text className="text-orange-500 font-medium">I don&apos;t have any dietary restrictions</Text>
         </TouchableOpacity>
 
         {/* Completion Message */}
@@ -196,19 +309,19 @@ export default function Step4() {
       <View className="px-6 pb-6">
         <TouchableOpacity
           onPress={handleComplete}
-          className="bg-emerald-400 rounded-xl py-4 items-center"
+          disabled={isLoading}
+          className={`rounded-xl py-4 items-center ${isLoading ? 'bg-gray-400' : 'bg-emerald-400'}`}
         >
-          <Text className="text-white font-semibold text-lg">Complete Profile</Text>
+          {isLoading ? (
+            <View className="flex-row items-center">
+              <ActivityIndicator size="small" color="white" />
+              <Text className="text-white font-semibold text-lg ml-2">Saving...</Text>
+            </View>
+          ) : (
+            <Text className="text-white font-semibold text-lg">Complete Profile</Text>
+          )}
         </TouchableOpacity>
       </View>
-
-      {/* Overlay to close dropdown */}
-      {showDropdown && (
-        <TouchableOpacity
-          onPress={() => setShowDropdown(false)}
-          className="absolute inset-0 bg-transparent z-5"
-        />
-      )}
     </SafeAreaView>
   );
 }

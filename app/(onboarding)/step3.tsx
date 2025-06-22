@@ -96,7 +96,7 @@ export default function Step3() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1 px-6">
+      <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="always">
         <View className="mb-6">
           <Text className="text-2xl font-bold text-gray-800 mb-2">Current Medications</Text>
           <Text className="text-gray-600">
@@ -162,7 +162,7 @@ export default function Step3() {
               </TouchableOpacity>
             </View>
 
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="always">
               {/* Medication Name */}
               <View className="mb-4">
                 <Text className="text-gray-700 font-medium mb-2">Medication Name *</Text>
@@ -178,7 +178,10 @@ export default function Step3() {
                     className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                   />
                   {activeField === 'name' && (
-                    <ScrollView className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10">
+                    <ScrollView
+                      className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10"
+                      keyboardShouldPersistTaps="handled"
+                    >
                       {filteredMedications.map((med, index) => (
                         <TouchableOpacity
                           key={index}
@@ -208,7 +211,10 @@ export default function Step3() {
                     className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                   />
                   {activeField === 'dosage' && (
-                    <ScrollView className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10">
+                    <ScrollView
+                      className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10"
+                      keyboardShouldPersistTaps="handled"
+                    >
                       {filteredDosages.map((dosage, index) => (
                         <TouchableOpacity
                           key={index}
@@ -238,7 +244,10 @@ export default function Step3() {
                     className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                   />
                   {activeField === 'frequency' && (
-                    <ScrollView className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10">
+                    <ScrollView
+                      className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10"
+                      keyboardShouldPersistTaps="handled"
+                    >
                       {filteredFrequencies.map((freq, index) => (
                         <TouchableOpacity
                           key={index}
