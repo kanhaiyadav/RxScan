@@ -43,8 +43,10 @@ export default function Step2() {
     setSelectedConditions(healthProfile?.medicalConditions || []);
   }, [healthProfile?.medicalConditions]);
 
+  // 🔥 ENHANCEMENT: Added filter to exclude already selected conditions
   const filteredOptions = CONDITION_OPTIONS.filter(option =>
-    option.toLowerCase().includes(searchText.toLowerCase())
+    option.toLowerCase().includes(searchText.toLowerCase()) &&
+    !selectedConditions.includes(option)
   );
 
   const handleSelectCondition = (condition: string) => {
@@ -73,116 +75,226 @@ export default function Step2() {
     router.push('/step3');
   };
 
+  // 🔥 ENHANCEMENT: Added dedicated skip handler for consistency
+  const handleSkipConditions = () => {
+    setSelectedConditions([]);
+    updateMedicalConditions([]);
+    updateStep();
+    router.push('/step3');
+  };
+
+  // 🔥 ENHANCEMENT: Improved search change handler
+  const handleSearchChange = (text: string) => {
+    setSearchText(text);
+    setShowDropdown(text.length > 0 || filteredOptions.length > 0);
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    // 🔥 CHANGE: Background color from bg-white to bg-gray-50 for better visual hierarchy
+    <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView
         className="flex-1 px-6"
-        keyboardShouldPersistTaps="always"
+        keyboardShouldPersistTaps="handled" // 🔥 CHANGE: Improved from "always" to "handled"
       >
-        <View className="mb-6">
-          <Text className="text-2xl font-bold text-gray-800 mb-2">Medical Conditions</Text>
-          <Text className="text-gray-600">
-            Help us understand your current health conditions for better medication safety.
-          </Text>
+        {/* 🔥 ENHANCEMENT: Complete header redesign with medical icon and info banner */}
+        <View className="mb-8 pt-4">
+          <View className="flex-row items-center mb-4">
+            <View className="bg-blue-100 rounded-full p-3 mr-4">
+              <Ionicons name="medical" size={24} color="#2563EB" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-2xl font-bold text-gray-900 mb-1">Medical Conditions</Text>
+              <Text className="text-gray-600 text-base leading-relaxed">
+                Share your health conditions for safer medication recommendations
+              </Text>
+            </View>
+          </View>
+          
+          {/* 🔥 ENHANCEMENT: Added informational banner */}
+          <View className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex-row items-start">
+            <Ionicons name="information-circle" size={20} color="#F59E0B" className="mr-3 mt-0.5" />
+            <Text className="text-amber-700 text-sm flex-1 leading-relaxed">
+              Your medical history helps us identify potential drug interactions and contraindications
+            </Text>
+          </View>
         </View>
 
-        {/* Search Input */}
-        <View className="relative mb-4">
-          <TextInput
-            value={searchText}
-            onChangeText={(text) => {
-              setSearchText(text);
-              setShowDropdown(true);
-            }}
-            onFocus={() => setShowDropdown(true)}
-            placeholder="Search or type medical condition..."
-            className="border border-gray-200 rounded-xl px-4 py-4 text-gray-800 bg-gray-50"
-          />
-          <Ionicons
-            name="search"
-            size={20}
-            color="#9CA3AF"
-            className="absolute right-4 top-4"
-          />
+        {/* 🔥 ENHANCEMENT: Enhanced search input with modern styling */}
+        <View className="relative mb-6" style={{ zIndex: 1000 }}>
+          <Text className="text-gray-700 font-medium mb-3">Search for medical conditions</Text>
+          <View className="relative">
+            <TextInput
+              value={searchText}
+              onChangeText={handleSearchChange} // 🔥 CHANGE: Using improved handler
+              onFocus={() => setShowDropdown(true)}
+              placeholder="Type to search conditions like diabetes, asthma, etc..."
+              className="border-2 border-gray-200 rounded-2xl px-4 py-4 pr-12 text-gray-800 bg-white text-base"
+              style={{
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.05,
+                shadowRadius: 8,
+                elevation: 2,
+              }}
+              autoCorrect={false}
+              autoCapitalize="words"
+            />
+            <View className="absolute right-4 top-4">
+              <Ionicons
+                name="search"
+                size={20}
+                color="#6B7280"
+              />
+            </View>
+          </View>
 
-          {/* Dropdown */}
+          {/* 🔥 ENHANCEMENT: Enhanced dropdown with better styling and icons */}
           {showDropdown && (searchText.length > 0 || filteredOptions.length > 0) && (
-            <View className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-48"
+            <View
+              className="absolute top-full left-0 right-0 bg-white border-2 border-gray-200 rounded-2xl mt-2"
               style={{
                 zIndex: 1001,
                 maxHeight: 200,
-                elevation: 1, // For Android shadow
-                shadowColor: '#000', // For iOS shadow
-                shadowOffset: { width: 0, height: 2 },
+                elevation: 8,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.1,
-                shadowRadius: 4,
+                shadowRadius: 12,
               }}
             >
               <ScrollView
                 nestedScrollEnabled={true}
-                keyboardShouldPersistTaps="always"
+                keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={true}
               >
                 {filteredOptions.map((option, index) => (
                   <TouchableOpacity
                     key={index}
                     onPress={() => handleSelectCondition(option)}
-                    className="px-4 py-3 border-b border-gray-100 last:border-b-0"
+                    className="px-4 py-4 border-b border-gray-100 flex-row items-center"
                     activeOpacity={0.7}
                   >
-                    <Text className="text-gray-800">{option}</Text>
+                    {/* 🔥 ENHANCEMENT: Added medical icon for each condition */}
+                    <Ionicons name="add-circle-outline" size={18} color="#2563EB" className="mr-3" />
+                    <Text className="text-gray-800 text-base">{option}</Text>
                   </TouchableOpacity>
                 ))}
+
+                {/* 🔥 ENHANCEMENT: Enhanced custom condition option */}
                 {searchText.trim() && !filteredOptions.some(option =>
                   option.toLowerCase() === searchText.toLowerCase()
+                ) && !selectedConditions.some(condition =>
+                  condition.toLowerCase() === searchText.toLowerCase()
                 ) && (
                     <TouchableOpacity
                       onPress={handleAddCustomCondition}
-                      className="px-4 py-3 bg-emerald-50"
+                      className="px-4 py-4 bg-blue-50 border-b border-blue-100 flex-row items-center"
                       activeOpacity={0.7}
                     >
-                      <Text className="text-emerald-600">+ Add &quot;{searchText}&quot;</Text>
+                      <Ionicons name="add-circle" size={18} color="#2563EB" className="mr-3" />
+                      <Text className="text-blue-700 font-medium text-base">Add &quot;{searchText}&quot;</Text>
                     </TouchableOpacity>
                   )}
+
+                {/* 🔥 ENHANCEMENT: Better empty state */}
+                {filteredOptions.length === 0 && searchText.length > 0 && (
+                  <View className="px-4 py-6 items-center">
+                    <Ionicons name="search" size={24} color="#9CA3AF" className="mb-2" />
+                    <Text className="text-gray-500 text-center text-base">No matching conditions found</Text>
+                  </View>
+                )}
               </ScrollView>
             </View>
           )}
         </View>
 
-        {/* Selected Conditions */}
-        <View className="mb-6">
-          <Text className="text-lg font-semibold text-gray-800 mb-3">Selected Conditions</Text>
-          <View className="flex-row flex-wrap">
-            {selectedConditions.map((condition, index) => (
-              <View key={index} className="bg-blue-100 rounded-full px-4 py-2 mr-2 mb-2 flex-row items-center">
-                <Text className="text-blue-700 mr-2">{condition}</Text>
-                <TouchableOpacity onPress={() => handleRemoveCondition(condition)}>
-                  <Ionicons name="close" size={16} color="#1D4ED8" />
-                </TouchableOpacity>
+        {/* 🔥 ENHANCEMENT: Completely redesigned selected conditions section */}
+        <View className="mb-8">
+          <View className="flex-row items-center justify-between mb-4">
+            <Text className="text-lg font-semibold text-gray-900">Your Medical Conditions</Text>
+            {selectedConditions.length > 0 && (
+              <View className="bg-blue-100 rounded-full px-3 py-1">
+                <Text className="text-blue-700 text-sm font-medium">
+                  {selectedConditions.length} selected
+                </Text>
               </View>
-            ))}
-            {selectedConditions.length === 0 && (
-              <Text className="text-gray-500 italic">No conditions selected</Text>
             )}
           </View>
+          
+          {selectedConditions.length > 0 ? (
+            <View className="bg-white rounded-2xl p-4 border border-gray-200"
+              style={{
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.05,
+                shadowRadius: 8,
+                elevation: 2,
+              }}
+            >
+              <View className="flex-row flex-wrap">
+                {selectedConditions.map((condition, index) => (
+                  // 🔥 CHANGE: Enhanced styling for condition tags with medical icons
+                  <View key={index} className="bg-blue-50 border border-blue-200 rounded-full px-4 py-3 mr-2 mb-2 flex-row items-center">
+                    <Ionicons name="medical-outline" size={14} color="#2563EB" className="mr-2" />
+                    <Text className="text-blue-700 font-medium text-sm mr-2">{condition}</Text>
+                    <TouchableOpacity onPress={() => handleRemoveCondition(condition)}>
+                      <Ionicons name="close-circle" size={18} color="#2563EB" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : (
+            // 🔥 ENHANCEMENT: Better empty state with icons and description
+            <View className="bg-white rounded-2xl p-6 border border-gray-200 items-center"
+              style={{
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.05,
+                shadowRadius: 8,
+                elevation: 2,
+              }}
+            >
+              <Ionicons name="medical-outline" size={32} color="#9CA3AF" className="mb-2" />
+              <Text className="text-gray-500 text-center text-base">No medical conditions added yet</Text>
+              <Text className="text-gray-400 text-center text-sm mt-1">
+                Search above to add your current health conditions
+              </Text>
+            </View>
+          )}
         </View>
 
-        {/* Skip option */}
-        <TouchableOpacity className="items-center mb-6">
-          <Text className="text-emerald-500 font-medium">I don&apos;t have any medical conditions</Text>
+        {/* 🔥 ENHANCEMENT: Enhanced skip option with button styling */}
+        <TouchableOpacity 
+          className="items-center mb-6 bg-gray-100 rounded-xl py-4 px-6" 
+          onPress={handleSkipConditions}
+          activeOpacity={0.7}
+        >
+          <View className="flex-row items-center">
+            <Ionicons name="checkmark-circle-outline" size={20} color="#059669" className="mr-2" />
+            <Text className="text-emerald-600 font-medium text-base">I don&#39;t have any medical conditions</Text>
+          </View>
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Bottom Button */}
-      <View className="px-6 pb-6">
+      {/* 🔥 ENHANCEMENT: Enhanced bottom button with shadow and icon */}
+      <View className="px-6 pb-6 pt-4 bg-white border-t border-gray-100">
         <TouchableOpacity
           onPress={handleNext}
-          className="bg-emerald-400 rounded-xl py-4 items-center"
+          className="bg-emerald-500 rounded-2xl py-4 px-6 items-center flex-row justify-center"
+          style={{
+            shadowColor: '#059669',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 8,
+            elevation: 4,
+          }}
+          activeOpacity={0.9}
         >
-          <Text className="text-white font-semibold text-lg">Continue</Text>
+          <Text className="text-white font-semibold text-lg mr-2">Continue</Text>
+          <Ionicons name="arrow-forward" size={20} color="white" />
         </TouchableOpacity>
       </View>
-
     </SafeAreaView>
   );
 }
