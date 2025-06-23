@@ -1,6 +1,6 @@
 // app/(onboarding)/step2.tsx
 import { useUserHealth } from '@/context/UserHealthContext';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -75,7 +75,6 @@ export default function Step2() {
     router.push('/step3');
   };
 
-  // 🔥 ENHANCEMENT: Added dedicated skip handler for consistency
   const handleSkipConditions = () => {
     setSelectedConditions([]);
     updateMedicalConditions([]);
@@ -83,24 +82,21 @@ export default function Step2() {
     router.push('/step3');
   };
 
-  // 🔥 ENHANCEMENT: Improved search change handler
   const handleSearchChange = (text: string) => {
     setSearchText(text);
     setShowDropdown(text.length > 0 || filteredOptions.length > 0);
   };
 
   return (
-    // 🔥 CHANGE: Background color from bg-white to bg-gray-50 for better visual hierarchy
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView
         className="flex-1 px-6"
-        keyboardShouldPersistTaps="handled" // 🔥 CHANGE: Improved from "always" to "handled"
+        keyboardShouldPersistTaps="handled" 
       >
-        {/* 🔥 ENHANCEMENT: Complete header redesign with medical icon and info banner */}
         <View className="mb-8 pt-4">
           <View className="flex-row items-center mb-4">
-            <View className="bg-blue-100 rounded-full p-3 mr-4">
-              <Ionicons name="medical" size={24} color="#2563EB" />
+            <View className="bg-primary-100 rounded-full p-3 mr-4">
+              <FontAwesome5 name="heartbeat" size={24} color="#10B981" />
             </View>
             <View className="flex-1">
               <Text className="text-2xl font-bold text-gray-900 mb-1">Medical Conditions</Text>
@@ -109,23 +105,14 @@ export default function Step2() {
               </Text>
             </View>
           </View>
-          
-          {/* 🔥 ENHANCEMENT: Added informational banner */}
-          <View className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex-row items-start">
-            <Ionicons name="information-circle" size={20} color="#F59E0B" className="mr-3 mt-0.5" />
-            <Text className="text-amber-700 text-sm flex-1 leading-relaxed">
-              Your medical history helps us identify potential drug interactions and contraindications
-            </Text>
-          </View>
         </View>
 
-        {/* 🔥 ENHANCEMENT: Enhanced search input with modern styling */}
         <View className="relative mb-6" style={{ zIndex: 1000 }}>
           <Text className="text-gray-700 font-medium mb-3">Search for medical conditions</Text>
           <View className="relative">
             <TextInput
               value={searchText}
-              onChangeText={handleSearchChange} // 🔥 CHANGE: Using improved handler
+              onChangeText={handleSearchChange}
               onFocus={() => setShowDropdown(true)}
               placeholder="Type to search conditions like diabetes, asthma, etc..."
               className="border-2 border-gray-200 rounded-2xl px-4 py-4 pr-12 text-gray-800 bg-white text-base"
@@ -148,7 +135,6 @@ export default function Step2() {
             </View>
           </View>
 
-          {/* 🔥 ENHANCEMENT: Enhanced dropdown with better styling and icons */}
           {showDropdown && (searchText.length > 0 || filteredOptions.length > 0) && (
             <View
               className="absolute top-full left-0 right-0 bg-white border-2 border-gray-200 rounded-2xl mt-2"
@@ -174,13 +160,11 @@ export default function Step2() {
                     className="px-4 py-4 border-b border-gray-100 flex-row items-center"
                     activeOpacity={0.7}
                   >
-                    {/* 🔥 ENHANCEMENT: Added medical icon for each condition */}
                     <Ionicons name="add-circle-outline" size={18} color="#2563EB" className="mr-3" />
                     <Text className="text-gray-800 text-base">{option}</Text>
                   </TouchableOpacity>
                 ))}
 
-                {/* 🔥 ENHANCEMENT: Enhanced custom condition option */}
                 {searchText.trim() && !filteredOptions.some(option =>
                   option.toLowerCase() === searchText.toLowerCase()
                 ) && !selectedConditions.some(condition =>
@@ -196,7 +180,6 @@ export default function Step2() {
                     </TouchableOpacity>
                   )}
 
-                {/* 🔥 ENHANCEMENT: Better empty state */}
                 {filteredOptions.length === 0 && searchText.length > 0 && (
                   <View className="px-4 py-6 items-center">
                     <Ionicons name="search" size={24} color="#9CA3AF" className="mb-2" />
@@ -208,7 +191,6 @@ export default function Step2() {
           )}
         </View>
 
-        {/* 🔥 ENHANCEMENT: Completely redesigned selected conditions section */}
         <View className="mb-8">
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-lg font-semibold text-gray-900">Your Medical Conditions</Text>
@@ -233,7 +215,6 @@ export default function Step2() {
             >
               <View className="flex-row flex-wrap">
                 {selectedConditions.map((condition, index) => (
-                  // 🔥 CHANGE: Enhanced styling for condition tags with medical icons
                   <View key={index} className="bg-blue-50 border border-blue-200 rounded-full px-4 py-3 mr-2 mb-2 flex-row items-center">
                     <Ionicons name="medical-outline" size={14} color="#2563EB" className="mr-2" />
                     <Text className="text-blue-700 font-medium text-sm mr-2">{condition}</Text>
@@ -245,7 +226,6 @@ export default function Step2() {
               </View>
             </View>
           ) : (
-            // 🔥 ENHANCEMENT: Better empty state with icons and description
             <View className="bg-white rounded-2xl p-6 border border-gray-200 items-center"
               style={{
                 shadowColor: '#000',
@@ -264,7 +244,6 @@ export default function Step2() {
           )}
         </View>
 
-        {/* 🔥 ENHANCEMENT: Enhanced skip option with button styling */}
         <TouchableOpacity 
           className="items-center mb-6 bg-gray-100 rounded-xl py-4 px-6" 
           onPress={handleSkipConditions}
@@ -275,9 +254,14 @@ export default function Step2() {
             <Text className="text-emerald-600 font-medium text-base">I don&#39;t have any medical conditions</Text>
           </View>
         </TouchableOpacity>
+        <View className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex-row items-start mb-[150px]">
+          <Ionicons name="information-circle" size={20} color="#F59E0B" className="mr-3 mt-0.5" />
+          <Text className="text-amber-700 text-sm flex-1 leading-relaxed">
+            Your medical history helps us identify potential drug interactions and contraindications
+          </Text>
+        </View>
       </ScrollView>
 
-      {/* 🔥 ENHANCEMENT: Enhanced bottom button with shadow and icon */}
       <View className="px-6 pb-6 pt-4 bg-white border-t border-gray-100">
         <TouchableOpacity
           onPress={handleNext}

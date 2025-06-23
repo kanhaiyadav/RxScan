@@ -1,9 +1,9 @@
 // app/(onboarding)/step1.tsx
 import { useUserHealth } from '@/context/UserHealthContext';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const ALLERGY_OPTIONS = [
   'Penicillin',
@@ -87,8 +87,9 @@ export default function Step1() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="handled">
-        {/* 🔥 ENHANCED: Header Section with Medical Icons */}
+      <StatusBar backgroundColor="transparent" />
+      <ScrollView className="flex-1 px-6 pb-[100px]" keyboardShouldPersistTaps="handled">
+
         <View className="mb-8 pt-4">
           <View className="flex-row items-center mb-4">
             <View className="bg-emerald-100 rounded-full p-3 mr-4">
@@ -101,17 +102,8 @@ export default function Step1() {
               </Text>
             </View>
           </View>
-          
-          {/* 🔥 ENHANCED: Info Banner */}
-          <View className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex-row items-start">
-            <Ionicons name="information-circle" size={20} color="#3B82F6" className="mr-3 mt-0.5" />
-            <Text className="text-blue-700 text-sm flex-1 leading-relaxed">
-              This information helps healthcare providers make safer medication decisions for you
-            </Text>
-          </View>
         </View>
 
-        {/* 🔥 ENHANCED: Search Input with Modern Design */}
         <View className="relative mb-6" style={{ zIndex: 1000 }}>
           <Text className="text-gray-700 font-medium mb-3">Search for allergies</Text>
           <View className="relative">
@@ -203,7 +195,6 @@ export default function Step1() {
           )}
         </View>
 
-        {/* 🔥 ENHANCED: Selected Allergies Section */}
         <View className="mb-8">
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-lg font-semibold text-gray-900">Your Allergies</Text>
@@ -257,7 +248,6 @@ export default function Step1() {
           )}
         </View>
 
-        {/* 🔥 ENHANCED: Skip Option with Better Design */}
         <TouchableOpacity 
           className="items-center mb-6 bg-gray-100 rounded-xl py-4 px-6" 
           onPress={handleSkipAllergies}
@@ -268,9 +258,34 @@ export default function Step1() {
             <Text className="text-emerald-600 font-medium text-base">I don&#39;t have any known allergies</Text>
           </View>
         </TouchableOpacity>
-      </ScrollView>
 
-      {/* 🔥 ENHANCED: Bottom Button with Better Styling */}
+        {/* Health Tip Card */}
+        <View className="mb-2">
+          <View className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+            <View className="flex-row items-center">
+              <View className="bg-blue-100 rounded-full p-2 mr-3">
+                <Ionicons name="bulb" size={16} color="#3B82F6" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-blue-900 font-semibold text-sm">Quick Tip</Text>
+                <Text className="text-blue-800 text-xs mt-0.5 leading-relaxed">
+                  Accurate health information helps us provide better medication safety alerts.
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex-row items-start mb-[50px]">
+          <Ionicons name="information-circle" size={20} color="#3B82F6" className="mr-3 mt-0.5" />
+          <Text className="text-blue-700 text-sm flex-1 leading-relaxed">
+            This information helps healthcare providers make safer medication decisions for you
+          </Text>
+        </View>
+        
+      </ScrollView>
+      
+
       <View className="px-6 pb-6 pt-4 bg-white border-t border-gray-100">
         <TouchableOpacity
           onPress={handleNext}

@@ -1,9 +1,11 @@
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { TouchableOpacity, View, Text, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useUserHealth } from '@/context/UserHealthContext';
 import { useEffect, useState } from 'react';
+import { images } from '@/constants/images';
+import { icons } from '@/constants/icons';
 
 export default function OnboardingLayout() {
   const router = useRouter();
@@ -63,7 +65,7 @@ export default function OnboardingLayout() {
       {/* Enhanced Header with Gradient-like Effect */}
       <View className="relative">
         {/* Main Header */}
-        <View className="bg-emerald-500 h-36 rounded-b-[32px] relative overflow-hidden">
+        <View className="bg-[#12c388] h-36 rounded-b-[32px] relative overflow-hidden">
           {/* Background Pattern/Overlay */}
           <View className="absolute inset-0 bg-emerald-400 opacity-20" />
           
@@ -85,12 +87,7 @@ export default function OnboardingLayout() {
             </TouchableOpacity>
             
             <View className="flex-1 items-center">
-              <View className="flex-row items-center">
-                <View className="bg-white/20 rounded-full p-1.5 mr-2">
-                  <Ionicons name="medical" size={20} color="white" />
-                </View>
                 <Text className="text-white text-xl font-bold">RxScan</Text>
-              </View>
               <Text className="text-white/90 text-sm font-medium mt-1">Health Profile Setup</Text>
             </View>
             
@@ -113,7 +110,7 @@ export default function OnboardingLayout() {
             {/* Step Info Header */}
             <View className="flex-row items-center justify-between mb-4">
               <View className="flex-row items-center">
-                <View className="bg-emerald-100 rounded-full p-2 mr-3">
+                <View className="bg-emerald-100 rounded-full h-8 w-8 mr-3 flex items-center justify-center">
                   <Text className="text-emerald-700 font-bold text-sm">{currentStep}</Text>
                 </View>
                 <View>
@@ -183,23 +180,6 @@ export default function OnboardingLayout() {
                   {label}
                 </Text>
               ))}
-            </View>
-          </View>
-        </View>
-
-        {/* Health Tip Card */}
-        <View className="px-6 mb-2">
-          <View className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
-            <View className="flex-row items-center">
-              <View className="bg-blue-100 rounded-full p-2 mr-3">
-                <Ionicons name="bulb" size={16} color="#3B82F6" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-blue-900 font-semibold text-sm">Quick Tip</Text>
-                <Text className="text-blue-800 text-xs mt-0.5 leading-relaxed">
-                  Accurate health information helps us provide better medication safety alerts.
-                </Text>
-              </View>
             </View>
           </View>
         </View>

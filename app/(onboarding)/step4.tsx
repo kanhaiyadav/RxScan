@@ -175,14 +175,9 @@ export default function Step4() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       {/* Header with Progress Indicator */}
-      <View className="px-6 pt-4 pb-2">
-        <View className="flex-row items-center mb-4">
-          <View className="flex-1 bg-gray-200 rounded-full h-2 mr-3">
-            <View className="bg-emerald-500 h-2 rounded-full" style={{ width: '100%' }} />
-          </View>
-          <Text className="text-sm font-medium text-gray-600">Step 4 of 4</Text>
-        </View>
-        
+
+      <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="always" showsVerticalScrollIndicator={false}>
+      <View className="pt-4 pb-2">
         <View className="flex-row items-center mb-2">
           <View className="bg-emerald-100 p-2 rounded-full mr-3">
             <Ionicons name="restaurant-outline" size={24} color="#10B981" />
@@ -195,22 +190,6 @@ export default function Step4() {
           </View>
         </View>
       </View>
-
-      <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="always" showsVerticalScrollIndicator={false}>
-        {/* Important Note Card */}
-        <View className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
-          <View className="flex-row items-start">
-            <View className="bg-blue-100 p-2 rounded-full mr-3 mt-0.5">
-              <Ionicons name="information-circle" size={20} color="#3B82F6" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-blue-900 font-semibold mb-1">Why This Matters</Text>
-              <Text className="text-blue-800 text-sm leading-relaxed">
-                Certain foods can affect how medications work or cause dangerous interactions. This helps us keep you safe.
-              </Text>
-            </View>
-          </View>
-        </View>
 
         {/* Search Input with Enhanced Styling */}
         <View className="relative mb-6" style={{ zIndex: 1000 }}>
@@ -337,6 +316,21 @@ export default function Step4() {
                   <Text className="text-gray-400 text-sm text-center mt-1">Tap above to search and add restrictions</Text>
                 </View>
               )}
+            </View>
+          </View>
+        </View>
+
+        {/* Enhanced Information Card */}
+        <View className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
+          <View className="flex-row items-start">
+            <View className="bg-blue-100 p-2 rounded-full mr-3 mt-0.5">
+              <Ionicons name="information-circle" size={20} color="#3B82F6" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-blue-900 font-semibold mb-1">Why This Matters</Text>
+              <Text className="text-blue-800 text-sm leading-relaxed">
+                Certain foods can affect how medications work or cause dangerous interactions. This helps us keep you safe.
+              </Text>
             </View>
           </View>
         </View>
