@@ -1,4 +1,4 @@
-import "@/app\\globals.css";
+import "@/app/globals.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { AuthProvider } from "@/context/AuthContext";
 import { UserHealthProvider } from "@/context/UserHealthContext";
