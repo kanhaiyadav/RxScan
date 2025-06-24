@@ -3,7 +3,7 @@ import { useUserHealth } from '@/context/UserHealthContext';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const CONDITION_OPTIONS = [
   'Diabetes (Type 1)',
@@ -89,6 +89,7 @@ export default function Step2() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
+      <StatusBar backgroundColor="transparent" />
       <ScrollView
         className="flex-1 px-6"
         keyboardShouldPersistTaps="handled" 

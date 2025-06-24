@@ -70,8 +70,8 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
+    <SafeAreaView className="flex-1 bg-transparent">
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" />
 
       {/* Header */}
       <LinearGradient
@@ -79,7 +79,7 @@ export default function HomeScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={{ elevation: 3 }}
-        className='border-b border-gray-200'
+        className='border-b border-gray-300'
       >
         <View className="bg-transparent px-6 py-4 ">
           <View className="flex-row items-center justify-between">
@@ -94,7 +94,7 @@ export default function HomeScreen() {
         </View>
       </LinearGradient>
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 bg-gray-50" showsVerticalScrollIndicator={false}>
         {/* Health Stats Card */}
         <View className='p-6'>
           <Text className="text-black text-lg font-semibold mb-4">Your Health Summary</Text>

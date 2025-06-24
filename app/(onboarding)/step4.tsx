@@ -4,7 +4,7 @@ import appwriteService from '@/lib/appwrite';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const DIETARY_RESTRICTION_OPTIONS = [
   'Alcohol Avoidance',
@@ -99,7 +99,7 @@ export default function Step4() {
               text: 'OK',
               onPress: () => {
                 // Navigate to login screen
-                router.replace('/login');
+                router.replace('/(auth)/signin');
               }
             }
           ]
@@ -129,14 +129,14 @@ export default function Step4() {
               // Navigate to main app or dashboard - try different routes
               try {
                 // Try common dashboard routes
-                router.replace('/(tabs)'); // If you have tabs layout
+                router.replace('/(dashboard)'); // If you have tabs layout
                 // router.replace('/dashboard'); // Original route
                 // router.replace('/home'); // Alternative route
                 // router.replace('/(main)/dashboard'); // If nested in main group
               } catch (error) {
                 console.error('Navigation error:', error);
                 // Fallback navigation
-                router.replace('/');
+                router.replace('/(dashboard)/index');
               }
             }
           }
@@ -174,8 +174,10 @@ export default function Step4() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header with Progress Indicator */}
 
+      <StatusBar backgroundColor="transparent" />
+      
+      {/* Header with Progress Indicator */}
       <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="always" showsVerticalScrollIndicator={false}>
       <View className="pt-4 pb-2">
         <View className="flex-row items-center mb-2">

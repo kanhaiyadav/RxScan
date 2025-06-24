@@ -213,7 +213,7 @@ export const useMedicineDatabase = () => {
                     for (const currentMed of healthProfile.currentMedications) {
                         const drugInteractions = await checkDrugDrugInteraction(
                             drug.name,
-                            currentMed
+                            currentMed.name
                         );
                         interactions.push(...drugInteractions);
                     }

@@ -6,6 +6,7 @@ import { useUserHealth } from '@/context/UserHealthContext';
 import { useEffect, useState } from 'react';
 import { images } from '@/constants/images';
 import { icons } from '@/constants/icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function OnboardingLayout() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function OnboardingLayout() {
   useEffect(() => {
     const currentRoute = segments[segments.length - 1];
     let step = 1;
-    
+
     switch (currentRoute) {
       case '(onboarding)':
         step = 1;
@@ -34,7 +35,7 @@ export default function OnboardingLayout() {
       default:
         step = 1;
     }
-    
+
     setCurrentStep(step);
   }, [segments]);
 
@@ -65,39 +66,48 @@ export default function OnboardingLayout() {
       {/* Enhanced Header with Gradient-like Effect */}
       <View className="relative">
         {/* Main Header */}
-        <View className="bg-[#12c388] h-36 rounded-b-[32px] relative overflow-hidden">
-          {/* Background Pattern/Overlay */}
-          <View className="absolute inset-0 bg-emerald-400 opacity-20" />
-          
-          {/* Header Content */}
-          <View className="flex-row items-center justify-between px-6 pt-12 pb-4">
-            <TouchableOpacity 
-              onPress={handleBack}
-              className="bg-white/20 rounded-full p-2"
-              activeOpacity={0.7}
-              style={{
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 3,
-              }}
-            >
-              <Ionicons name="arrow-back" size={24} color="white" />
-            </TouchableOpacity>
-            
-            <View className="flex-1 items-center">
-                <Text className="text-white text-xl font-bold">RxScan</Text>
-              <Text className="text-white/90 text-sm font-medium mt-1">Health Profile Setup</Text>
+        <LinearGradient
+          colors={['#00ffc8', '#80f7ed']} // teal-500 to teal-600
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={{ elevation: 3 }}
+          className='border-b border-gray-200 rounded-b-[32px] overflow-hidden'
+        >
+
+          <View className="bg-[#00ffc8] h-36 rounded-b-[32px] relative overflow-hidden">
+            {/* Background Pattern/Overlay */}
+            <View className="absolute inset-0 bg-emerald-400 opacity-20" />
+
+            {/* Header Content */}
+            <View className="flex-row items-center justify-between px-6 pt-12 pb-4">
+              <TouchableOpacity
+                onPress={handleBack}
+                className="bg-primary-500 rounded-full p-2"
+                activeOpacity={0.7}
+                style={{
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3,
+                }}
+              >
+                <Ionicons name="arrow-back" size={24} color="white" />
+              </TouchableOpacity>
+
+              <View className="flex-1 items-center">
+                <Text className="text-black/80 text-xl font-bold">RxScan</Text>
+                <Text className="text-black/60 text-sm font-medium mt-1">Health Profile Setup</Text>
+              </View>
+
+              <View className="w-10" />
             </View>
-            
-            <View className="w-10" />
           </View>
-        </View>
+        </LinearGradient>
 
         {/* Floating Progress Card */}
         <View className="px-6 -mt-8 mb-4">
-          <View 
+          <View
             className="bg-white rounded-3xl p-6 border border-gray-100"
             style={{
               shadowColor: '#000',
@@ -118,7 +128,7 @@ export default function OnboardingLayout() {
                   <Text className="text-gray-500 text-sm">Step {currentStep} of 4</Text>
                 </View>
               </View>
-              
+
               <View className="items-end">
                 <Text className="text-emerald-600 text-lg font-bold">{currentStep * 25}%</Text>
                 <Text className="text-gray-400 text-xs">Complete</Text>
@@ -128,24 +138,23 @@ export default function OnboardingLayout() {
             {/* Enhanced Progress Bar */}
             <View className="relative">
               <View className="bg-gray-100 rounded-full h-3 overflow-hidden">
-                <View 
+                <View
                   className="bg-emerald-500 rounded-full h-3"
-                  style={{ 
+                  style={{
                     width: `${currentStep * 25}%`,
                   }}
                 />
               </View>
-              
+
               {/* Progress Steps Indicators */}
               <View className="flex-row justify-between absolute -top-1 -bottom-1 left-0 right-0">
                 {[1, 2, 3, 4].map((step) => (
                   <View
                     key={step}
-                    className={`w-5 h-5 rounded-full border-2 ${
-                      currentStep >= step
+                    className={`w-5 h-5 rounded-full border-2 ${currentStep >= step
                         ? 'bg-emerald-500 border-emerald-500'
                         : 'bg-white border-gray-300'
-                    }`}
+                      }`}
                     style={{
                       shadowColor: currentStep >= step ? '#10B981' : '#6B7280',
                       shadowOffset: { width: 0, height: 2 },
@@ -169,13 +178,12 @@ export default function OnboardingLayout() {
               {['Personal', 'Medical', 'Medications', 'Dietary'].map((label, index) => (
                 <Text
                   key={index}
-                  className={`text-xs font-medium ${
-                    currentStep > index + 1
+                  className={`text-xs font-medium ${currentStep > index + 1
                       ? 'text-emerald-600'
                       : currentStep === index + 1
-                      ? 'text-emerald-700'
-                      : 'text-gray-400'
-                  }`}
+                        ? 'text-emerald-700'
+                        : 'text-gray-400'
+                    }`}
                 >
                   {label}
                 </Text>

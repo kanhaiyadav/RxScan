@@ -91,28 +91,28 @@ export default function ProfileScreen() {
           title: 'Medical Conditions',
           subtitle: '3 conditions added',
           color: 'bg-red-500',
-          route: '/profile/conditions'
+          route: '/(onboarding)/step2'
         },
         {
           icon: 'warning',
           title: 'Allergies',
           subtitle: '2 allergies listed',
           color: 'bg-orange-500',
-          route: '/profile/allergies'
+          route: '/(onboarding)/'
         },
         {
           icon: 'medkit',
           title: 'Current Medications',
           subtitle: '5 active medicines',
           color: 'bg-blue-500',
-          route: '/profile/medications'
+          route: '/(onboarding)/step3'
         },
         {
           icon: 'restaurant',
           title: 'Dietary Restrictions',
           subtitle: 'Vegetarian, No alcohol',
           color: 'bg-green-500',
-          route: '/profile/diet'
+          route: '/(onboarding)/step4'
         }
       ]
     },
@@ -331,8 +331,7 @@ export default function ProfileScreen() {
                     }`}
                   onPress={() => {
                     if (item.route) {
-                      // Navigate to route
-                      console.log('Navigate to:', item.route);
+                      router.push(item.route as any);
                     }
                   }}
                 >
