@@ -1,7 +1,52 @@
-// hooks/usePrescriptionScanner.ts
 import { useState, useCallback } from "react";
 import { useMedicineDatabase } from "./useMedicinDatabase";
+import { MedicineSearchResult } from "@/types/medicine";
 
+// Types for the API response data structure
+interface ApiMedication {
+    name?: string;
+    dosage?: string;
+    quantity?: string;
+    frequency?: string;
+    duration?: string;
+    instructions?: string;
+    uncertain?: boolean;
+}
+
+interface ApiDoctor {
+    name?: string;
+    qualifications?: string;
+    registration_number?: string;
+    clinic_name?: string;
+    address?: string;
+    phone?: string;
+}
+
+interface ApiPatient {
+    name?: string;
+    age?: string;
+    gender?: string;
+    address?: string;
+    prescription_date?: string;
+}
+
+interface ApiAdditionalNotes {
+    special_instructions?: string;
+    follow_up?: string;
+    warnings?: string;
+}
+
+interface ApiPrescriptionData {
+    doctor?: ApiDoctor;
+    patient?: ApiPatient;
+    medications?: ApiMedication[];
+    additional_notes?: ApiAdditionalNotes;
+    extraction_notes?: string;
+    raw_response?: string;
+    note?: string;
+}
+
+// Existing hook interfaces (keeping them unchanged for backward compatibility)
 interface ExtractedMedicine {
     name: string;
     dosage?: string;
@@ -24,7 +69,7 @@ interface PrescriptionAnalysis {
     prescription: PrescriptionScanResult;
     medicineAnalysis: {
         medicine: ExtractedMedicine;
-        analysis: any; // MedicineSearchResult from useMedicineDatabase
+        analysis: MedicineSearchResult | null;
         hasWarnings: boolean;
         warningCount: number;
     }[];
@@ -37,7 +82,69 @@ export const usePrescriptionScanner = () => {
     const [error, setError] = useState<string | null>(null);
     const { analyzeMedicine } = useMedicineDatabase();
 
-    // Extract medicines from OCR text using pattern matching and NLP
+    // Convert API response to ExtractedMedicine format
+    const convertApiMedicationsToExtracted = useCallback(
+        (apiMedications: ApiMedication[]): ExtractedMedicine[] => {
+            return apiMedications.map((med) => ({
+                name: med.name || "Unknown Medicine",
+                dosage: med.dosage || undefined,
+                frequency: med.frequency || undefined,
+                duration: med.duration || undefined,
+                instructions: med.instructions || undefined,
+                // Set confidence based on uncertainty flag and available data
+                confidence: med.uncertain
+                    ? 0.5
+                    : med.dosage && med.frequency
+                    ? 0.95
+                    : med.dosage || med.frequency
+                    ? 0.8
+                    : 0.7,
+            }));
+        },
+        []
+    );
+
+    // Convert API prescription data to PrescriptionScanResult format
+    const convertApiDataToPrescriptionResult = useCallback(
+        (apiData: ApiPrescriptionData): PrescriptionScanResult => {
+            const medicines = apiData.medications
+                ? convertApiMedicationsToExtracted(apiData.medications)
+                : [];
+
+            // Create a synthetic raw text from the structured data for compatibility
+            const rawText = [
+                apiData.doctor?.name ? `Dr. ${apiData.doctor.name}` : "",
+                apiData.doctor?.clinic_name || "",
+                apiData.patient?.name ? `Patient: ${apiData.patient.name}` : "",
+                apiData.patient?.age ? `Age: ${apiData.patient.age}` : "",
+                apiData.patient?.prescription_date
+                    ? `Date: ${apiData.patient.prescription_date}`
+                    : "",
+                ...medicines.map((med) =>
+                    `${med.name} ${med.dosage || ""} ${med.frequency || ""} ${
+                        med.instructions || ""
+                    }`.trim()
+                ),
+                apiData.additional_notes?.special_instructions || "",
+                apiData.extraction_notes || "",
+            ]
+                .filter(Boolean)
+                .join("\n");
+
+            return {
+                medicines,
+                doctorName: apiData.doctor?.name || undefined,
+                hospitalName: apiData.doctor?.clinic_name || undefined,
+                prescriptionDate:
+                    apiData.patient?.prescription_date || undefined,
+                patientName: apiData.patient?.name || undefined,
+                rawText,
+            };
+        },
+        [convertApiMedicationsToExtracted]
+    );
+
+    // Extract medicines from OCR text using pattern matching and NLP (keeping original for backward compatibility)
     const extractMedicinesFromText = useCallback(
         (text: string): ExtractedMedicine[] => {
             const medicines: ExtractedMedicine[] = [];
@@ -214,7 +321,7 @@ export const usePrescriptionScanner = () => {
         []
     );
 
-    // Extract prescription metadata
+    // Extract prescription metadata (keeping original for backward compatibility)
     const extractPrescriptionMetadata = useCallback(
         (text: string): Partial<PrescriptionScanResult> => {
             const metadata: Partial<PrescriptionScanResult> = {};
@@ -269,7 +376,32 @@ export const usePrescriptionScanner = () => {
         []
     );
 
-    // Scan and parse prescription
+    // NEW: Scan and parse prescription from API structured data
+    const scanPrescriptionFromApiData = useCallback(
+        async (
+            apiData: ApiPrescriptionData
+        ): Promise<PrescriptionScanResult> => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const result = convertApiDataToPrescriptionResult(apiData);
+                return result;
+            } catch (err) {
+                const errorMessage =
+                    err instanceof Error
+                        ? err.message
+                        : "Failed to process prescription data";
+                setError(errorMessage);
+                throw err;
+            } finally {
+                setLoading(false);
+            }
+        },
+        [convertApiDataToPrescriptionResult]
+    );
+
+    // Original: Scan and parse prescription from OCR text
     const scanPrescription = useCallback(
         async (ocrText: string): Promise<PrescriptionScanResult> => {
             try {
@@ -300,7 +432,144 @@ export const usePrescriptionScanner = () => {
         [extractMedicinesFromText, extractPrescriptionMetadata]
     );
 
-    // Analyze complete prescription with medicine database
+    // NEW: Analyze prescription from API structured data
+    const analyzePrescriptionFromApiData = useCallback(
+        async (apiData: ApiPrescriptionData): Promise<PrescriptionAnalysis> => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                // Convert API data to prescription result
+                const prescription = await scanPrescriptionFromApiData(apiData);
+
+                // Analyze each medicine
+                const medicineAnalysis = [];
+                const criticalWarnings: string[] = [];
+                let highRiskCount = 0;
+                let mediumRiskCount = 0;
+
+                // Add extraction notes as warnings if present
+                if (apiData.extraction_notes) {
+                    criticalWarnings.push(
+                        `Extraction Notes: ${apiData.extraction_notes}`
+                    );
+                }
+
+                for (const medicine of prescription.medicines) {
+                    const analysis = await analyzeMedicine(medicine.name);
+
+                    if (analysis) {
+                        const hasWarnings =
+                            analysis.warnings.length > 0 ||
+                            analysis.allergyWarnings.length > 0;
+                        const warningCount =
+                            analysis.warnings.length +
+                            analysis.allergyWarnings.length;
+
+                        // Count critical warnings
+                        interface DrugInteraction {
+                            severity:
+                                | "contraindicated"
+                                | "major"
+                                | "moderate"
+                                | "minor";
+                            description: string;
+                            interactionType?:
+                                | "drug-allergy"
+                                | "drug-drug"
+                                | "drug-condition"
+                                | "drug-food";
+                        }
+
+                        const criticalInteractions: DrugInteraction[] =
+                            analysis.interactions.filter(
+                                (interaction: DrugInteraction) =>
+                                    interaction.severity ===
+                                        "contraindicated" ||
+                                    interaction.severity === "major"
+                            );
+
+                        if (criticalInteractions.length > 0) {
+                            highRiskCount++;
+                            criticalInteractions.forEach((interaction) => {
+                                criticalWarnings.push(
+                                    `${medicine.name}: ${interaction.description}`
+                                );
+                            });
+                        } else if (
+                            analysis.interactions.some(
+                                (i: any) => i.severity === "moderate"
+                            )
+                        ) {
+                            mediumRiskCount++;
+                        }
+
+                        medicineAnalysis.push({
+                            medicine,
+                            analysis,
+                            hasWarnings,
+                            warningCount,
+                        });
+                    } else {
+                        // Medicine not found in database
+                        medicineAnalysis.push({
+                            medicine,
+                            analysis: null,
+                            hasWarnings: true,
+                            warningCount: 1,
+                        });
+                        criticalWarnings.push(
+                            `${medicine.name}: Medicine not found in database. Please verify with pharmacist.`
+                        );
+                    }
+                }
+
+                // Check for uncertain medicines from API
+                if (apiData.medications) {
+                    apiData.medications.forEach((med) => {
+                        if (med.uncertain && med.name) {
+                            if (
+                                !criticalWarnings.some((w) =>
+                                    w.includes(med.name!)
+                                )
+                            ) {
+                                criticalWarnings.push(
+                                    `${med.name}: Information is uncertain. Please verify with doctor or pharmacist.`
+                                );
+                            }
+                        }
+                    });
+                }
+
+                // Determine overall risk level
+                let overallRisk: "low" | "medium" | "high" = "low";
+                if (highRiskCount > 0) {
+                    overallRisk = "high";
+                } else if (mediumRiskCount > 0 || criticalWarnings.length > 0) {
+                    overallRisk = "medium";
+                }
+
+                return {
+                    prescription,
+                    medicineAnalysis,
+                    overallRisk,
+                    criticalWarnings,
+                };
+            } catch (err) {
+                const errorMessage =
+                    err instanceof Error
+                        ? err.message
+                        : "Failed to analyze prescription";
+                setError(errorMessage);
+                throw err;
+            } finally {
+                setLoading(false);
+            }
+        },
+        [scanPrescriptionFromApiData, analyzeMedicine]
+    );
+
+    // Original: Analyze complete prescription with medicine database from OCR text
     const analyzePrescription = useCallback(
         async (ocrText: string): Promise<PrescriptionAnalysis> => {
             try {
@@ -328,9 +597,23 @@ export const usePrescriptionScanner = () => {
                             analysis.allergyWarnings.length;
 
                         // Count critical warnings
-                        const criticalInteractions =
+                        interface DrugInteraction {
+                            severity:
+                                | "contraindicated"
+                                | "major"
+                                | "moderate"
+                                | "minor";
+                            description: string;
+                            interactionType?:
+                                | "drug-allergy"
+                                | "drug-drug"
+                                | "drug-condition"
+                                | "drug-food";
+                        }
+
+                        const criticalInteractions: DrugInteraction[] =
                             analysis.interactions.filter(
-                                (interaction) =>
+                                (interaction: DrugInteraction) =>
                                     interaction.severity ===
                                         "contraindicated" ||
                                     interaction.severity === "major"
@@ -345,7 +628,7 @@ export const usePrescriptionScanner = () => {
                             });
                         } else if (
                             analysis.interactions.some(
-                                (i) => i.severity === "moderate"
+                                (i: any) => i.severity === "moderate"
                             )
                         ) {
                             mediumRiskCount++;
@@ -413,7 +696,7 @@ export const usePrescriptionScanner = () => {
             analysis.medicineAnalysis.forEach(
                 ({ medicine, analysis: medAnalysis }) => {
                     if (medAnalysis) {
-                        medAnalysis.interactions.forEach((interaction:any) => {
+                        medAnalysis.interactions.forEach((interaction: any) => {
                             switch (interaction.interactionType) {
                                 case "drug-allergy":
                                     validationResults.allergyConflicts.push(
@@ -464,9 +747,14 @@ export const usePrescriptionScanner = () => {
     return {
         loading,
         error,
+        // Original methods (for backward compatibility)
         scanPrescription,
         analyzePrescription,
         validatePrescription,
         extractMedicinesFromText,
+        // New methods for API data
+        scanPrescriptionFromApiData,
+        analyzePrescriptionFromApiData,
+        convertApiDataToPrescriptionResult,
     };
 };

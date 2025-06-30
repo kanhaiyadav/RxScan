@@ -3,18 +3,18 @@ import { vars } from 'nativewind';
 
 export const config = {
     light: vars({
-      "--color-primary-0": "240 253 250",      // Slightly minty white
-      "--color-primary-50": "236 253 245",     // Very light emerald tint
-      "--color-primary-100": "209 250 229",    // Soft emerald pastel
-      "--color-primary-200": "167 243 208",    // Light mint
-      "--color-primary-300": "110 231 183",    // Light emerald green
-      "--color-primary-400": "52 211 153",     // Emerald medium
-      "--color-primary-500": "16 185 129",     // Your base color: #10B981
-      "--color-primary-600": "5 150 105",      // Darker, richer emerald
-      "--color-primary-700": "4 120 87",       // Deep emerald
-      "--color-primary-800": "6 95 70",        // Very dark green
-      "--color-primary-900": "6 78 59",        // Near forest green
-      "--color-primary-950": "2 44 34",        // Almost black-green
+        "--color-primary-0": "240 253 249",
+        "--color-primary-50": "240 253 249",
+        "--color-primary-100": "204 251 236",
+        "--color-primary-200": "154 245 218",
+        "--color-primary-300": "95 233 197",
+        "--color-primary-400": "47 210 173",
+        "--color-primary-500": "23 193 157",
+        "--color-primary-600": "14 147 121",
+        "--color-primary-700": "16 117 99",
+        "--color-primary-800": "18 93 80",
+        "--color-primary-900": "20 77 67",
+        "--color-primary-950": "4 47 42",
 
         /* Secondary  */
         "--color-secondary-0": "253 253 253",

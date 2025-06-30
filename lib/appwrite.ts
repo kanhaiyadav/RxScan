@@ -1,5 +1,5 @@
-import { Client, Account, Databases, ID, Query } from 'appwrite';
 import { UserHealthProfile } from '@/context/UserHealthContext';
+import { Account, Client, Databases, ID, Query } from 'appwrite';
 
 // Get configuration from environment variables with validation
 const APPWRITE_ENDPOINT = process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT as string;
@@ -255,9 +255,5 @@ export default appwriteService;
 
 // Export config for easy access
 export {
-  APPWRITE_ENDPOINT,
-  APPWRITE_PROJECT_ID,
-  APPWRITE_DATABASE_ID,
-  APPWRITE_USER_COLLECTION_ID,
-  APPWRITE_HEALTH_PROFILE_COLLECTION_ID,
+  APPWRITE_DATABASE_ID, APPWRITE_ENDPOINT, APPWRITE_HEALTH_PROFILE_COLLECTION_ID, APPWRITE_PROJECT_ID, APPWRITE_USER_COLLECTION_ID
 };

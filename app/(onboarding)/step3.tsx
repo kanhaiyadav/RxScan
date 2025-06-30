@@ -1,6 +1,6 @@
 // app/(onboarding)/step3.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Modal, StatusBar } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Modal } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useUserHealth } from '@/context/UserHealthContext';
@@ -97,7 +97,6 @@ export default function Step3() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar backgroundColor="transparent" />
       <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="always">
         <View className="mt-4 mb-8">
           <View className="flex-row items-center mb-4">
