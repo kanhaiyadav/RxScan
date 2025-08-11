@@ -30,7 +30,7 @@ const SignIn = () => {
     
     if (success) {
       // Navigation will be handled by the auth state change in index.tsx
-      router.replace('/(onboarding)');
+      router.replace('/(dashboard)');
     } else {
       Alert.alert('Sign In Failed', error || 'Invalid email or password');
     }
