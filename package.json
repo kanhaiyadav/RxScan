@@ -11,7 +11,9 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@expo/html-elements": "^0.4.2",
     "@expo/vector-icons": "^14.1.0",
+    "@gluestack-ui/actionsheet": "^0.2.53",
     "@gluestack-ui/alert-dialog": "^0.1.38",
     "@gluestack-ui/button": "^1.0.14",
     "@gluestack-ui/checkbox": "^0.1.39",
@@ -33,7 +35,6 @@
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.6",
     "expo-document-picker": "^13.1.6",
-    "expo-file-system": "^18.1.10",
     "expo-font": "~13.3.1",
     "expo-haptics": "~14.1.4",
     "expo-image": "~2.2.0",

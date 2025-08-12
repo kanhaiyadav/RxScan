@@ -1,80 +1,47 @@
+import {
+    Actionsheet,
+    ActionsheetBackdrop,
+    ActionsheetContent,
+    ActionsheetDragIndicator,
+    ActionsheetDragIndicatorWrapper,
+    ActionsheetItem,
+    ActionsheetScrollView
+} from "@/components/ui/actionsheet";
+import { Feather, Ionicons } from '@expo/vector-icons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
-    View,
+    Alert,
+    SafeAreaView,
+    ScrollView,
     Text,
     TouchableOpacity,
-    ScrollView,
-    Alert,
-    Dimensions,
-    SafeAreaView,
+    View
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
+import { MedicineSearchResult } from "@/hooks/useMedicineSearch";
+import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
 
-const { width } = Dimensions.get('window');
-
-interface ActiveIngredient {
-    name: string;
-    strength: string;
-    purpose: string;
-}
-
-interface SideEffects {
-    common: string[];
-    serious: string[];
-    rare: string[];
-}
-
-interface Interactions {
-    drugInteractions: string[];
-    foodInteractions: string[];
-    conditionInteractions: string[];
-}
-
-interface OverdoseMissedDose {
-    overdose: string;
-    missedDose: string;
-}
-
-interface ApproximatePrice {
-    currency: string;
-    priceRange: string;
-    unit: string;
-    lastUpdated: string;
-}
-
-interface Medicine {
-    name: string;
-    imageUrl: string;
-    uses: string[];
-    sideEffects: SideEffects;
-    warningsAndPrecautions: string[];
-    interactions: Interactions;
-    overdoseMissedDose: OverdoseMissedDose;
-    approximatePrice: ApproximatePrice;
-    manufacturer: string[];
-    activeIngredients: ActiveIngredient[];
-    dosageForm: string;
-    prescriptionRequired: boolean;
-    genericAvailable: boolean;
-    fdaApproved: boolean;
-    lastUpdated: string;
-}
-
-interface MedicineData {
-    medicines: Medicine[];
-}
 
 interface Props {
-    result: MedicineData;
+    ocrResult: any;
+    result: MedicineSearchResult;
     resetToStart: () => void;
+    loading: boolean;
 }
 
-const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
+const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loading }) => {
+    console.log(JSON.stringify(ocrResult, null, 2));
+
     const [selectedMedicine, setSelectedMedicine] = useState(0);
     const [activeSection, setActiveSection] = useState<string>('overview');
 
     const currentMedicine = result.medicines[selectedMedicine];
+
+    const [showActionsheet, setShowActionsheet] = React.useState(false)
+    const handleClose = () => setShowActionsheet(false)
 
     const sections = [
         { id: 'overview', title: 'Overview', icon: 'information-circle' },
@@ -85,41 +52,70 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
         { id: 'dosage', title: 'Dosage Info', icon: 'medical' },
     ];
 
+    const renderInfoItem = (label: string, value?: string): React.ReactNode => {
+        if (!value || value === 'null') return null;
+
+        return (
+            <View className="flex-row mb-3 px-1">
+                <Text className="font-semibold text-gray-700 min-w-[100px] mr-3">{label}:</Text>
+                <Text className="text-gray-900 flex-1 font-medium">{value}</Text>
+            </View>
+        );
+    };
+
     const renderMedicineSelector = () => (
-        <View className="px-4 py-3 bg-gray-50">
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View className="flex-row gap-3">
-                    {result.medicines.map((medicine, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            onPress={() => setSelectedMedicine(index)}
-                            className={`px-4 py-2 rounded-full ${selectedMedicine === index
-                                    ? 'bg-[#00ffc8]'
-                                    : 'bg-white border border-gray-200'
-                                }`}
-                        >
-                            <Text className={`font-medium ${selectedMedicine === index ? 'text-black' : 'text-gray-600'
-                                }`}>
-                                {medicine.name}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            </ScrollView>
+        <View className="py-3 gap-2 px-1">
+            {ocrResult.medications.map((medicine: {
+                name: string;
+                uncertain?: boolean;
+                duration?: string;
+                Instructions?: string;
+            }, index: number) => (
+                <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                        setSelectedMedicine(index)
+                        setShowActionsheet(true)
+                    }}
+                    className={`p-4 rounded-xl ${medicine.uncertain ? 'bg-red-100 border-red-400' : 'bg-white'} border border-gray-200`}
+                >
+                    <Text className={`font-medium ${selectedMedicine === index ? 'text-black' : 'text-gray-600'
+                        }`}>
+                        {medicine.name}
+                    </Text>
+                    <View className='flex-row mt-1'>
+                        {medicine.uncertain && (
+                            <View className="flex-row gap-1">
+                                <Text className='text-red-500 text-sm'>Uncertain</Text>
+                                <Text className='text-sm'>|</Text>
+                            </View>
+                        )}
+                        {medicine.duration && (
+                            <Text className='text-gray-500 text-sm'> Duration: {medicine.duration}</Text>
+                        )}
+                        {medicine.Instructions && (
+                            <Text className='text-gray-500 text-sm'> | {medicine.Instructions}</Text>
+                        )}
+                    </View>
+                </TouchableOpacity>
+            ))}
         </View>
     );
 
     const renderSectionTabs = () => (
-        <View className="px-4 py-3 bg-white border-b border-gray-100">
+        <View className=" py-3 bg-white border-b border-gray-100">
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-2">
                     {sections.map((section) => (
                         <TouchableOpacity
                             key={section.id}
-                            onPress={() => setActiveSection(section.id)}
+                            onPress={() => {
+                                if (loading) return;
+                                setActiveSection(section.id)
+                            }}
                             className={`flex-row items-center px-4 py-2 rounded-xl ${activeSection === section.id
-                                    ? 'bg-[#00ffc8]'
-                                    : 'bg-gray-100'
+                                ? 'bg-[#00ffc8]'
+                                : 'bg-gray-100'
                                 }`}
                         >
                             <Ionicons
@@ -139,78 +135,112 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
     );
 
     const renderOverview = () => (
-        <View className="p-4 space-y-4">
+        <View className="pb-4 gap-4">
             {/* Medicine Header */}
-            <View className="bg-gradient-to-r from-[#00ffc8] to-[#00e6b8] rounded-2xl p-5">
-                <Text className="text-2xl font-bold text-black mb-2">
-                    {currentMedicine.name}
-                </Text>
-                <View className="flex-row flex-wrap gap-2 mb-3">
-                    <View className="bg-black/10 rounded-full px-3 py-1">
-                        <Text className="text-black font-medium text-xs">
-                            {currentMedicine.dosageForm}
+            <View className="bg-gradient-to-r from-[#00ffc8] to-[#00e6b8] rounded-2xl">
+                {
+                    loading ?
+                        <SkeletonText _lines={1} className="h-[25px] mb-2 w-[60%] rounded-lg" speed={4} />
+                        :
+                        <Text className="text-2xl font-bold text-black mb-2">
+                            {currentMedicine.medicalInfo.name}
                         </Text>
-                    </View>
-                    {currentMedicine.prescriptionRequired && (
-                        <View className="bg-black/10 rounded-full px-3 py-1">
-                            <Text className="text-black font-medium text-xs">Prescription Required</Text>
+                }
+                {
+                    loading ?
+                        <View className="flex-row flex-wrap gap-2 mb-3">
+                            <Skeleton className="h-[20px] w-[120px] rounded-full" speed={4} />
+                            <Skeleton className="h-[20px] w-[140px] rounded-full" speed={4} />
+                            <Skeleton className="h-[20px] w-[90px] rounded-full" speed={4} />
                         </View>
-                    )}
-                    {currentMedicine.fdaApproved && (
-                        <View className="bg-black/10 rounded-full px-3 py-1">
-                            <Text className="text-black font-medium text-xs">FDA Approved</Text>
+                        :
+                        <View className="flex-row flex-wrap gap-2 mb-3">
+                            <View className="bg-black/10 rounded-full px-3 py-1">
+                                <Text className="text-black font-medium text-xs">
+                                    {currentMedicine.medicalInfo.dosageForm}
+                                </Text>
+                            </View>
+                            {currentMedicine.medicalInfo.prescriptionRequired && (
+                                <View className="bg-black/10 rounded-full px-3 py-1">
+                                    <Text className="text-black font-medium text-xs">Prescription Required</Text>
+                                </View>
+                            )}
+                            {currentMedicine.medicalInfo.fdaApproved && (
+                                <View className="bg-black/10 rounded-full px-3 py-1">
+                                    <Text className="text-black font-medium text-xs">FDA Approved</Text>
+                                </View>
+                            )}
                         </View>
-                    )}
-                </View>
-                <Text className="text-black/80 text-base leading-6">
-                    Primary uses: {currentMedicine.uses.slice(0, 3).join(', ')}
-                    {currentMedicine.uses.length > 3 && '...'}
-                </Text>
+                }
+                {
+                    loading ?
+                        <SkeletonText _lines={3} className="h-[18px] mb-[-1] w-full rounded-lg" speed={4} />
+                        :
+                        <Text className="text-black/80 text-base leading-6">
+                            Primary uses: {currentMedicine.medicalInfo.uses.slice(0, 3).join(', ')}
+                            {currentMedicine.medicalInfo.uses.length > 3 && '...'}
+                        </Text>
+                }
             </View>
 
             {/* Quick Stats */}
-            <View className="flex-row gap-3">
-                <View className="flex-1 bg-blue-50 rounded-xl p-4">
-                    <Ionicons name="medical" size={24} color="#3b82f6" />
-                    <Text className="text-blue-600 font-semibold mt-2">{currentMedicine.uses.length}</Text>
-                    <Text className="text-blue-600 text-sm">Uses</Text>
-                </View>
-                <View className="flex-1 bg-orange-50 rounded-xl p-4">
-                    <Ionicons name="warning" size={24} color="#f97316" />
-                    <Text className="text-orange-600 font-semibold mt-2">
-                        {currentMedicine.sideEffects.common.length + currentMedicine.sideEffects.serious.length}
-                    </Text>
-                    <Text className="text-orange-600 text-sm">Side Effects</Text>
-                </View>
-                <View className="flex-1 bg-green-50 rounded-xl p-4">
-                    <Ionicons name="business" size={24} color="#10b981" />
-                    <Text className="text-green-600 font-semibold mt-2">{currentMedicine.manufacturer.length}</Text>
-                    <Text className="text-green-600 text-sm">Manufacturers</Text>
-                </View>
-            </View>
+            {
+                loading ?
+                    <View className="flex-row gap-3">
+                        <Skeleton className="h-[90px] flex-1 rounded-lg" speed={4} />
+                        <Skeleton className="h-[90px] flex-1 rounded-lg" speed={4} />
+                        <Skeleton className="h-[90px] flex-1 rounded-lg" speed={4} />
+                    </View>
+                    :
+                    <View className="flex-row gap-3">
+                        <View className="flex-1 bg-blue-50 rounded-xl p-4">
+                            <Ionicons name="medical" size={24} color="#3b82f6" />
+                            <Text className="text-blue-600 font-semibold mt-2">{currentMedicine.medicalInfo.uses.length}</Text>
+                            <Text className="text-blue-600 text-sm">Uses</Text>
+                        </View>
+                        <View className="flex-1 bg-orange-50 rounded-xl p-4">
+                            <Ionicons name="warning" size={24} color="#f97316" />
+                            <Text className="text-orange-600 font-semibold mt-2">
+                                {currentMedicine.medicalInfo.sideEffects.common.length + currentMedicine.medicalInfo.sideEffects.serious.length}
+                            </Text>
+                            <Text className="text-orange-600 text-sm">Side Effects</Text>
+                        </View>
+                        <View className="flex-1 bg-green-50 rounded-xl p-4">
+                            <Ionicons name="business" size={24} color="#10b981" />
+                            <Text className="text-green-600 font-semibold mt-2">{currentMedicine.medicalInfo.manufacturer.length}</Text>
+                            <Text className="text-green-600 text-sm">Manufacturers</Text>
+                        </View>
+                    </View>
+            }
 
             {/* Price Info */}
-            <View className="bg-white border border-gray-200 rounded-xl p-4">
-                <View className="flex-row items-center justify-between">
-                    <View>
-                        <Text className="text-lg font-bold text-gray-900">
-                            {currentMedicine.approximatePrice.priceRange}
-                        </Text>
-                        <Text className="text-gray-600 text-sm">
-                            {currentMedicine.approximatePrice.unit}
-                        </Text>
+            {
+                loading ? 
+                    <Skeleton className="h-[80px] rounded-lg" />
+                    :
+                    currentMedicine.medicalInfo.approximatePrice &&
+                    <View className="bg-white border border-gray-200 rounded-xl p-4">
+                        <View className="flex-row items-center justify-between">
+                            <View>
+                                <Text className="text-lg font-bold text-gray-900">
+                                    {currentMedicine.medicalInfo.approximatePrice.priceRange}
+                                </Text>
+                                <Text className="text-gray-600 text-sm">
+                                    {currentMedicine.medicalInfo.approximatePrice.unit}
+                                </Text>
+                            </View>
+                            <View className="bg-[#00ffc8] rounded-full p-2">
+                                <Ionicons name="pricetag" size={20} color="#000" />
+                            </View>
+                        </View>
                     </View>
-                    <View className="bg-[#00ffc8] rounded-full p-2">
-                        <Ionicons name="pricetag" size={20} color="#000" />
-                    </View>
-                </View>
-            </View>
+            }
         </View>
     );
 
     const renderIngredients = () => (
-        <View className="p-4 space-y-3">
-            {currentMedicine.activeIngredients.map((ingredient, index) => (
+        <View className="p-4 gap-3">
+            {currentMedicine.medicalInfo.activeIngredients.map((ingredient, index) => (
                 <View key={index} className="bg-white border border-gray-200 rounded-xl p-4">
                     <View className="flex-row items-center justify-between mb-2">
                         <Text className="text-lg font-semibold text-gray-900">
@@ -229,26 +259,26 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
     );
 
     const renderSideEffects = () => (
-        <View className="p-4 space-y-4">
-            {currentMedicine.sideEffects.common.length > 0 && (
+        <View className="p-4 gap-4">
+            {currentMedicine.medicalInfo.sideEffects.common.length > 0 && (
                 <View className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                     <View className="flex-row items-center mb-3">
                         <Ionicons name="information-circle" size={20} color="#3b82f6" />
                         <Text className="text-blue-700 font-semibold ml-2">Common Side Effects</Text>
                     </View>
-                    {currentMedicine.sideEffects.common.map((effect, index) => (
+                    {currentMedicine.medicalInfo.sideEffects.common.map((effect, index) => (
                         <Text key={index} className="text-blue-700 mb-1">• {effect}</Text>
                     ))}
                 </View>
             )}
 
-            {currentMedicine.sideEffects.serious.length > 0 && (
+            {currentMedicine.medicalInfo.sideEffects.serious.length > 0 && (
                 <View className="bg-red-50 border border-red-200 rounded-xl p-4">
                     <View className="flex-row items-center mb-3">
                         <Ionicons name="warning" size={20} color="#ef4444" />
                         <Text className="text-red-700 font-semibold ml-2">Serious Side Effects</Text>
                     </View>
-                    {currentMedicine.sideEffects.serious.map((effect, index) => (
+                    {currentMedicine.medicalInfo.sideEffects.serious.map((effect, index) => (
                         <Text key={index} className="text-red-700 mb-1 leading-5">• {effect}</Text>
                     ))}
                 </View>
@@ -258,41 +288,41 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
 
     const renderInteractions = () => (
         <ScrollView className="p-4" showsVerticalScrollIndicator={false}>
-            <View className="space-y-4">
+            <View className="gap-4">
                 {/* Drug Interactions */}
-                {currentMedicine.interactions.drugInteractions.length > 0 && (
+                {currentMedicine.medicalInfo.interactions.drugInteractions.length > 0 && (
                     <View className="bg-orange-50 border border-orange-200 rounded-xl p-4">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="medical" size={20} color="#f97316" />
                             <Text className="text-orange-700 font-semibold ml-2">Drug Interactions</Text>
                         </View>
-                        {currentMedicine.interactions.drugInteractions.map((interaction, index) => (
+                        {currentMedicine.medicalInfo.interactions.drugInteractions.map((interaction, index) => (
                             <Text key={index} className="text-orange-700 mb-2 leading-5">• {interaction}</Text>
                         ))}
                     </View>
                 )}
 
                 {/* Food Interactions */}
-                {currentMedicine.interactions.foodInteractions.length > 0 && (
+                {currentMedicine.medicalInfo.interactions.foodInteractions.length > 0 && (
                     <View className="bg-green-50 border border-green-200 rounded-xl p-4">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="restaurant" size={20} color="#10b981" />
                             <Text className="text-green-700 font-semibold ml-2">Food Interactions</Text>
                         </View>
-                        {currentMedicine.interactions.foodInteractions.map((interaction, index) => (
+                        {currentMedicine.medicalInfo.interactions.foodInteractions.map((interaction, index) => (
                             <Text key={index} className="text-green-700 mb-2 leading-5">• {interaction}</Text>
                         ))}
                     </View>
                 )}
 
                 {/* Condition Interactions */}
-                {currentMedicine.interactions.conditionInteractions.length > 0 && (
+                {currentMedicine.medicalInfo.interactions.conditionInteractions.length > 0 && (
                     <View className="bg-purple-50 border border-purple-200 rounded-xl p-4">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="fitness" size={20} color="#8b5cf6" />
                             <Text className="text-purple-700 font-semibold ml-2">Medical Conditions</Text>
                         </View>
-                        {currentMedicine.interactions.conditionInteractions.map((condition, index) => (
+                        {currentMedicine.medicalInfo.interactions.conditionInteractions.map((condition, index) => (
                             <Text key={index} className="text-purple-700 mb-2 leading-5">• {condition}</Text>
                         ))}
                     </View>
@@ -302,8 +332,8 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
     );
 
     const renderPrecautions = () => (
-        <View className="p-4 space-y-3">
-            {currentMedicine.warningsAndPrecautions.map((precaution, index) => (
+        <View className="p-4 gap-3">
+            {currentMedicine.medicalInfo.warningsAndPrecautions.map((precaution, index) => (
                 <View key={index} className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                     <View className="flex-row items-start">
                         <Ionicons name="shield-checkmark" size={20} color="#f59e0b" className="mt-0.5 mr-3" />
@@ -317,7 +347,7 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
     );
 
     const renderDosageInfo = () => (
-        <View className="p-4 space-y-4">
+        <View className="p-4 gap-4">
             {/* Overdose Info */}
             <View className="bg-red-50 border border-red-200 rounded-xl p-4">
                 <View className="flex-row items-center mb-3">
@@ -325,7 +355,7 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
                     <Text className="text-red-700 font-semibold ml-2">Overdose Information</Text>
                 </View>
                 <Text className="text-red-700 leading-6">
-                    {currentMedicine.overdoseMissedDose.overdose}
+                    {currentMedicine.medicalInfo.overdoseMissedDose.overdose}
                 </Text>
             </View>
 
@@ -336,7 +366,7 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
                     <Text className="text-blue-700 font-semibold ml-2">Missed Dose</Text>
                 </View>
                 <Text className="text-blue-700 leading-6">
-                    {currentMedicine.overdoseMissedDose.missedDose}
+                    {currentMedicine.medicalInfo.overdoseMissedDose.missedDose}
                 </Text>
             </View>
 
@@ -347,7 +377,7 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
                     <Text className="text-gray-700 font-semibold ml-2">Manufacturers</Text>
                 </View>
                 <View className="flex-row flex-wrap gap-2">
-                    {currentMedicine.manufacturer.map((manufacturer, index) => (
+                    {currentMedicine.medicalInfo.manufacturer.map((manufacturer, index) => (
                         <View key={index} className="bg-white rounded-full px-3 py-1 border border-gray-200">
                             <Text className="text-gray-700 text-sm">{manufacturer}</Text>
                         </View>
@@ -377,46 +407,150 @@ const MedicineDisplay: React.FC<Props> = ({ result, resetToStart }) => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white">
-            {/* Medicine Selector */}
-            {result.medicines.length > 1 && renderMedicineSelector()}
+        <SafeAreaView className="flex-1">
+            <ScrollView showsVerticalScrollIndicator={false} className="px-6">
+                <View className="pt-[20px]">
 
-            {/* Section Tabs */}
-            {renderSectionTabs()}
+                    {/* Doctor Information */}
+                    {ocrResult.doctor && (
+                        <View>
+                            <View className="flex-row items-center mb-4">
+                                <LinearGradient
+                                    colors={['#00ffc8', '#00e6b8']}
+                                    className="w-12 h-12 items-center justify-center mr-4"
+                                    style={{ borderRadius: 10 }}
+                                >
+                                    <FontAwesome6 name="user-doctor" size={24} color="white" />
+                                </LinearGradient>
+                                <Text className="text-lg font-bold text-gray-900">Doctor Information</Text>
+                            </View>
+                            <View className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                                {renderInfoItem('Name', ocrResult.doctor.name)}
+                                {renderInfoItem('Qualifications', ocrResult.doctor.qualifications)}
+                                {renderInfoItem('Registration', ocrResult.doctor.registration_number)}
+                                {renderInfoItem('Clinic', ocrResult.doctor.clinic_name)}
+                                {renderInfoItem('Address', ocrResult.doctor.address)}
+                                {renderInfoItem('Phone', ocrResult.doctor.phone)}
+                            </View>
+                        </View>
+                    )}
 
-            {/* Content */}
-            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-                {renderContent()}
-                <View className="h-24" />
+                    {/* Patient Information */}
+                    {ocrResult.patient && (
+                        <View className="pt-3 mb-3 shadow-sm">
+                            <View className="flex-row items-center mb-2">
+                                <LinearGradient
+                                    colors={['#00ffc8', '#00e6b8']}
+                                    className="w-12 h-12 items-center justify-center mr-4"
+                                    style={{ borderRadius: 10 }}
+                                >
+                                    <Fontisto name="bed-patient" size={24} color="white" />
+                                </LinearGradient>
+                                <Text className="text-lg font-bold text-gray-900">Patient Information</Text>
+                            </View>
+                            <View className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                                {renderInfoItem('Name', ocrResult.patient.name)}
+                                {renderInfoItem('Age', ocrResult.patient.age)}
+                                {renderInfoItem('Gender', ocrResult.patient.gender)}
+                                {renderInfoItem('Address', ocrResult.patient.address)}
+                                {renderInfoItem('Date', ocrResult.patient.prescription_date)}
+                            </View>
+                        </View>
+                    )}
+
+
+                </View>
+
+                <View className="flex-row items-center">
+                    <LinearGradient
+                        colors={['#00ffc8', '#00e6b8']}
+                        className="w-12 h-12 items-center justify-center mr-4"
+                        style={{ borderRadius: 10 }}
+                    >
+                        <MaterialCommunityIcons name="pill" size={24} color="white" />
+                    </LinearGradient>
+                    <Text className="text-lg font-bold text-gray-900">Medicines Recognised</Text>
+                </View>
+
+                {/* Medicine Selector */}
+                {result.medicines.length > 1 && renderMedicineSelector()}
+
+                {/* Additional Notes */}
+                {ocrResult.additional_notes && (ocrResult.special_instructions || ocrResult.follow_up || ocrResult.warnings) && (
+                    <View className="mt-4">
+                        <View className="flex-row items-center mb-4">
+                            <LinearGradient
+                                colors={['#00ffc8', '#00e6b8']}
+                                className="w-12 h-12 rounded-full items-center justify-center mr-4"
+                                style={{ borderRadius: 10 }}
+                            >
+                                <Ionicons name="document-text" size={24} color="#6b7280" />
+                            </LinearGradient>
+                            <Text className="text-lg font-bold text-gray-900">Additional Notes</Text>
+                        </View>
+                        <View className="gap-2 bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                            {renderInfoItem('Special Instructions', ocrResult.additional_notes.special_instructions)}
+                            {renderInfoItem('Follow-up', ocrResult.additional_notes.follow_up)}
+                            {renderInfoItem('Warnings', ocrResult.additional_notes.warnings)}
+                        </View>
+                    </View>
+                )}
+
+                {/* Extraction Notes */}
+                {ocrResult.extraction_notes && (
+                    <View className="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-12">
+                        <View className="flex-row items-center mb-3">
+                            <Ionicons name="information-circle" size={20} color="#6b7280" />
+                            <Text className="text-lg font-bold text-gray-700 ml-2">Extraction Notes</Text>
+                        </View>
+                        <Text className="text-gray-800">{ocrResult.extraction_notes}</Text>
+                    </View>
+                )}
+
+                {/* Bottom Actions */}
+                <View className="py-4">
+                    <View className="flex-row gap-3">
+                        <TouchableOpacity
+                            className="flex-1 bg-white rounded-2xl p-4 flex-row items-center justify-center"
+                            style={{ elevation: 1 }}
+                            onPress={resetToStart}
+                        >
+                            <Ionicons name="refresh" size={20} color="#6b7280" />
+                            <Text className="text-gray-700 font-medium ml-2">Scan New</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            className="flex-1 rounded-2xl overflow-hidden"
+                            onPress={() => {
+                                Alert.alert('Feature Coming Soon', 'Save and share functionality will be available soon!');
+                            }}
+                        >
+                            <LinearGradient
+                                colors={['#00ffc8', '#00e6b8']}
+                                className="flex-row p-4 items-center justify-center"
+                            >
+                                <Feather name="download" size={20} color="#000" />
+                                <Text className="text-black font-medium ml-2">Save Report</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </ScrollView>
 
-            {/* Bottom Actions */}
-            <View className="px-6 py-4 bg-white border-t border-gray-200">
-                <View className="flex-row gap-3">
-                    <TouchableOpacity
-                        className="flex-1 bg-gray-100 rounded-2xl p-4 flex-row items-center justify-center"
-                        onPress={resetToStart}
-                    >
-                        <Ionicons name="refresh" size={20} color="#6b7280" />
-                        <Text className="text-gray-700 font-medium ml-2">Scan New</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        className="flex-1 rounded-2xl overflow-hidden"
-                        onPress={() => {
-                            Alert.alert('Feature Coming Soon', 'Save and share functionality will be available soon!');
-                        }}
-                    >
-                        <LinearGradient
-                            colors={['#00ffc8', '#00e6b8']}
-                            className="flex-row p-4 items-center justify-center"
-                        >
-                            <Feather name="download" size={20} color="#000" />
-                            <Text className="text-black font-medium ml-2">Save Report</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                </View>
-            </View>
+            <Actionsheet isOpen={showActionsheet} onClose={handleClose}>
+                <ActionsheetBackdrop />
+                <ActionsheetContent>
+                    <ActionsheetDragIndicatorWrapper>
+                        <ActionsheetDragIndicator />
+                    </ActionsheetDragIndicatorWrapper>
+                    <ActionsheetItem onPress={handleClose}>
+                        {renderSectionTabs()}
+                    </ActionsheetItem>
+                    <ActionsheetScrollView className="max-h-[600px] overflow-auto" showsVerticalScrollIndicator={false}>
+                        {renderContent()}
+                    </ActionsheetScrollView>
+                </ActionsheetContent>
+            </Actionsheet>
         </SafeAreaView>
     );
 };
