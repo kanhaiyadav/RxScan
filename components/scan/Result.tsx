@@ -12,7 +12,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     Alert,
     SafeAreaView,
@@ -23,6 +23,11 @@ import {
 } from 'react-native';
 import { MedicineSearchResult } from "@/hooks/useMedicineSearch";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
+import { HStack } from "../ui/hstack";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { getSeverityColor, getSeverityTextColor } from "@/lib/utils";
+import { FontAwesome5 } from '@expo/vector-icons'
+
 
 
 interface Props {
@@ -43,8 +48,16 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     const [showActionsheet, setShowActionsheet] = React.useState(false)
     const handleClose = () => setShowActionsheet(false)
 
+    const getMedicineData = useMemo(() => {
+        return (name: string, index: number) => {
+            let medicine = result.medicines.find(m => m.medicalInfo.name.toLowerCase() === name.toLowerCase());
+            return medicine || result.medicines[index];
+        };
+    }, [result.medicines]);
+
     const sections = [
         { id: 'overview', title: 'Overview', icon: 'information-circle' },
+        { id: 'healthConflicts', title: 'Health Conflicts', icon: 'warning' },
         { id: 'ingredients', title: 'Ingredients', icon: 'flask' },
         { id: 'sideEffects', title: 'Side Effects', icon: 'warning' },
         { id: 'interactions', title: 'Interactions', icon: 'link' },
@@ -63,44 +76,122 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
         );
     };
 
-    const renderMedicineSelector = () => (
-        <View className="py-3 gap-2 px-1">
-            {ocrResult.medications.map((medicine: {
-                name: string;
-                uncertain?: boolean;
-                duration?: string;
-                Instructions?: string;
-            }, index: number) => (
-                <TouchableOpacity
-                    key={index}
-                    onPress={() => {
-                        setSelectedMedicine(index)
-                        setShowActionsheet(true)
-                    }}
-                    className={`p-4 rounded-xl ${medicine.uncertain ? 'bg-red-100 border-red-400' : 'bg-white'} border border-gray-200`}
-                >
-                    <Text className={`font-medium ${selectedMedicine === index ? 'text-black' : 'text-gray-600'
-                        }`}>
-                        {medicine.name}
-                    </Text>
-                    <View className='flex-row mt-1'>
-                        {medicine.uncertain && (
-                            <View className="flex-row gap-1">
-                                <Text className='text-red-500 text-sm'>Uncertain</Text>
-                                <Text className='text-sm'>|</Text>
-                            </View>
+    const renderMedicineSelector = () => {
+
+        const getMedSeverityColor = (name: string) => {
+            const medicine = result.medicines.find(m => m.medicalInfo.name.toLowerCase() === name.toLowerCase());
+            if (!medicine) return 'bg-green-100 border-green-400';
+
+            if (medicine.medicalInfo.healthProfileInteraction.hasInteractions) {
+                if (medicine.medicalInfo.healthProfileInteraction.overallRisk === 'critical') {
+                    return 'bg-red-200 border-red-600 border-2';
+                } else if (medicine.medicalInfo.healthProfileInteraction.overallRisk === 'high') {
+                    return 'bg-red-100 border-red-400';
+                } else if (medicine.medicalInfo.healthProfileInteraction.overallRisk === 'moderate') {
+                    return 'bg-orange-200 border-orange-600';
+                } else if (medicine.medicalInfo.healthProfileInteraction.overallRisk === 'low') {
+                    return 'bg-yellow-100 border-yellow-400';
+                }
+            }
+
+            return 'bg-green-100 border-green-400';
+        };
+
+        return (
+            <View className="py-3 gap-2 px-1">
+                {ocrResult.medications.map((medicine: {
+                    name: string;
+                    uncertain?: boolean;
+                    duration?: string;
+                    instructions?: string;
+                    frequency?: string;
+                }, index: number) => (
+                    <TouchableOpacity
+                        key={index}
+                        onPress={() => {
+                            setSelectedMedicine(index)
+                            setShowActionsheet(true)
+                        }}
+                        className={`p-4 rounded-xl  ${medicine.uncertain ? 'bg-red-100 border-red-400' : getMedSeverityColor(medicine.name)} border border-gray-200`}
+                    >
+                        <Text className={`font-medium text-black`}>
+                            {medicine.name}
+                        </Text>
+                        <View className='flex-row mt-1'>
+                            {medicine.uncertain && (
+                                <View className="flex-row gap-1">
+                                    <Text className='text-red-500 text-sm'>Uncertain</Text>
+                                    <Text className='text-sm'>|</Text>
+                                </View>
+                            )}
+                            {medicine.duration && (
+                                <Text className='text-gray-500 text-sm'>Duration: {medicine.duration}</Text>
+                            )}
+                            {medicine.instructions && (
+                                <Text className='text-gray-500 text-sm'> | {medicine.instructions}</Text>
+                            )}
+                        </View>
+
+                        {medicine.frequency && (
+                            <Text className='text-gray-500 text-sm'>{medicine.frequency}</Text>
                         )}
-                        {medicine.duration && (
-                            <Text className='text-gray-500 text-sm'> Duration: {medicine.duration}</Text>
-                        )}
-                        {medicine.Instructions && (
-                            <Text className='text-gray-500 text-sm'> | {medicine.Instructions}</Text>
-                        )}
-                    </View>
-                </TouchableOpacity>
-            ))}
-        </View>
-    );
+
+                        {
+                            getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.overallRisk !== 'minimal' && (
+                                <Text className="mt-2 text-gray-600">Health Profile Conflicts:</Text>
+                            )
+                        }
+                        <HStack className="gap-1 mt-1">
+                            {
+                                getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount &&
+                                <TouchableOpacity
+                                    className={`flex-row items-center px-3 py-1 rounded-xl bg-red-500`}
+                                >
+                                    <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount}</Text>
+                                    <Text className={`ml-2 font-medium text-sm text-white`}>
+                                        critical
+                                    </Text>
+                                </TouchableOpacity>
+                            }
+                            {
+                                getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount &&
+                                <TouchableOpacity
+                                    className={`flex-row items-center px-3 py-1 rounded-xl bg-orange-500`}
+                                >
+                                    <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount}</Text>
+                                    <Text className={`ml-2 font-medium text-sm text-white`}>
+                                        high
+                                    </Text>
+                                </TouchableOpacity>
+                            }
+                            {
+                                getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount &&
+                                <TouchableOpacity
+                                    className={`flex-row items-center px-3 py-1 rounded-xl bg-yellow-500`}
+                                >
+                                    <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount}</Text>
+                                    <Text className={`ml-2 font-medium text-sm text-white`}>
+                                        moderate
+                                    </Text>
+                                </TouchableOpacity>
+                            }
+                            {
+                                getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount &&
+                                <TouchableOpacity
+                                    className={`flex-row items-center px-3 py-1 rounded-xl bg-cyan-500`}
+                                >
+                                    <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount}</Text>
+                                    <Text className={`ml-2 font-medium text-sm text-white`}>
+                                        low
+                                    </Text>
+                                </TouchableOpacity>
+                            }
+                        </HStack>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        )
+    };
 
     const renderSectionTabs = () => (
         <View className=" py-3 bg-white border-b border-gray-100">
@@ -177,8 +268,8 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                         <SkeletonText _lines={3} className="h-[18px] mb-[-1] w-full rounded-lg" speed={4} />
                         :
                         <Text className="text-black/80 text-base leading-6">
-                            Primary uses: {currentMedicine.medicalInfo.uses.slice(0, 3).join(', ')}
-                            {currentMedicine.medicalInfo.uses.length > 3 && '...'}
+                            <Text className="font-bold">Primary uses:</Text> {currentMedicine.medicalInfo.uses.join(', ')}
+                            {/* {currentMedicine.medicalInfo.uses.length > 3 && '...'} */}
                         </Text>
                 }
             </View>
@@ -193,29 +284,29 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     </View>
                     :
                     <View className="flex-row gap-3">
-                        <View className="flex-1 bg-blue-50 rounded-xl p-4">
-                            <Ionicons name="medical" size={24} color="#3b82f6" />
-                            <Text className="text-blue-600 font-semibold mt-2">{currentMedicine.medicalInfo.uses.length}</Text>
-                            <Text className="text-blue-600 text-sm">Uses</Text>
+                        <View className="flex-1 bg-red-100 rounded-xl p-4">
+                            <MaterialIcons name="report-gmailerrorred" size={24} color="red" />
+                            <Text className="text-red-600 font-semibold m-auto text-4xl">{currentMedicine.medicalInfo.healthProfileInteraction.criticalCount + currentMedicine.medicalInfo.healthProfileInteraction.moderateCount + currentMedicine.medicalInfo.healthProfileInteraction.highCount}</Text>
+                            <Text className="text-red-600 text-sm">Health Conflicts</Text>
                         </View>
                         <View className="flex-1 bg-orange-50 rounded-xl p-4">
                             <Ionicons name="warning" size={24} color="#f97316" />
-                            <Text className="text-orange-600 font-semibold mt-2">
+                            <Text className="text-orange-600 font-semibold m-auto text-4xl">
                                 {currentMedicine.medicalInfo.sideEffects.common.length + currentMedicine.medicalInfo.sideEffects.serious.length}
                             </Text>
-                            <Text className="text-orange-600 text-sm">Side Effects</Text>
+                            <Text className="text-orange-600 text-sm text-center">Side Effects</Text>
                         </View>
                         <View className="flex-1 bg-green-50 rounded-xl p-4">
                             <Ionicons name="business" size={24} color="#10b981" />
-                            <Text className="text-green-600 font-semibold mt-2">{currentMedicine.medicalInfo.manufacturer.length}</Text>
-                            <Text className="text-green-600 text-sm">Manufacturers</Text>
+                            <Text className="text-green-600 font-semibold m-auto text-4xl">{currentMedicine.medicalInfo.manufacturer.length}</Text>
+                            <Text className="text-green-600 text-sm text-center">Manufacturers</Text>
                         </View>
                     </View>
             }
 
             {/* Price Info */}
             {
-                loading ? 
+                loading ?
                     <Skeleton className="h-[80px] rounded-lg" />
                     :
                     currentMedicine.medicalInfo.approximatePrice &&
@@ -229,9 +320,27 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                     {currentMedicine.medicalInfo.approximatePrice.unit}
                                 </Text>
                             </View>
-                            <View className="bg-[#00ffc8] rounded-full p-2">
-                                <Ionicons name="pricetag" size={20} color="#000" />
-                            </View>
+                        </View>
+                    </View>
+            }
+
+            {/* Manufacturers */}
+            {
+                loading ?
+                    <Skeleton className="h-[80px] rounded-lg" />
+                    :
+                    currentMedicine.medicalInfo.manufacturer.length > 0 &&
+                    <View className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                        <View className="flex-row items-center mb-3">
+                            <Ionicons name="business" size={20} color="#6b7280" />
+                            <Text className="text-gray-700 font-semibold ml-2">Manufacturers</Text>
+                        </View>
+                        <View className="flex-row flex-wrap gap-2">
+                            {currentMedicine.medicalInfo.manufacturer.map((manufacturer, index) => (
+                                <View key={index} className="bg-white rounded-full px-3 py-1 border border-gray-200">
+                                    <Text className="text-gray-700 text-sm">{manufacturer}</Text>
+                                </View>
+                            ))}
                         </View>
                     </View>
             }
@@ -369,28 +478,56 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     {currentMedicine.medicalInfo.overdoseMissedDose.missedDose}
                 </Text>
             </View>
-
-            {/* Manufacturers */}
-            <View className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                <View className="flex-row items-center mb-3">
-                    <Ionicons name="business" size={20} color="#6b7280" />
-                    <Text className="text-gray-700 font-semibold ml-2">Manufacturers</Text>
-                </View>
-                <View className="flex-row flex-wrap gap-2">
-                    {currentMedicine.medicalInfo.manufacturer.map((manufacturer, index) => (
-                        <View key={index} className="bg-white rounded-full px-3 py-1 border border-gray-200">
-                            <Text className="text-gray-700 text-sm">{manufacturer}</Text>
-                        </View>
-                    ))}
-                </View>
-            </View>
         </View>
+    );
+
+    const renderHealthConflicts = () => (
+        <ScrollView className="p-4" showsVerticalScrollIndicator={false}>
+            <View className="gap-4">
+                {
+                    ['allergy', 'medical_condition', 'current_medication', 'dietary_restriction'].map((type) => {
+                        const interactions = currentMedicine.medicalInfo.healthProfileInteraction.interactions.filter((interaction) => interaction.type === type);
+                        return (
+                            <View key={type}>
+                                {
+                                    interactions.length > 0 && (
+                                        <View className="flex-row items-center mb-3">
+                                            {
+                                                type === 'allergy' && <Ionicons name="warning" size={20} color="black" />
+                                            }
+                                            {
+                                                type === 'medical_condition' && <FontAwesome5 name="procedures" size={20} color="black" />
+                                            }
+                                            {
+                                                type === 'current_medication' && <FontAwesome5 name="pills" size={20} color="black" />
+                                            }
+                                            {
+                                                type === 'dietary_restriction' && <FontAwesome5 name="utensils" size={20} color="black" />
+                                            }
+                                            <Text className="text-black font-semibold ml-2">{type}</Text>
+                                        </View>
+                                    )}
+                                {interactions.map((interaction, index) => (
+                                    <View key={index} className={`${getSeverityColor(interaction.severity)} border rounded-xl p-4 mb-2`}>
+                                        <Text className={`${getSeverityTextColor(interaction.severity)} font-bold ml-2`}>{interaction.item}</Text>
+                                        <Text className={`${getSeverityTextColor(interaction.severity)} mb-2 leading-5 ml-3`}>{interaction.description}</Text>
+                                        <Text className="ml-2 font-semibold">Recommendation: </Text>
+                                        <Text className={`text-gray-600 ml-3`}>{interaction.recommendation}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        );
+                    })}
+            </View>
+        </ScrollView>
     );
 
     const renderContent = () => {
         switch (activeSection) {
             case 'overview':
                 return renderOverview();
+            case 'healthConflicts':
+                return renderHealthConflicts();
             case 'ingredients':
                 return renderIngredients();
             case 'sideEffects':
@@ -543,9 +680,9 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     <ActionsheetDragIndicatorWrapper>
                         <ActionsheetDragIndicator />
                     </ActionsheetDragIndicatorWrapper>
-                    <ActionsheetItem onPress={handleClose}>
+                    <ActionsheetScrollView horizontal showsHorizontalScrollIndicator={false} className="border-b border-gray-200 mb-2">
                         {renderSectionTabs()}
-                    </ActionsheetItem>
+                    </ActionsheetScrollView>
                     <ActionsheetScrollView className="max-h-[600px] overflow-auto" showsVerticalScrollIndicator={false}>
                         {renderContent()}
                     </ActionsheetScrollView>

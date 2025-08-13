@@ -15,6 +15,8 @@ import MedicineDisplay from '@/components/scan/Result';
 import { dummyMedicineSearchResult } from '@/constants/staticData';
 import Preview from '@/components/scan/Preview';
 import Select from '@/components/scan/Select';
+import { useHealthProfile } from '@/context/HealthProfileContext';
+import { useUserHealth } from '@/context/UserHealthContext';
 
 // Type definitions
 interface Doctor {
@@ -63,6 +65,7 @@ interface SelectedImage {
 }
 
 export default function EnhancedPrescriptionOCR() {
+    const { healthProfile } = useUserHealth();
     const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
     const [ocrLoading, setOcrLoading] = useState<boolean>(false);
     const [ocrResult, setOcrResult] = useState<PrescriptionData | null>(null);
@@ -71,9 +74,8 @@ export default function EnhancedPrescriptionOCR() {
     const { searchMedicines, loading, error, reset } = useMedicineSearch(process.env.EXPO_PUBLIC_GEMINI_API_KEY as string);
     const [result, setResult] = useState<MedicineSearchResult | null>(dummyMedicineSearchResult);
 
-
     // Replace with your actual API base URL
-    const API_BASE_URL = 'https://a3ba324869e0.ngrok-free.app';
+    const API_BASE_URL = 'https://5c49b555d292.ngrok-free.app';
 
     const parseRawResponse = (rawResponse: string): PrescriptionData | null => {
         try {
@@ -224,13 +226,12 @@ export default function EnhancedPrescriptionOCR() {
                 setOcrResult(processedResult);
                 setCurrentStep('results');
 
-                // Automatically starting analysis in background after OCR
-                if (processedResult.medications) {
-                    reset();
-                    const res = await searchMedicines(processedResult.medications);
-                    console.log(JSON.stringify(res, null, 2));
-                    setResult(res);
-                }
+                // if (processedResult.medications) {
+                //     reset();
+                //     const res = await searchMedicines({ prescription_medications: processedResult.medications, health_profile: healthProfile });
+                //     console.log(JSON.stringify(res, null, 2));
+                //     setResult(res);
+                // }
             } else {
                 setOcrError(data.error || 'Failed to extract prescription data');
             }
