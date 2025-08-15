@@ -10,59 +10,16 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { useMedicineSearch, MedicineInput, MedicineSearchResult } from '@/hooks/useMedicineSearch';
+import { useMedicineSearch } from '@/hooks/useMedicineSearch';
 import MedicineDisplay from '@/components/scan/Result';
 import { dummyMedicineSearchResult } from '@/constants/staticData';
 import Preview from '@/components/scan/Preview';
 import Select from '@/components/scan/Select';
 import { useHealthProfile } from '@/context/HealthProfileContext';
 import { useUserHealth } from '@/context/UserHealthContext';
+import appwriteService from '@/lib/appwrite';
+import { ApiResponse, MedicineSearchResult, PrescriptionData, SelectedImage } from '@/types/prescription';
 
-// Type definitions
-interface Doctor {
-    name?: string;
-    qualifications?: string;
-    registration_number?: string;
-    clinic_name?: string;
-    address?: string;
-    phone?: string;
-}
-
-interface Patient {
-    name?: string;
-    age?: string;
-    gender?: string;
-    address?: string;
-    prescription_date?: string;
-}
-
-interface AdditionalNotes {
-    special_instructions?: string;
-    follow_up?: string;
-    warnings?: string;
-}
-
-interface PrescriptionData {
-    doctor?: Doctor;
-    patient?: Patient;
-    medications?: MedicineInput[];
-    additional_notes?: AdditionalNotes;
-    extraction_notes?: string;
-    raw_response?: string;
-    note?: string;
-}
-
-interface ApiResponse {
-    success: boolean;
-    data?: PrescriptionData;
-    error?: string;
-}
-
-interface SelectedImage {
-    uri: string;
-    fileName?: string;
-    fileSize?: number;
-}
 
 export default function EnhancedPrescriptionOCR() {
     const { healthProfile } = useUserHealth();
@@ -75,7 +32,7 @@ export default function EnhancedPrescriptionOCR() {
     const [result, setResult] = useState<MedicineSearchResult | null>(dummyMedicineSearchResult);
 
     // Replace with your actual API base URL
-    const API_BASE_URL = 'https://5c49b555d292.ngrok-free.app';
+    const API_BASE_URL = 'https://4e52488f050e.ngrok-free.app';
 
     const parseRawResponse = (rawResponse: string): PrescriptionData | null => {
         try {
@@ -250,6 +207,46 @@ export default function EnhancedPrescriptionOCR() {
         }
     };
 
+    const savePrescription = async () => {
+
+        if (!ocrResult) {
+            Alert.alert('No Result', 'Please extract prescription data first');
+            return;
+        }
+
+        if (!result) {
+            Alert.alert('No Search Result', 'Please do search for prescription data first');
+            return;
+        }
+
+        if (!selectedImage?.uri) {
+            Alert.alert('No Image', 'Please select an image first');
+            return;
+        }
+
+        const currentUser = await appwriteService.getCurrentUser();
+
+        if (!currentUser) {
+            Alert.alert('Authentication Error', 'Please log in to save prescriptions');
+            return;
+        }
+
+        try {
+
+            const field = await appwriteService.uploadImage(selectedImage.uri, selectedImage.fileName)
+            if (!field) {
+                throw new Error('Failed to upload image');
+            }
+            const imgUrl = appwriteService.getImageUrl(field);
+            await appwriteService.createPrescription(currentUser.$id, ocrResult, result, imgUrl);
+            resetResults();
+            setCurrentStep('select');
+        } catch (error) {
+            console.error('Upload error:', error);
+            Alert.alert('Upload Failed', `Failed to upload prescription: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+
 
     const resetToStart = () => {
         reset();
@@ -315,8 +312,9 @@ export default function EnhancedPrescriptionOCR() {
                 )}
 
                 {/* Results Screen */}
-                {currentStep === 'results' && result && (
-                    <MedicineDisplay ocrResult={ocrResult} result={result} resetToStart={resetToStart} loading={loading} />                )}
+                {currentStep === 'results' && ocrResult && result && (
+                    <MedicineDisplay ocrResult={ocrResult} result={result} resetToStart={resetToStart} loading={loading} savePrescription={savePrescription} />
+                )}
 
             </View>
 

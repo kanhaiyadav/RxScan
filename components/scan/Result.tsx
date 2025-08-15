@@ -4,10 +4,9 @@ import {
     ActionsheetContent,
     ActionsheetDragIndicator,
     ActionsheetDragIndicatorWrapper,
-    ActionsheetItem,
     ActionsheetScrollView
 } from "@/components/ui/actionsheet";
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -21,23 +20,23 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { MedicineSearchResult } from "@/hooks/useMedicineSearch";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
 import { HStack } from "../ui/hstack";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { getSeverityColor, getSeverityTextColor } from "@/lib/utils";
-import { FontAwesome5 } from '@expo/vector-icons'
+import { MedicineSearchResult, PrescriptionData } from "@/types/prescription";
 
 
 
 interface Props {
-    ocrResult: any;
+    ocrResult: PrescriptionData;
     result: MedicineSearchResult;
     resetToStart: () => void;
     loading: boolean;
+    savePrescription: () => void;
 }
 
-const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loading }) => {
+const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loading, savePrescription }) => {
     console.log(JSON.stringify(ocrResult, null, 2));
 
     const [selectedMedicine, setSelectedMedicine] = useState(0);
@@ -99,7 +98,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
 
         return (
             <View className="py-3 gap-2 px-1">
-                {ocrResult.medications.map((medicine: {
+                {ocrResult.medications?.map((medicine: {
                     name: string;
                     uncertain?: boolean;
                     duration?: string;
@@ -613,7 +612,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 {result.medicines.length > 1 && renderMedicineSelector()}
 
                 {/* Additional Notes */}
-                {ocrResult.additional_notes && (ocrResult.special_instructions || ocrResult.follow_up || ocrResult.warnings) && (
+                {ocrResult.additional_notes && (
                     <View className="mt-4">
                         <View className="flex-row items-center mb-4">
                             <LinearGradient
@@ -659,7 +658,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                         <TouchableOpacity
                             className="flex-1 rounded-2xl overflow-hidden"
                             onPress={() => {
-                                Alert.alert('Feature Coming Soon', 'Save and share functionality will be available soon!');
+                                savePrescription();
                             }}
                         >
                             <LinearGradient

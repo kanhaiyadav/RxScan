@@ -2,12 +2,7 @@ import { Image, View, Text, TouchableOpacity, ActivityIndicator } from 'react-na
 import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
-
-interface SelectedImage {
-    uri: string;
-    fileName?: string;
-    fileSize?: number;
-}
+import { SelectedImage } from '@/types/prescription'
 
 const Preview = ({ selectedImage, isLoading, extractPrescription, setCurrentStep, ocrError, ocrLoading }: {
     selectedImage: SelectedImage | null
