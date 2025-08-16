@@ -19,6 +19,7 @@ import { useHealthProfile } from '@/context/HealthProfileContext';
 import { useUserHealth } from '@/context/UserHealthContext';
 import appwriteService from '@/lib/appwrite';
 import { ApiResponse, MedicineSearchResult, PrescriptionData, SelectedImage } from '@/types/prescription';
+import s3Service from '@/lib/AWSS3Service';
 
 
 export default function EnhancedPrescriptionOCR() {
@@ -32,7 +33,7 @@ export default function EnhancedPrescriptionOCR() {
     const [result, setResult] = useState<MedicineSearchResult | null>(dummyMedicineSearchResult);
 
     // Replace with your actual API base URL
-    const API_BASE_URL = 'https://4e52488f050e.ngrok-free.app';
+    const API_BASE_URL = process.env.EXPO_PUBLIC_FLASK_API_URL;
 
     const parseRawResponse = (rawResponse: string): PrescriptionData | null => {
         try {
@@ -232,13 +233,14 @@ export default function EnhancedPrescriptionOCR() {
         }
 
         try {
+            // Upload to S3 instead of Appwrite
+            const res = await s3Service.uploadViaBackend(selectedImage.uri, selectedImage.fileName);
+            console.log('Upload result:', res);
 
-            const field = await appwriteService.uploadImage(selectedImage.uri, selectedImage.fileName)
-            if (!field) {
-                throw new Error('Failed to upload image');
-            }
-            const imgUrl = appwriteService.getImageUrl(field);
-            await appwriteService.createPrescription(currentUser.$id, ocrResult, result, imgUrl);
+            // Save prescription data to Appwrite with S3 URL
+            await appwriteService.createPrescription(currentUser.$id, ocrResult, result, res.fileUrl || "", res.key || "");
+
+            Alert.alert('Success', 'Prescription saved successfully!');
             resetResults();
             setCurrentStep('select');
         } catch (error) {

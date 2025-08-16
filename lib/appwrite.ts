@@ -329,13 +329,14 @@ class AppwriteService {
     }
     }
 
-    async createPrescription(userId: string, ocrResult:PrescriptionData, searchResult:MedicineSearchResult, image: string) {
+    async createPrescription(userId: string, ocrResult:PrescriptionData, searchResult:MedicineSearchResult, image: string, key:string) {
         try {
             const prescriptionData = {
                 userId,
                 ocrResult: JSON.stringify(ocrResult),
                 searchResult: JSON.stringify(searchResult),
                 image,
+                key,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
             };
@@ -351,7 +352,33 @@ class AppwriteService {
             throw error;
         }
     }
+
+    async getPrescriptions(userId: string) {
+        try {
+            const response = await this.databases.listDocuments(
+                APPWRITE_DATABASE_ID,
+                APPWRITE_PRESCRIPTION_COLLECTION_ID,
+                [
+                    Query.equal('userId', userId)
+                ]
+            );
+
+            return response.documents.map(doc => ({
+                $id: doc.$id,
+                userId: doc.userId,
+                ocrResult: JSON.parse(doc.ocrResult || '{}'),
+                searchResult: JSON.parse(doc.searchResult || '{}'),
+                image: doc.image || '',
+                createdAt: doc.createdAt,
+                updatedAt: doc.updatedAt,
+            }));
+        } catch (error) {
+            console.log('Appwrite service :: getPrescriptions :: error', error);
+            return [];
+        }
+    }
 }
+    
 
 const appwriteService = new AppwriteService();
 

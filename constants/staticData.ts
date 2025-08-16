@@ -1,4 +1,4 @@
-import { MedicineSearchResult } from "@/hooks/useMedicineSearch";
+import { MedicineSearchResult } from "@/types/prescription";
 
 export const dummyMedicineSearchResult: MedicineSearchResult = {
     medicines: [
