@@ -31,9 +31,9 @@ import { MedicineSearchResult, PrescriptionData } from "@/types/prescription";
 interface Props {
     ocrResult: PrescriptionData;
     result: MedicineSearchResult;
-    resetToStart: () => void;
-    loading: boolean;
-    savePrescription: () => void;
+    resetToStart?: () => void;
+    loading?: boolean;
+    savePrescription?: () => void;
 }
 
 const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loading, savePrescription }) => {
@@ -543,7 +543,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     };
 
     return (
-        <SafeAreaView className="flex-1">
+        <SafeAreaView className="flex-1 bg-gray-50">
             <ScrollView showsVerticalScrollIndicator={false} className="px-6">
                 <View className="pt-[20px]">
 
@@ -644,33 +644,36 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 )}
 
                 {/* Bottom Actions */}
-                <View className="py-4">
-                    <View className="flex-row gap-3">
-                        <TouchableOpacity
-                            className="flex-1 bg-white rounded-2xl p-4 flex-row items-center justify-center"
-                            style={{ elevation: 1 }}
-                            onPress={resetToStart}
-                        >
-                            <Ionicons name="refresh" size={20} color="#6b7280" />
-                            <Text className="text-gray-700 font-medium ml-2">Scan New</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            className="flex-1 rounded-2xl overflow-hidden"
-                            onPress={() => {
-                                savePrescription();
-                            }}
-                        >
-                            <LinearGradient
-                                colors={['#00ffc8', '#00e6b8']}
-                                className="flex-row p-4 items-center justify-center"
+                {
+                    savePrescription &&
+                    <View className="py-4">
+                        <View className="flex-row gap-3">
+                            <TouchableOpacity
+                                className="flex-1 bg-white rounded-2xl p-4 flex-row items-center justify-center"
+                                style={{ elevation: 1 }}
+                                onPress={resetToStart}
                             >
-                                <Feather name="download" size={20} color="#000" />
-                                <Text className="text-black font-medium ml-2">Save Report</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
+                                <Ionicons name="refresh" size={20} color="#6b7280" />
+                                <Text className="text-gray-700 font-medium ml-2">Scan New</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                className="flex-1 rounded-2xl overflow-hidden"
+                                onPress={() => {
+                                    savePrescription?.();
+                                }}
+                            >
+                                <LinearGradient
+                                    colors={['#00ffc8', '#00e6b8']}
+                                    className="flex-row p-4 items-center justify-center"
+                                >
+                                    <Feather name="download" size={20} color="#000" />
+                                    <Text className="text-black font-medium ml-2">Save Report</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
+                }
             </ScrollView>
 
             <Actionsheet isOpen={showActionsheet} onClose={handleClose}>

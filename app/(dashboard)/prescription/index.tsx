@@ -12,21 +12,11 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import appwriteService from '@/lib/appwrite';
-import { MedicineSearchResult, PrescriptionData } from '@/types/prescription';
 import LottieView from 'lottie-react-native';
 import searchingPrescriptionsAnimation from '@/assets/lottie/searching_prescriptions.json';
 import notFoundAnimation from '@/assets/lottie/not_found.json';
 import { useRouter } from 'expo-router';
-
-interface Prescription {
-    $id: string;
-    image: string;
-    key: string;
-    ocrResult: PrescriptionData;
-    searchResult: MedicineSearchResult;
-    createdAt: string;
-    updatedAt: string;
-}
+import { Prescription } from '@/types/prescription';
 
 export default function PrescriptionsScreen() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -58,7 +48,6 @@ export default function PrescriptionsScreen() {
                 setLoading(false);
                 //@ts-ignore
                 setPrescriptions(res)
-                // setPrescriptions(res);
             }
         })();
     }, [])
@@ -211,7 +200,10 @@ export default function PrescriptionsScreen() {
                                 {/* Actions */}
                                 <View className="flex-row mt-4 gap-3">
                                     <TouchableOpacity className="flex-1 bg-teal-50 py-3 px-4 rounded-xl flex-row items-center justify-center"
-                                        onPress={() => router.push(`/prescription/details`)}
+                                        onPress={() => router.push({
+                                            pathname: `/prescription/details`,
+                                            params: { prescription: JSON.stringify(prescription) }
+                                        })}
                                     >
                                         <Ionicons name="eye-outline" size={16} color="#14B8A6" />
                                         <Text className="text-teal-600 font-medium ml-2">View Details</Text>

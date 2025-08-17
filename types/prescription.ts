@@ -204,3 +204,13 @@ export interface SelectedImage {
     fileName?: string;
     fileSize?: number;
 }
+
+export interface Prescription {
+    $id: string;
+    image: string;
+    key: string;
+    ocrResult: PrescriptionData;
+    searchResult: MedicineSearchResult;
+    createdAt: string;
+    updatedAt: string;
+}

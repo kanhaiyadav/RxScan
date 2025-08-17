@@ -27,7 +27,7 @@ const PrescriptionLayout = () => {
             <Stack.Screen
                 name="details"
                 options={{
-                    headerShown: true,
+                    headerShown: false,
                     animation: "ios_from_right",
                 }}
             />
