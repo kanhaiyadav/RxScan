@@ -5,18 +5,20 @@ import {
     TouchableOpacity,
     SafeAreaView,
     StatusBar,
-    Image
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams } from 'expo-router';
-import { Prescription } from '@/types/prescription';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import MedicineDisplay from '@/components/scan/Result';
+import { useSelector } from 'react-redux';
+import { selectPrescriptionById } from '@/Store/slices/prescriptionSlice';
+import { RootState } from '@/Store/store';
 
 export default function PrescriptionDetails() {
 
-    const { prescription } = useLocalSearchParams();
-    const data: Prescription = JSON.parse(Array.isArray(prescription) ? prescription[0] : prescription);
+    const router = useRouter();
+    const { prescriptionId } = useLocalSearchParams();
+    const data = useSelector((state: RootState) => selectPrescriptionById(state, Array.isArray(prescriptionId) ? prescriptionId[0] : prescriptionId));
 
     return (
         <SafeAreaView className="flex-1">
@@ -35,6 +37,7 @@ export default function PrescriptionDetails() {
                     <View className="flex-row items-center">
                         <TouchableOpacity
                             className="mr-4 bg-white/20 w-10 h-10 rounded-full items-center justify-center"
+                            onPress={() => router.back()}
                         >
                             <Ionicons name="arrow-back" size={26} color="#1f2937" />
                         </TouchableOpacity>

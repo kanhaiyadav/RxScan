@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -11,19 +11,21 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import appwriteService from '@/lib/appwrite';
 import LottieView from 'lottie-react-native';
 import searchingPrescriptionsAnimation from '@/assets/lottie/searching_prescriptions.json';
 import notFoundAnimation from '@/assets/lottie/not_found.json';
 import { useRouter } from 'expo-router';
 import { Prescription } from '@/types/prescription';
+import { useSelector } from 'react-redux';
+import { selectPrescriptionEntities, selectPrescriptionLoading } from '@/Store/slices/prescriptionSlice';
 
 export default function PrescriptionsScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState('All');
-    const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
-    const [loading, setLoading] = useState(true);
-
+    const prescriptionsEntities = useSelector(selectPrescriptionEntities);
+    const loading =  useSelector(selectPrescriptionLoading);
+    const prescriptions = Object.values(prescriptionsEntities);
+    console.log("***************rPrescriptions:", prescriptions);
     const filters = ['All', 'Recent', 'Active', 'Completed'];
 
     const router = useRouter();
@@ -39,18 +41,6 @@ export default function PrescriptionsScreen() {
                 return 'bg-blue-100 text-blue-800';
         }
     };
-
-    useEffect(() => {
-        (async () => {
-            const currentUser = await appwriteService.getCurrentUser();
-            if (currentUser) {
-                const res = await appwriteService.getPrescriptions(currentUser.$id);
-                setLoading(false);
-                //@ts-ignore
-                setPrescriptions(res)
-            }
-        })();
-    }, [])
 
     const getWarning = (prescription: Prescription) => {
         return prescription.searchResult.medicines.reduce((acc, medicine) => {
@@ -139,9 +129,9 @@ export default function PrescriptionsScreen() {
             ) :
                 <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                     <View className="mx-6 mt-6">
-                        {prescriptions.map((prescription) => (
+                        {prescriptions.map((prescription, index) => (
                             <View
-                                key={prescription.$id}
+                                key={index}
                                 className="bg-white p-5 mb-4 overflow-hidden"
                                 style={{ borderRadius: 16, elevation: 1 }}
                             >
@@ -156,12 +146,12 @@ export default function PrescriptionsScreen() {
                                 <View className="flex-row items-center justify-between mb-3">
                                     <View className="flex-1">
                                         <Text className="text-lg font-semibold text-gray-900">
-                                            {prescription.ocrResult.doctor?.name || prescription.ocrResult.doctor?.clinic_name}
+                                            {prescription.ocrResult?.doctor?.name || prescription.ocrResult?.doctor?.clinic_name}
                                         </Text>
                                         {
-                                            prescription.ocrResult.doctor?.name &&
+                                            prescription.ocrResult?.doctor?.name &&
                                             <Text className="text-gray-500 text-sm mt-1">
-                                                {prescription.ocrResult.doctor?.clinic_name}
+                                                {prescription.ocrResult?.doctor?.clinic_name}
                                             </Text>
                                         }
                                     </View>
@@ -174,9 +164,9 @@ export default function PrescriptionsScreen() {
                                 <View className="flex-row items-center justify-between mb-4">
                                     <View className="flex-row items-center">
                                         <Ionicons name="calendar-outline" size={16} color="#9CA3AF" />
-                                        <Text className="text-gray-500 ml-2">{prescription.ocrResult.patient?.prescription_date || prescription.createdAt}</Text>
+                                        <Text className="text-gray-500 ml-2">{prescription.ocrResult?.patient?.prescription_date || prescription.createdAt}</Text>
                                     </View>
-                                    {prescription.searchResult.overallHealthAnalysis.riskLevel && (
+                                    {prescription.searchResult?.overallHealthAnalysis.riskLevel && (
                                         <View className="flex-row items-center bg-orange-50 px-3 py-1 rounded-full">
                                             <Ionicons name="warning" size={14} color="#F97316" />
                                             <Text className="text-orange-600 text-xs ml-1 font-medium">
@@ -189,7 +179,7 @@ export default function PrescriptionsScreen() {
                                 {/* Medicines */}
                                 <View className="bg-gray-50 rounded-xl p-3">
                                     <Text className="text-gray-700 font-medium mb-2">Medicines:</Text>
-                                    {prescription.ocrResult.medications?.map((medicine, index) => (
+                                    {prescription.ocrResult?.medications?.map((medicine, index) => (
                                         <View key={index} className="flex-row items-center mb-1">
                                             <View className="w-1.5 h-1.5 bg-teal-500 rounded-full mr-2" />
                                             <Text className="text-gray-600 text-sm">{medicine.name}</Text>
@@ -202,7 +192,7 @@ export default function PrescriptionsScreen() {
                                     <TouchableOpacity className="flex-1 bg-teal-50 py-3 px-4 rounded-xl flex-row items-center justify-center"
                                         onPress={() => router.push({
                                             pathname: `/prescription/details`,
-                                            params: { prescription: JSON.stringify(prescription) }
+                                            params: { prescriptionId: prescription.$id }
                                         })}
                                     >
                                         <Ionicons name="eye-outline" size={16} color="#14B8A6" />

@@ -207,6 +207,10 @@ export interface SelectedImage {
 
 export interface Prescription {
     $id: string;
+    $createdAt: string;
+    $updatedAt: string;
+    $databaseId: string;
+    $collectionId: string;
     image: string;
     key: string;
     ocrResult: PrescriptionData;
