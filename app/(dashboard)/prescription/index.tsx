@@ -16,18 +16,8 @@ import searchingPrescriptionsAnimation from '@/assets/lottie/searching_prescript
 import notFoundAnimation from '@/assets/lottie/not_found.json';
 import { useRouter } from 'expo-router';
 import { Prescription } from '@/types/prescription';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectPrescriptionEntities, selectPrescriptionLoading } from '@/Store/slices/prescriptionSlice';
-import {
-    Modal,
-    ModalBackdrop,
-    ModalContent,
-    ModalCloseButton,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-} from "@/components/ui/modal"
-import { useDispatch } from 'react-redux';
 import { openModal } from '@/Store/slices/modalSlice';
 
 export default function PrescriptionsScreen() {

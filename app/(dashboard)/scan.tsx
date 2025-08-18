@@ -20,6 +20,8 @@ import { useUserHealth } from '@/context/UserHealthContext';
 import appwriteService from '@/lib/appwrite';
 import { ApiResponse, MedicineSearchResult, PrescriptionData, SelectedImage } from '@/types/prescription';
 import s3Service from '@/lib/AWSS3Service';
+import { openModal } from '@/Store/slices/modalSlice';
+import { useDispatch } from 'react-redux';
 
 
 export default function EnhancedPrescriptionOCR() {
@@ -31,6 +33,8 @@ export default function EnhancedPrescriptionOCR() {
     const [currentStep, setCurrentStep] = useState<'select' | 'preview' | 'results'>('select');
     const { searchMedicines, loading, error, reset } = useMedicineSearch(process.env.EXPO_PUBLIC_GEMINI_API_KEY as string);
     const [result, setResult] = useState<MedicineSearchResult | null>(dummyMedicineSearchResult);
+
+    const dispatch = useDispatch();
 
     // Replace with your actual API base URL
     const API_BASE_URL = process.env.EXPO_PUBLIC_FLASK_API_URL;
@@ -211,27 +215,27 @@ export default function EnhancedPrescriptionOCR() {
     const savePrescription = async () => {
 
         if (!ocrResult) {
-            Alert.alert('No Result', 'Please extract prescription data first');
+            dispatch(openModal({ name: "status", data: { type: "error" }, title: "No Result", description: "Please extract prescription data first" }));
             return;
         }
 
         if (!result) {
-            Alert.alert('No Search Result', 'Please do search for prescription data first');
+            dispatch(openModal({ name: "status", data: { type: "error" }, title: "No Search Result", description: "Please do search for prescription data first" }));
             return;
         }
 
         if (!selectedImage?.uri) {
-            Alert.alert('No Image', 'Please select an image first');
+            dispatch(openModal({ name: "status", data: { type: "error" }, title: "No Image", description: "Please select an image first" }));
             return;
         }
 
         const currentUser = await appwriteService.getCurrentUser();
 
         if (!currentUser) {
-            Alert.alert('Authentication Error', 'Please log in to save prescriptions');
+            dispatch(openModal({ name: "status", data: { type: "error" }, title: "error", description: "Please log in to save prescriptions" }));
             return;
         }
-
+        
         try {
             // Upload to S3 instead of Appwrite
             const res = await s3Service.uploadViaBackend(selectedImage.uri, selectedImage.fileName);
@@ -240,12 +244,12 @@ export default function EnhancedPrescriptionOCR() {
             // Save prescription data to Appwrite with S3 URL
             await appwriteService.createPrescription(currentUser.$id, ocrResult, result, res.fileUrl || "", res.key || "");
 
-            Alert.alert('Success', 'Prescription saved successfully!');
+            dispatch(openModal({ name: "status", data: { type: "success" }, title: "Success", description: "Prescription saved successfully!" }));
             resetResults();
             setCurrentStep('select');
         } catch (error) {
+            dispatch(openModal({ name: "status", data: { type: "error" }, title: "Upload Failed", description: `Failed to upload prescription: ${error instanceof Error ? JSON.stringify(error.message) : 'Unknown error'}` }));
             console.error('Upload error:', error);
-            Alert.alert('Upload Failed', `Failed to upload prescription: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 

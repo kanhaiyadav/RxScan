@@ -336,9 +336,7 @@ class AppwriteService {
                 ocrResult: JSON.stringify(ocrResult),
                 searchResult: JSON.stringify(searchResult),
                 image,
-                key,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
+                object_key: key,
             };
 
             return await this.databases.createDocument(
