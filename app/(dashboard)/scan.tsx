@@ -18,10 +18,11 @@ import Select from '@/components/scan/Select';
 import { useHealthProfile } from '@/context/HealthProfileContext';
 import { useUserHealth } from '@/context/UserHealthContext';
 import appwriteService from '@/lib/appwrite';
-import { ApiResponse, MedicineSearchResult, PrescriptionData, SelectedImage } from '@/types/prescription';
+import { ApiResponse, MedicineSearchResult, Prescription, PrescriptionData, SelectedImage } from '@/types/prescription';
 import s3Service from '@/lib/AWSS3Service';
 import { openModal } from '@/Store/slices/modalSlice';
 import { useDispatch } from 'react-redux';
+import { addPrescription } from '@/Store/slices/prescriptionSlice';
 
 
 export default function EnhancedPrescriptionOCR() {
@@ -43,7 +44,6 @@ export default function EnhancedPrescriptionOCR() {
         try {
             const cleanedResponse = rawResponse.replace(/```json\s*|\s*```/g, '').trim();
             const parsedData = JSON.parse(cleanedResponse);
-            console.log('Successfully parsed JSON:', parsedData);
             return parsedData;
         } catch (error) {
             console.error('Failed to parse JSON from raw response:', error);
@@ -163,7 +163,6 @@ export default function EnhancedPrescriptionOCR() {
             const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
 
             if (!response.ok) {
-                console.log(response);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
@@ -237,12 +236,18 @@ export default function EnhancedPrescriptionOCR() {
         }
         
         try {
-            // Upload to S3 instead of Appwrite
+
             const res = await s3Service.uploadViaBackend(selectedImage.uri, selectedImage.fileName);
             console.log('Upload result:', res);
 
             // Save prescription data to Appwrite with S3 URL
-            await appwriteService.createPrescription(currentUser.$id, ocrResult, result, res.fileUrl || "", res.key || "");
+            const doc = await appwriteService.createPrescription(currentUser.$id, ocrResult, result, res.fileUrl || "", res.key || "");
+            //@ts-ignore
+            dispatch(addPrescription({
+                ...doc,
+                ocrResult: ocrResult,
+                searchResult: result,
+            } as Prescription));
 
             dispatch(openModal({ name: "status", data: { type: "success" }, title: "Success", description: "Prescription saved successfully!" }));
             resetResults();

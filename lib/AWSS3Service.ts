@@ -67,14 +67,13 @@ class AWSS3Service {
         size: number;
     }> {
         try {
-            const finalFileName = fileName || `prescription_${Date.now()}.jpg`;
 
             // Create FormData
             const formData = new FormData();
             formData.append("file", {
                 uri: fileUri,
                 type: "image/jpeg",
-                name: finalFileName,
+                name: fileName,
             } as any);
 
             // Upload via your backend

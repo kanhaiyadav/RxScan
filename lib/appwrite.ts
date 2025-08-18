@@ -375,8 +375,46 @@ class AppwriteService {
             return [];
         }
     }
+
+    async deletePrescription(prescriptionId: string) {
+        try {
+            return await this.databases.deleteDocument(
+                APPWRITE_DATABASE_ID,
+                APPWRITE_PRESCRIPTION_COLLECTION_ID,
+                prescriptionId
+            );
+        } catch (error) {
+            console.log('Appwrite service :: deletePrescription :: error', error);
+            throw error;
+        }
+    }
+
+    async changePrescriptionStatus(prescriptionId: string, status: 'active' | 'inactive' | 'abandoned' | 'completed') {
+        try {
+            const existingPrescription = await this.databases.getDocument(
+                APPWRITE_DATABASE_ID,
+                APPWRITE_PRESCRIPTION_COLLECTION_ID,
+                prescriptionId
+            );
+
+            if (existingPrescription) {
+                return await this.databases.updateDocument(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_PRESCRIPTION_COLLECTION_ID,
+                    prescriptionId,
+                    {
+                        status
+                    }
+                );
+            }
+
+            throw new Error('Prescription not found');
+        } catch (error) {
+            console.log('Appwrite service :: changePrescriptionStatus :: error', error);
+            throw error;
+        }
+    }
 }
-    
 
 const appwriteService = new AppwriteService();
 

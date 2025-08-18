@@ -32,9 +32,18 @@ const prescriptionSlice = createSlice({
         addManyPrescriptions: prescriptionAdapter.addMany,
         updatePrescription: prescriptionAdapter.updateOne,
         removePrescription: prescriptionAdapter.removeOne,
+        deletePrescription: prescriptionAdapter.removeOne,
+        deleteManyPrescriptions: prescriptionAdapter.removeMany,
         setLoading: (state, action) => {
             state.isLoading = action.payload;
         },
+        setPrescriptionStatus: (state, action) => {
+            const { prescriptionId, status } = action.payload;
+            const existingPrescription = state.entities[prescriptionId];
+            if (existingPrescription) {
+                existingPrescription.status = status;
+            }
+        }
     },
     extraReducers: (builder) => {
         // Add your extra reducers here
@@ -46,6 +55,9 @@ export const {
     addManyPrescriptions,
     updatePrescription,
     removePrescription,
+    deletePrescription,
+    deleteManyPrescriptions,
+    setPrescriptionStatus,
     setLoading,
 } = prescriptionSlice.actions;
 

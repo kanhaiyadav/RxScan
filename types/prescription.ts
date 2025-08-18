@@ -211,10 +211,12 @@ export interface Prescription {
     $updatedAt: string;
     $databaseId: string;
     $collectionId: string;
+    userId: string;
     image: string;
-    key: string;
+    object_key: string;
     ocrResult: PrescriptionData;
     searchResult: MedicineSearchResult;
+    status: "active" | "completed" | "inactive" | "abandoned";
     createdAt: string;
     updatedAt: string;
 }

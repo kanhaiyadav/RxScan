@@ -10,6 +10,10 @@ import { store, persistor } from "@/Store/store";
 import { PersistGate } from "redux-persist/integration/react";
 import ModalManager from "@/components/modal/ModalManager";
 
+if (__DEV__) {
+    import('../lib/reactotron').then(() => console.log('Reactotron Configured'))
+}
+
 export default function RootLayout() {
     return (
         <SafeAreaProvider>

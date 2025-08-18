@@ -1,4 +1,3 @@
-// store/storeExpo.ts
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
     persistStore,
@@ -14,13 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import prescriptionSlice from "./slices/prescriptionSlice"
 import modalSlice from "./slices/modalSlice";
-
-// Check if we're in Expo development environment
-const isExpoDev = __DEV__ && typeof window !== "undefined";
-
-// Redux DevTools Extension configuration
-const reduxDevToolsExtension =
-    isExpoDev && (window as any).__REDUX_DEVTOOLS_EXTENSION__;
+import reactotron from "../lib/reactotron";
 
 const persistConfig = {
     key: "root",
@@ -41,6 +34,14 @@ const rootReducer = combineReducers({
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+const createEnhancers = (getDefaultEnhancers:any) => {
+    if (__DEV__) {
+        return getDefaultEnhancers().concat(reactotron.createEnhancer());
+    } else {
+        return getDefaultEnhancers();
+    }
+};
+
 export const store = configureStore({
     reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
@@ -56,31 +57,11 @@ export const store = configureStore({
                 ],
             },
         }),
-    devTools: reduxDevToolsExtension
-        ? {
-              name: "MyApp (Expo)",
-              trace: true,
-              traceLimit: 25,
-          }
-        : false,
+    enhancers: createEnhancers,
+    devTools: __DEV__,
 });
 
 export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-
-// Development helpers
-if (__DEV__) {
-    // Make store accessible globally for debugging
-    (global as any).store = store;
-
-    // Log store changes in development
-    store.subscribe(() => {
-        if (console.group) {
-            console.group("Redux State Changed");
-            console.log("Current State:", store.getState());
-            console.groupEnd();
-        }
-    });
-}

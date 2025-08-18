@@ -13,13 +13,11 @@ export default function Index() {
   useEffect(() => {
     const checkWelcomeStatus = async () => {
       const hasSeenWelcome = await asyncStorage.getItem("hasSeenWelcome");
-      console.log("################", hasSeenWelcome);
       if (hasSeenWelcome !== "true") {
         // If the user has not seen the welcome screen, redirect to it
         router.replace("/(welcome)");
         return;
       }
-      console.log("Auth state check:", { user, isLoading });
       if (!isLoading) {
         if (user) {
           router.replace("/(dashboard)");
