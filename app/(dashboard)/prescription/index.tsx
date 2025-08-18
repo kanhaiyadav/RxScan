@@ -18,6 +18,17 @@ import { useRouter } from 'expo-router';
 import { Prescription } from '@/types/prescription';
 import { useSelector } from 'react-redux';
 import { selectPrescriptionEntities, selectPrescriptionLoading } from '@/Store/slices/prescriptionSlice';
+import {
+    Modal,
+    ModalBackdrop,
+    ModalContent,
+    ModalCloseButton,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+} from "@/components/ui/modal"
+import { useDispatch } from 'react-redux';
+import { openModal } from '@/Store/slices/modalSlice';
 
 export default function PrescriptionsScreen() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -25,8 +36,9 @@ export default function PrescriptionsScreen() {
     const prescriptionsEntities = useSelector(selectPrescriptionEntities);
     const loading =  useSelector(selectPrescriptionLoading);
     const prescriptions = Object.values(prescriptionsEntities);
-    console.log("***************rPrescriptions:", prescriptions);
     const filters = ['All', 'Recent', 'Active', 'Completed'];
+
+    const dispatch = useDispatch();
 
     const router = useRouter();
 
@@ -135,7 +147,11 @@ export default function PrescriptionsScreen() {
                                 className="bg-white p-5 mb-4 overflow-hidden"
                                 style={{ borderRadius: 16, elevation: 1 }}
                             >
-                                <TouchableOpacity activeOpacity={0.7}>
+                                <TouchableOpacity activeOpacity={0.7}
+                                    onPress={() => {
+                                        dispatch(openModal({ name: "img", data: { imgUrl: prescription.image } }));
+                                    }}
+                                >
                                     <Image
                                         source={{ uri: prescription.image }}
                                         className="w-full h-40 rounded-lg mb-4"
@@ -208,8 +224,6 @@ export default function PrescriptionsScreen() {
                     <View className="h-20" />
                 </ScrollView>
             }
-
-
         </SafeAreaView>
     );
 }

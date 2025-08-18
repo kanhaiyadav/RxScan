@@ -13,6 +13,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import prescriptionSlice from "./slices/prescriptionSlice"
+import modalSlice from "./slices/modalSlice";
 
 // Check if we're in Expo development environment
 const isExpoDev = __DEV__ && typeof window !== "undefined";
@@ -35,6 +36,7 @@ const prescriptionPersistConfig = {
 
 const rootReducer = combineReducers({
     prescription: persistReducer(prescriptionPersistConfig, prescriptionSlice),
+    modal: modalSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -8,6 +8,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { store, persistor } from "@/Store/store";
 import { PersistGate } from "redux-persist/integration/react";
+import ModalManager from "@/components/modal/ModalManager";
 
 export default function RootLayout() {
     return (
@@ -61,6 +62,7 @@ export default function RootLayout() {
                                         }}
                                     />
                                 </Stack>
+                                <ModalManager />
                             </GluestackUIProvider>
                         </UserHealthProvider>
                     </PersistGate>
