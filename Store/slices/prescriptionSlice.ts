@@ -1,6 +1,7 @@
 import {
     createSlice,
     createEntityAdapter,
+    createSelector,
 } from "@reduxjs/toolkit";
 import { Prescription } from "@/types/prescription";
 import { RootState } from "../store";
@@ -68,6 +69,12 @@ export const {
     selectEntities: selectPrescriptionEntities,
     selectTotal: selectTotalPrescriptions,
 } = prescriptionAdapter.getSelectors((state: RootState) => state.prescription);
+
+export const selectActivePrescription = createSelector(
+    [selectPrescriptionEntities], // Your existing entities selector
+    (entities) =>
+        Object.values(entities).filter((entity) => entity.status === "active")
+);
 
 export const selectPrescriptionLoading = (state: RootState) =>
     state.prescription.isLoading;

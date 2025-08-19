@@ -1,7 +1,7 @@
-import { Tabs } from 'expo-router';
-import React, { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Platform } from 'react-native';
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 // import appwriteService from '@/lib/appwrite';
 // import { addManyPrescriptions, setLoading } from '@/Store/slices/prescriptionSlice';
