@@ -362,13 +362,9 @@ class AppwriteService {
             );
 
             return response.documents.map(doc => ({
-                $id: doc.$id,
-                userId: doc.userId,
+                ...doc,
                 ocrResult: JSON.parse(doc.ocrResult || '{}'),
                 searchResult: JSON.parse(doc.searchResult || '{}'),
-                image: doc.image || '',
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt,
             }));
         } catch (error) {
             console.log('Appwrite service :: getPrescriptions :: error', error);

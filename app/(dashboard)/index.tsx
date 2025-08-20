@@ -82,15 +82,15 @@ export default function HomeScreen() {
 
     useEffect(() => {
         // Calculate health stats based on prescriptions
-        const totalPrescriptions = prescriptions.length;
-        const activeCount = activePrescriptions.length;
-        const warnings = activePrescriptions.reduce((acc, prescription) => {
-            return acc + prescription.searchResult.medicines.reduce((medAcc, medicine) => {
-                return medAcc + medicine.medicalInfo.healthProfileInteraction.interactions.length
+        const totalPrescriptions = prescriptions?.length;
+        const activeCount = activePrescriptions?.length;
+        const warnings = activePrescriptions?.reduce((acc, prescription) => {
+            return acc + prescription.searchResult.medicines?.reduce((medAcc, medicine) => {
+                return medAcc + medicine.medicalInfo.healthProfileInteraction.interactions?.length
             }, 0)
         }, 0)
-        const meds = activePrescriptions.reduce((acc, prescription) => {
-            return acc + prescription.searchResult.medicines.length
+        const meds = activePrescriptions?.reduce((acc, prescription) => {
+            return acc + prescription.searchResult.medicines?.length
         }, 0)
 
         setStats({
@@ -232,7 +232,7 @@ export default function HomeScreen() {
                                     onPress={() => {
                                         router.push({
                                             pathname: '/(dashboard)/prescription/details',
-                                            params: { id: prescription.$id }
+                                            params: { prescriptionId: prescription.$id }
                                         })
                                     }}
                                 >

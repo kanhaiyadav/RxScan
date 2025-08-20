@@ -85,9 +85,6 @@ export default function Step4() {
         additionalNotes: additionalNotes?.trim() || ''
       };
 
-      console.log('Complete Health Profile Data:', completeHealthData);
-
-      // Get current user
       const currentUser = await appwriteService.getCurrentUser();
       
       if (!currentUser) { 

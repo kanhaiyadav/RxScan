@@ -1,5 +1,5 @@
 import { UserHealthProfile } from "@/context/UserHealthContext";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 
 interface HealthProfileState {
     data: UserHealthProfile | null;
@@ -22,6 +22,8 @@ const healthProfileSlice = createSlice({
         },
     },
 });
+
+export const selectHealthProfile = (state: { healthProfile: HealthProfileState }) => state.healthProfile.data;
 
 export const {
     setProfile,

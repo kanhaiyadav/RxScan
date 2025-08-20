@@ -7,7 +7,6 @@ import {
     SafeAreaView,
     StatusBar,
     Switch,
-    Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,12 +21,28 @@ import {
 import { Button, ButtonText } from "@/components/ui/button"
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
+import { selectHealthProfile } from '@/Store/slices/healthProfileSlice';
+import { useSelector } from 'react-redux';
+import {
+    Accordion,
+    AccordionItem,
+    AccordionHeader,
+    AccordionTrigger,
+    AccordionTitleText,
+    AccordionContentText,
+    AccordionIcon,
+    AccordionContent,
+} from "@/components/ui/accordion"
+import { Divider } from "@/components/ui/divider"
+import { ChevronUpIcon, ChevronDownIcon, Icon, EditIcon } from "@/components/ui/icon"
 
 export default function ProfileScreen() {
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [darkModeEnabled, setDarkModeEnabled] = useState(false);
     const [showAlertDialog, setShowAlertDialog] = React.useState(false)
     const handleClose = () => setShowAlertDialog(false)
+
+    const healthProfile = useSelector(selectHealthProfile);
 
     const router = useRouter();
     const { signOut, user } = useAuth();
@@ -87,32 +102,36 @@ export default function ProfileScreen() {
             title: 'Health Information',
             items: [
                 {
-                    icon: 'medical',
-                    title: 'Medical Conditions',
-                    subtitle: '3 conditions added',
-                    color: 'bg-red-500',
-                    route: '/(onboarding)'
-                },
-                {
                     icon: 'warning',
                     title: 'Allergies',
-                    subtitle: '2 allergies listed',
+                    subtitle: 'allergies listed',
                     color: 'bg-orange-500',
-                    route: '/profile/allergies'
+                    route: '/profile/allergies',
+                    slug: 'allergies'
+                },
+                {
+                    icon: 'medical',
+                    title: 'Medical Conditions',
+                    subtitle: 'medical conditions added',
+                    color: 'bg-red-500',
+                    route: '/(onboarding)',
+                    slug: 'medicalConditions'
                 },
                 {
                     icon: 'medkit',
                     title: 'Current Medications',
-                    subtitle: '5 active medicines',
+                    subtitle: 'active medicines',
                     color: 'bg-blue-500',
-                    route: '/profile/medications'
+                    route: '/profile/medications',
+                    slug: 'currentMedications'
                 },
                 {
                     icon: 'restaurant',
                     title: 'Dietary Restrictions',
-                    subtitle: 'Vegetarian, No alcohol',
+                    subtitle: 'dietary restrictions',
                     color: 'bg-green-500',
-                    route: '/profile/diet'
+                    route: '/profile/diet',
+                    slug: 'dietaryRestrictions'
                 }
             ]
         },
@@ -208,6 +227,7 @@ export default function ProfileScreen() {
             >
                 <View className="px-6 py-4 pt-8">
                     <Text className="text-2xl font-bold text-gray-900">Profile</Text>
+                    <Text className="text-sm text-gray-600">Yyour profile information and settings</Text>
                 </View>
             </LinearGradient>
 
@@ -275,7 +295,7 @@ export default function ProfileScreen() {
 
                         {/* Edit Button */}
                         <TouchableOpacity
-                            className="bg-gray-100 p-3 rounded-full ml-2"
+                            className="bg-primary-100 p-3 rounded-full ml-2"
                             style={{
                                 shadowColor: '#000',
                                 shadowOffset: { width: 0, height: 1 },
@@ -284,51 +304,156 @@ export default function ProfileScreen() {
                                 elevation: 2
                             }}
                         >
-                            <Ionicons name="create-outline" size={20} color="#374151" />
+                            <Icon as={EditIcon} className='text-primary-600' />
                         </TouchableOpacity>
                     </View>
                 </View>
 
 
                 {/* Profile Sections */}
-                {profileSections.map((section, sectionIndex) => (
-                    <View key={sectionIndex} className="mx-6 mt-4">
-                        <Text className="text-lg font-semibold text-gray-900 mb-4">{section.title}</Text>
-                        <View className="bg-white rounded-2xl shadow-sm border border-gray-100">
-                            {section.items.map((item, itemIndex) => (
-                                <TouchableOpacity
-                                    key={itemIndex}
-                                    className={`p-5 flex-row items-center ${itemIndex < section.items.length - 1 ? 'border-b border-gray-100' : ''
-                                        }`}
-                                    onPress={() => {
-                                        if (item.route) {
-                                            // Navigate to route
-                                            router.push(item.route as any);
-                                        }
-                                    }}
-                                >
-                                    <View className={`${item.color} w-10 h-10 rounded-full items-center justify-center mr-4`}>
-                                        <Ionicons name={item.icon as any} size={20} color="white" />
-                                    </View>
-                                    <View className="flex-1">
-                                        <Text className="text-gray-900 font-medium">{item.title}</Text>
-                                        <Text className="text-gray-500 text-sm mt-1">{item.subtitle}</Text>
-                                    </View>
-                                    {item.hasToggle ? (
-                                        <Switch
-                                            value={item.toggleValue}
-                                            onValueChange={item.onToggle}
-                                            trackColor={{ false: '#E5E7EB', true: '#14B8A6' }}
-                                            thumbColor="#FFFFFF"
-                                        />
-                                    ) : (
-                                        <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-                                    )}
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                <View className="mx-6 mt-4">
+                    <View className='flex-row justify-between'>
+                        <Text className="text-lg font-semibold text-gray-900 mb-4">{profileSections[0].title}</Text>
+                        <TouchableOpacity
+                            className="flex-row items-center"
+                            onPress={() => router.push('/(onboarding)/')}
+                        >
+                            <Icon as={EditIcon} className='text-gray-900 mr-2' />
+                        </TouchableOpacity>
                     </View>
-                ))}
+                    <View className="">
+                        <Accordion
+                            size="md"
+                            variant="filled"
+                            type="single"
+                            isCollapsible={true}
+                            isDisabled={false}
+                            className="border border-outline-200 rounded-2xl overflow-hidden"
+                        >
+                            {profileSections[0].items.map((item, itemIndex) => (
+                                <View key={itemIndex}>
+                                    <AccordionItem value={item.title} className='p-1'>
+                                        <AccordionHeader>
+                                            <AccordionTrigger>
+                                                {({ isExpanded }: { isExpanded: boolean }) => {
+                                                    return (
+                                                        <>
+                                                            <View className='flex-row gap-4'>
+                                                                <View className={`${item.color} w-10 h-10 rounded-full items-center justify-center mb-2`}>
+                                                                    <Ionicons name={item.icon as any} size={20} color="white" />
+                                                                </View>
+                                                                <View>
+                                                                    <Text className='text-md font-bold'>{item.title}</Text>
+                                                                    <Text className='text-sm text-gray-500'>{`${healthProfile && 'slug' in item && item.slug && (healthProfile as any)[item.slug] ? (healthProfile as any)[item.slug].length : 0} ${item.subtitle}`}</Text>
+                                                                </View>
+                                                            </View>
+                                                            {isExpanded ? (
+                                                                <AccordionIcon as={ChevronUpIcon} className="ml-3" />
+                                                            ) : (
+                                                                <AccordionIcon as={ChevronDownIcon} className="ml-3" />
+                                                            )}
+                                                        </>
+                                                    )
+                                                }}
+                                            </AccordionTrigger>
+                                        </AccordionHeader>
+                                        <AccordionContent>
+                                            <View className='w-full h-full flex-row flex-wrap gap-2'>
+                                                {healthProfile && 'slug' in item && item.slug && (healthProfile as any)[item.slug] && (healthProfile as any)[item.slug].map((detail: any, detailIndex: number) => (
+                                                    <View key={detailIndex} className='bg-gray-100 p-2 px-3 rounded-md'>
+                                                        {
+                                                            'slug' in item && item.slug !== 'currentMedications' ?
+                                                                <Text className='text-sm text-gray-700'>{detail}</Text>
+                                                                : <View className='m-1'>
+                                                                    <Text className='text-sm text-gray-700'>{`${detail.name} ${detail.dosage ? `(${detail.dosage})` : ''}`}</Text>
+                                                                    <Text className='text-sm text-gray-700'>{detail.frequency}</Text>
+                                                                </View>
+                                                        }
+                                                    </View>
+                                                ))}
+                                            </View>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                    <Divider className={`${itemIndex < profileSections[0].items.length - 1 ? 'block' : 'hidden'}`} />
+                                </View>
+                            ))}
+                        </Accordion>
+                    </View>
+                </View>
+
+
+                <View className="mx-6 mt-4">
+                    <Text className="text-lg font-semibold text-gray-900 mb-4">{profileSections[1].title}</Text>
+                    <View className="bg-white rounded-2xl shadow-sm border border-gray-100">
+                        {profileSections[1].items.map((item, itemIndex) => (
+                            <TouchableOpacity
+                                key={itemIndex}
+                                className={`p-5 flex-row items-center ${itemIndex < profileSections[1].items.length - 1 ? 'border-b border-gray-100' : ''
+                                    }`}
+                                onPress={() => {
+                                    if (item.route) {
+                                        // Navigate to route
+                                        router.push(item.route as any);
+                                    }
+                                }}
+                            >
+                                <View className={`${item.color} w-10 h-10 rounded-full items-center justify-center mr-4`}>
+                                    <Ionicons name={item.icon as any} size={20} color="white" />
+                                </View>
+                                <View className="flex-1">
+                                    <Text className="text-gray-900 font-medium">{item.title}</Text>
+                                    <Text className="text-gray-500 text-sm mt-1">{item.subtitle}</Text>
+                                </View>
+                                {'hasToggle' in item && item.hasToggle ? (
+                                    <Switch
+                                        value={'toggleValue' in item ? item.toggleValue : false}
+                                        onValueChange={'onToggle' in item ? item.onToggle : undefined}
+                                        trackColor={{ false: '#E5E7EB', true: '#14B8A6' }}
+                                        thumbColor="#FFFFFF"
+                                    />
+                                ) : (
+                                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                                )}
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
+                <View className="mx-6 mt-4">
+                    <Text className="text-lg font-semibold text-gray-900 mb-4">{profileSections[2].title}</Text>
+                    <View className="bg-white rounded-2xl shadow-sm border border-gray-100">
+                        {profileSections[2].items.map((item, itemIndex) => (
+                            <TouchableOpacity
+                                key={itemIndex}
+                                className={`p-5 flex-row items-center ${itemIndex < profileSections[2].items.length - 1 ? 'border-b border-gray-100' : ''
+                                    }`}
+                                onPress={() => {
+                                    if (item.route) {
+                                        // Navigate to route
+                                        router.push(item.route as any);
+                                    }
+                                }}
+                            >
+                                <View className={`${item.color} w-10 h-10 rounded-full items-center justify-center mr-4`}>
+                                    <Ionicons name={item.icon as any} size={20} color="white" />
+                                </View>
+                                <View className="flex-1">
+                                    <Text className="text-gray-900 font-medium">{item.title}</Text>
+                                    <Text className="text-gray-500 text-sm mt-1">{item.subtitle}</Text>
+                                </View>
+                                {'hasToggle' in item && item.hasToggle ? (
+                                    <Switch
+                                        value={'toggleValue' in item ? item.toggleValue : false}
+                                        onValueChange={'onToggle' in item ? item.onToggle : undefined}
+                                        trackColor={{ false: '#E5E7EB', true: '#14B8A6' }}
+                                        thumbColor="#FFFFFF"
+                                    />
+                                ) : (
+                                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                                )}
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
 
                 {/* Logout Button */}
                 <View className="mx-6 mt-8 mb-8">

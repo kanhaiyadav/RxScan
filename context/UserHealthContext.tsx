@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
+import { setProfile } from '@/Store/slices/healthProfileSlice';
 
 export interface UserHealthProfile {
   allergies: string[];
@@ -171,6 +173,7 @@ interface UserHealthProviderProps {
 export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(userHealthReducer, initialState);
 
+    const reduxDispatch = useDispatch();
   // Load profile from AsyncStorage on app start
   const loadProfile = async () => {
     try {
@@ -192,7 +195,8 @@ export const UserHealthProvider: React.FC<UserHealthProviderProps> = ({ children
   // Save profile to AsyncStorage
   const saveProfile = async (profile: UserHealthProfile) => {
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+        reduxDispatch(setProfile(profile));
     } catch (error) {
       console.error('Error saving health profile:', error);
       throw error;

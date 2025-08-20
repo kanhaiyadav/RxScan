@@ -1,28 +1,28 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-// import appwriteService from '@/lib/appwrite';
-// import { addManyPrescriptions, setLoading } from '@/Store/slices/prescriptionSlice';
-// import { useDispatch } from 'react-redux';
+import appwriteService from '@/lib/appwrite';
+import { addManyPrescriptions, setLoading } from '@/Store/slices/prescriptionSlice';
+import { useDispatch } from 'react-redux';
 
 
 export default function TabLayout() {
 
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     (async () => {
-    //         const currentUser = await appwriteService.getCurrentUser();
-    //         if (currentUser) {
-    //             const res = await appwriteService.getPrescriptions(currentUser.$id);
-    //             //@ts-ignore
-    //             dispatch(addManyPrescriptions(res));
-    //             dispatch(setLoading(false));
-    //         }
-    //     })();
-    // }, [dispatch])
+    useEffect(() => {
+        (async () => {
+            const currentUser = await appwriteService.getCurrentUser();
+            if (currentUser) {
+                const res = await appwriteService.getPrescriptions(currentUser.$id);
+                //@ts-ignore
+                dispatch(addManyPrescriptions(res));
+                dispatch(setLoading(false));
+            }
+        })();
+    }, [dispatch])
 
     return (
         <SafeAreaView
