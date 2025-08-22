@@ -1,15 +1,20 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, Dimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Audio, AVPlaybackStatus, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
-import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
-import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 // Import Gluestack components (add these to your components/ui folder)
-import { Select, SelectTrigger, SelectInput, SelectIcon, SelectPortal, SelectBackdrop, SelectContent, SelectDragIndicatorWrapper, SelectDragIndicator, SelectItem } from '@/components/ui/select';
 import { ChevronDownIcon } from '@/components/ui/icon';
-import { Slider, SliderTrack, SliderFilledTrack, SliderThumb } from '@/components/ui/slider';
+import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectTrigger } from '@/components/ui/select';
+import { Slider, SliderFilledTrack, SliderThumb, SliderTrack } from '@/components/ui/slider';
+import { usePrescriptionNarrative } from '@/lib/generateNarrative';
+import { selectPrescriptionById } from '@/Store/slices/prescriptionSlice';
+import { RootState } from '@/Store/store';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSelector } from 'react-redux';
 
 // Polyfill for crypto.getRandomValues (required by Azure SDK)
 if (typeof global.crypto !== 'object') {
@@ -82,11 +87,17 @@ const LANGUAGE_GROUPS: LanguageGroup[] = [
         name: '🇺🇸 English (United States)',
         voices: [
             { name: 'en-US-AriaNeural', displayName: 'Aria (Female)', language: 'en-US', languageDisplay: 'English (US)', gender: 'Female' },
-            { name: 'en-US-DavisNeural', displayName: 'Davis (Male)', language: 'en-US', languageDisplay: 'English (US)', gender: 'Male' },
-            { name: 'en-US-JennyNeural', displayName: 'Jenny (Female)', language: 'en-US', languageDisplay: 'English (US)', gender: 'Female' },
             { name: 'en-US-GuyNeural', displayName: 'Guy (Male)', language: 'en-US', languageDisplay: 'English (US)', gender: 'Male' },
-            { name: 'en-US-JaneNeural', displayName: 'Jane (Female)', language: 'en-US', languageDisplay: 'English (US)', gender: 'Female' },
-            { name: 'en-US-JasonNeural', displayName: 'Jason (Male)', language: 'en-US', languageDisplay: 'English (US)', gender: 'Male' },
+            { name: 'en-US-JennyNeural', displayName: 'Jenny (Female)', language: 'en-US', languageDisplay: 'English (US)', gender: 'Female' },
+            { name: 'en-US-DavisNeural', displayName: 'Davis (Male)', language: 'en-US', languageDisplay: 'English (US)', gender: 'Male' },
+        ]
+    },
+    {
+        code: 'en-IN',
+        name: '🇮🇳 English (India)',
+        voices: [
+            { name: 'en-IN-NeerjaNeural', displayName: 'Neerja (Female)', language: 'en-IN', languageDisplay: 'English (India)', gender: 'Female' },
+            { name: 'en-IN-PrabhatNeural', displayName: 'Prabhat (Male)', language: 'en-IN', languageDisplay: 'English (India)', gender: 'Male' },
         ]
     },
     {
@@ -95,106 +106,90 @@ const LANGUAGE_GROUPS: LanguageGroup[] = [
         voices: [
             { name: 'hi-IN-SwaraNeural', displayName: 'Swara (Female)', language: 'hi-IN', languageDisplay: 'Hindi (India)', gender: 'Female' },
             { name: 'hi-IN-MadhurNeural', displayName: 'Madhur (Male)', language: 'hi-IN', languageDisplay: 'Hindi (India)', gender: 'Male' },
-            { name: 'hi-IN-RehaNeural', displayName: 'Reha (Female)', language: 'hi-IN', languageDisplay: 'Hindi (India)', gender: 'Female' },
         ]
     },
     {
-        code: 'en-GB',
-        name: '🇬🇧 English (United Kingdom)',
+        code: 'bn-IN',
+        name: '🇮🇳 Bengali (India)',
         voices: [
-            { name: 'en-GB-SoniaNeural', displayName: 'Sonia (Female)', language: 'en-GB', languageDisplay: 'English (UK)', gender: 'Female' },
-            { name: 'en-GB-RyanNeural', displayName: 'Ryan (Male)', language: 'en-GB', languageDisplay: 'English (UK)', gender: 'Male' },
-            { name: 'en-GB-LibbyNeural', displayName: 'Libby (Female)', language: 'en-GB', languageDisplay: 'English (UK)', gender: 'Female' },
-            { name: 'en-GB-MaisieNeural', displayName: 'Maisie (Female)', language: 'en-GB', languageDisplay: 'English (UK)', gender: 'Female' },
+            { name: 'bn-IN-TanishaaNeural', displayName: 'Tanishaa (Female)', language: 'bn-IN', languageDisplay: 'Bengali (India)', gender: 'Female' },
+            { name: 'bn-IN-BashkarNeural', displayName: 'Bashkar (Male)', language: 'bn-IN', languageDisplay: 'Bengali (India)', gender: 'Male' },
         ]
     },
     {
-        code: 'es-ES',
-        name: '🇪🇸 Spanish (Spain)',
+        code: 'kn-IN',
+        name: '🇮🇳 Kannada (India)',
         voices: [
-            { name: 'es-ES-ElviraNeural', displayName: 'Elvira (Female)', language: 'es-ES', languageDisplay: 'Spanish (Spain)', gender: 'Female' },
-            { name: 'es-ES-AlvaroNeural', displayName: 'Alvaro (Male)', language: 'es-ES', languageDisplay: 'Spanish (Spain)', gender: 'Male' },
-            { name: 'es-ES-AbrilNeural', displayName: 'Abril (Female)', language: 'es-ES', languageDisplay: 'Spanish (Spain)', gender: 'Female' },
-            { name: 'es-ES-ArnauNeural', displayName: 'Arnau (Male)', language: 'es-ES', languageDisplay: 'Spanish (Spain)', gender: 'Male' },
+            { name: 'kn-IN-SapnaNeural', displayName: 'Sapna (Female)', language: 'kn-IN', languageDisplay: 'Kannada (India)', gender: 'Female' },
+            { name: 'kn-IN-GaganNeural', displayName: 'Gagan (Male)', language: 'kn-IN', languageDisplay: 'Kannada (India)', gender: 'Male' },
         ]
     },
     {
-        code: 'es-MX',
-        name: '🇲🇽 Spanish (Mexico)',
+        code: 'ml-IN',
+        name: '🇮🇳 Malayalam (India)',
         voices: [
-            { name: 'es-MX-DaliaNeural', displayName: 'Dalia (Female)', language: 'es-MX', languageDisplay: 'Spanish (Mexico)', gender: 'Female' },
-            { name: 'es-MX-JorgeNeural', displayName: 'Jorge (Male)', language: 'es-MX', languageDisplay: 'Spanish (Mexico)', gender: 'Male' },
-            { name: 'es-MX-CandelaNeural', displayName: 'Candela (Female)', language: 'es-MX', languageDisplay: 'Spanish (Mexico)', gender: 'Female' },
+            { name: 'ml-IN-SobhanaNeural', displayName: 'Sobhana (Female)', language: 'ml-IN', languageDisplay: 'Malayalam (India)', gender: 'Female' },
+            { name: 'ml-IN-MidhunNeural', displayName: 'Midhun (Male)', language: 'ml-IN', languageDisplay: 'Malayalam (India)', gender: 'Male' },
         ]
     },
     {
-        code: 'fr-FR',
-        name: '🇫🇷 French (France)',
+        code: 'mr-IN',
+        name: '🇮🇳 Marathi (India)',
         voices: [
-            { name: 'fr-FR-DeniseNeural', displayName: 'Denise (Female)', language: 'fr-FR', languageDisplay: 'French (France)', gender: 'Female' },
-            { name: 'fr-FR-HenriNeural', displayName: 'Henri (Male)', language: 'fr-FR', languageDisplay: 'French (France)', gender: 'Male' },
-            { name: 'fr-FR-EloiseNeural', displayName: 'Eloise (Female)', language: 'fr-FR', languageDisplay: 'French (France)', gender: 'Female' },
-            { name: 'fr-FR-RemyNeural', displayName: 'Remy (Male)', language: 'fr-FR', languageDisplay: 'French (France)', gender: 'Male' },
+            { name: 'mr-IN-AarohiNeural', displayName: 'Aarohi (Female)', language: 'mr-IN', languageDisplay: 'Marathi (India)', gender: 'Female' },
+            { name: 'mr-IN-ManoharNeural', displayName: 'Manohar (Male)', language: 'mr-IN', languageDisplay: 'Marathi (India)', gender: 'Male' },
         ]
     },
     {
-        code: 'de-DE',
-        name: '🇩🇪 German (Germany)',
+        code: 'pa-IN',
+        name: '🇮🇳 Punjabi (India)',
         voices: [
-            { name: 'de-DE-KatjaNeural', displayName: 'Katja (Female)', language: 'de-DE', languageDisplay: 'German (Germany)', gender: 'Female' },
-            { name: 'de-DE-ConradNeural', displayName: 'Conrad (Male)', language: 'de-DE', languageDisplay: 'German (Germany)', gender: 'Male' },
-            { name: 'de-DE-AmalaNeural', displayName: 'Amala (Female)', language: 'de-DE', languageDisplay: 'German (Germany)', gender: 'Female' },
-            { name: 'de-DE-BerndNeural', displayName: 'Bernd (Male)', language: 'de-DE', languageDisplay: 'German (Germany)', gender: 'Male' },
+            { name: 'pa-IN-AnanyaNeural', displayName: 'Ananya (Female)', language: 'pa-IN', languageDisplay: 'Punjabi (India)', gender: 'Female' },
+            { name: 'pa-IN-SukhdeepNeural', displayName: 'Sukhdeep (Male)', language: 'pa-IN', languageDisplay: 'Punjabi (India)', gender: 'Male' },
         ]
     },
     {
-        code: 'ja-JP',
-        name: '🇯🇵 Japanese (Japan)',
+        code: 'or-IN',
+        name: '🇮🇳 Odia (India)',
         voices: [
-            { name: 'ja-JP-NanamiNeural', displayName: 'Nanami (Female)', language: 'ja-JP', languageDisplay: 'Japanese (Japan)', gender: 'Female' },
-            { name: 'ja-JP-KeitaNeural', displayName: 'Keita (Male)', language: 'ja-JP', languageDisplay: 'Japanese (Japan)', gender: 'Male' },
-            { name: 'ja-JP-AoiNeural', displayName: 'Aoi (Female)', language: 'ja-JP', languageDisplay: 'Japanese (Japan)', gender: 'Female' },
-            { name: 'ja-JP-DaichiNeural', displayName: 'Daichi (Male)', language: 'ja-JP', languageDisplay: 'Japanese (Japan)', gender: 'Male' },
+            { name: 'or-IN-SuchitraNeural', displayName: 'Suchitra (Female)', language: 'or-IN', languageDisplay: 'Odia (India)', gender: 'Female' },
+            { name: 'or-IN-KishoreNeural', displayName: 'Kishore (Male)', language: 'or-IN', languageDisplay: 'Odia (India)', gender: 'Male' },
         ]
     },
     {
-        code: 'zh-CN',
-        name: '🇨🇳 Chinese (Mainland)',
+        code: 'ta-IN',
+        name: '🇮🇳 Tamil (India)',
         voices: [
-            { name: 'zh-CN-XiaoxiaoNeural', displayName: 'Xiaoxiao (Female)', language: 'zh-CN', languageDisplay: 'Chinese (Mainland)', gender: 'Female' },
-            { name: 'zh-CN-YunxiNeural', displayName: 'Yunxi (Male)', language: 'zh-CN', languageDisplay: 'Chinese (Mainland)', gender: 'Male' },
-            { name: 'zh-CN-XiaoyiNeural', displayName: 'Xiaoyi (Female)', language: 'zh-CN', languageDisplay: 'Chinese (Mainland)', gender: 'Female' },
-            { name: 'zh-CN-YunjianNeural', displayName: 'Yunjian (Male)', language: 'zh-CN', languageDisplay: 'Chinese (Mainland)', gender: 'Male' },
+            { name: 'ta-IN-PallaviNeural', displayName: 'Pallavi (Female)', language: 'ta-IN', languageDisplay: 'Tamil (India)', gender: 'Female' },
+            { name: 'ta-IN-ValluvarNeural', displayName: 'Valluvar (Male)', language: 'ta-IN', languageDisplay: 'Tamil (India)', gender: 'Male' },
         ]
     },
     {
-        code: 'pt-BR',
-        name: '🇧🇷 Portuguese (Brazil)',
+        code: 'te-IN',
+        name: '🇮🇳 Telugu (India)',
         voices: [
-            { name: 'pt-BR-FranciscaNeural', displayName: 'Francisca (Female)', language: 'pt-BR', languageDisplay: 'Portuguese (Brazil)', gender: 'Female' },
-            { name: 'pt-BR-AntonioNeural', displayName: 'Antonio (Male)', language: 'pt-BR', languageDisplay: 'Portuguese (Brazil)', gender: 'Male' },
-            { name: 'pt-BR-BrendaNeural', displayName: 'Brenda (Female)', language: 'pt-BR', languageDisplay: 'Portuguese (Brazil)', gender: 'Female' },
+            { name: 'te-IN-ShrutiNeural', displayName: 'Shruti (Female)', language: 'te-IN', languageDisplay: 'Telugu (India)', gender: 'Female' },
+            { name: 'te-IN-MohanNeural', displayName: 'Mohan (Male)', language: 'te-IN', languageDisplay: 'Telugu (India)', gender: 'Male' },
         ]
     },
     {
-        code: 'it-IT',
-        name: '🇮🇹 Italian (Italy)',
+        code: 'gu-IN',
+        name: '🇮🇳 Gujarati (India)',
         voices: [
-            { name: 'it-IT-ElsaNeural', displayName: 'Elsa (Female)', language: 'it-IT', languageDisplay: 'Italian (Italy)', gender: 'Female' },
-            { name: 'it-IT-IsabellaNeural', displayName: 'Isabella (Female)', language: 'it-IT', languageDisplay: 'Italian (Italy)', gender: 'Female' },
-            { name: 'it-IT-DiegoNeural', displayName: 'Diego (Male)', language: 'it-IT', languageDisplay: 'Italian (Italy)', gender: 'Male' },
+            { name: 'gu-IN-DhwaniNeural', displayName: 'Dhwani (Female)', language: 'gu-IN', languageDisplay: 'Gujarati (India)', gender: 'Female' },
+            { name: 'gu-IN-NiranjanNeural', displayName: 'Niranjan (Male)', language: 'gu-IN', languageDisplay: 'Gujarati (India)', gender: 'Male' },
         ]
     },
     {
-        code: 'ru-RU',
-        name: '🇷🇺 Russian (Russia)',
+        code: 'ur-IN',
+        name: '🇮🇳 Urdu (India)',
         voices: [
-            { name: 'ru-RU-SvetlanaNeural', displayName: 'Svetlana (Female)', language: 'ru-RU', languageDisplay: 'Russian (Russia)', gender: 'Female' },
-            { name: 'ru-RU-DmitryNeural', displayName: 'Dmitry (Male)', language: 'ru-RU', languageDisplay: 'Russian (Russia)', gender: 'Male' },
-            { name: 'ru-RU-DariyaNeural', displayName: 'Dariya (Female)', language: 'ru-RU', languageDisplay: 'Russian (Russia)', gender: 'Female' },
+            { name: 'ur-IN-GulNeural', displayName: 'Gul (Female)', language: 'ur-IN', languageDisplay: 'Urdu (India)', gender: 'Female' },
+            { name: 'ur-IN-SalmanNeural', displayName: 'Salman (Male)', language: 'ur-IN', languageDisplay: 'Urdu (India)', gender: 'Male' },
         ]
-    }
+    },
 ];
+
 
 // Audio format options
 const AUDIO_FORMATS = [
@@ -218,10 +213,11 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
     const [text, setText] = useState<string>('');
     const [selectedLanguage, setSelectedLanguage] = useState<LanguageGroup>(LANGUAGE_GROUPS[0]);
     const [selectedVoice, setSelectedVoice] = useState<VoiceOption>(LANGUAGE_GROUPS[0].voices[0]);
-    const [audioFormat, setAudioFormat] = useState<string>(AUDIO_FORMATS[2].value);
+    const [audioFormat, setAudioFormat] = useState<string>(`${AUDIO_FORMATS[2].quality}-${AUDIO_FORMATS[2].display}`);
     const [speechRate, setSpeechRate] = useState<number>(1.0);
     const [speechPitch, setSpeechPitch] = useState<string>('+0%');
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
+    const [isTranslating, setIsTranslating] = useState<boolean>(false);
     const [audioFileInfo, setAudioFileInfo] = useState<{ uri: string, size: string } | null>(null);
     const [playbackState, setPlaybackState] = useState<PlaybackState>({
         isPlaying: false,
@@ -233,6 +229,28 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
     });
     const [showVolumeControl, setShowVolumeControl] = useState<boolean>(false);
     const [showSpeedControl, setShowSpeedControl] = useState<boolean>(false);
+
+    const { generateNarrative } = usePrescriptionNarrative(process.env.EXPO_PUBLIC_GEMINI_API_KEY!);
+    const [narrative, setNarrative] = useState<string | null>(null);
+    const router = useRouter();
+    const { prescriptionId } = useLocalSearchParams();
+    const data = useSelector((state: RootState) => selectPrescriptionById(state, Array.isArray(prescriptionId) ? prescriptionId[0] : prescriptionId));
+
+    useEffect(() => {
+        (async () => {
+            setIsTranslating(true);
+            const { raw_response, ...withoutRaw } = data.ocrResult;
+            const result = await generateNarrative(withoutRaw, { language: selectedLanguage.name });
+            // const result = {
+            //     narrative: "Generated narrative text",
+            //     // Add any other properties you need
+            // }
+            if (result.narrative) {
+                setText(result.narrative);
+            }
+            setIsTranslating(false);
+        })();
+    }, [selectedLanguage, data?.ocrResult])
 
     const soundRef = useRef<Audio.Sound | null>(null);
     const audioUriRef = useRef<string | null>(null);
@@ -529,76 +547,27 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
         <ScrollView style={{ flex: 1, backgroundColor: '#f8fafc' }}>
             {/* Header with Gradient */}
             <LinearGradient
-                colors={['#667eea', '#764ba2']}
+                colors={['#00ffc8', '#80f7ed']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={{
-                    paddingTop: 60,
-                    paddingBottom: 30,
-                    paddingHorizontal: 20,
-                    borderBottomLeftRadius: 30,
-                    borderBottomRightRadius: 30,
-                }}
+                className='p-4 flex-row items-center gap-4'
             >
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                    <Ionicons name="volume-high" size={28} color="#ffffff" />
-                    <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#ffffff', marginLeft: 12 }}>
-                        Text to Speech
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                >
+                    <Ionicons name='arrow-back' size={24} />
+                </TouchableOpacity>
+                <View>
+                    <Text className="text-2xl font-bold text-gray-900">
+                        Hear Prescription
+                    </Text>
+                    <Text className="text-base text-gray-600">
+                        Hear out what your prescription has to say
                     </Text>
                 </View>
-                <Text style={{ fontSize: 16, color: '#e2e8f0', opacity: 0.9 }}>
-                    Convert your text to natural-sounding speech
-                </Text>
             </LinearGradient>
 
             <View style={{ padding: 20 }}>
-                {/* Text Input Card */}
-                <View style={{
-                    backgroundColor: '#ffffff',
-                    borderRadius: 16,
-                    padding: 20,
-                    marginBottom: 20,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 8,
-                    elevation: 5,
-                }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                        <Ionicons name="document-text" size={20} color="#667eea" />
-                        <Text style={{ fontSize: 18, fontWeight: '600', color: '#1e293b', marginLeft: 8 }}>
-                            Enter Your Text
-                        </Text>
-                    </View>
-
-                    <TextInput
-                        style={{
-                            borderWidth: 2,
-                            borderColor: '#e2e8f0',
-                            borderRadius: 12,
-                            padding: 16,
-                            fontSize: 16,
-                            minHeight: 120,
-                            textAlignVertical: 'top',
-                            backgroundColor: '#f8fafc',
-                            color: '#1e293b',
-                        }}
-                        placeholder="Type or paste the text you want to convert to speech..."
-                        placeholderTextColor="#94a3b8"
-                        value={text}
-                        onChangeText={setText}
-                        multiline
-                    />
-
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-                        <Text style={{ color: '#64748b', fontSize: 12 }}>
-                            {text.length} characters
-                        </Text>
-                        <Text style={{ color: '#64748b', fontSize: 12 }}>
-                            ~{Math.ceil(text.length / 4)} words
-                        </Text>
-                    </View>
-                </View>
 
                 {/* Voice Settings Card */}
                 <View style={{
@@ -610,10 +579,10 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.1,
                     shadowRadius: 8,
-                    elevation: 5,
+                    elevation: 2,
                 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-                        <Ionicons name="mic" size={20} color="#667eea" />
+                        <Ionicons name="mic" size={20} color="teal" />
                         <Text style={{ fontSize: 18, fontWeight: '600', color: '#1e293b', marginLeft: 8 }}>
                             Voice Settings
                         </Text>
@@ -625,7 +594,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             Language
                         </Text>
                         <Select
-                            selectedValue={selectedLanguage.code}
+                            selectedValue={selectedLanguage.name}
                             onValueChange={(value) => {
                                 const lang = LANGUAGE_GROUPS.find(l => l.code === value);
                                 if (lang) {
@@ -633,9 +602,10 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                     setSelectedVoice(lang.voices[0]);
                                 }
                             }}
+                            isDisabled={isTranslating}
                         >
-                            <SelectTrigger variant="outline" size="md">
-                                <SelectInput placeholder="Select Language" />
+                            <SelectTrigger variant="outline" size="lg">
+                                <SelectInput placeholder="Select Language" className='h-[50px] px-4 text-gray-600 text-md' />
                                 <SelectIcon className="mr-3">
                                     <ChevronDownIcon />
                                 </SelectIcon>
@@ -664,7 +634,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             Voice ({selectedLanguage.voices.length} available)
                         </Text>
                         <Select
-                            selectedValue={selectedVoice.name}
+                            selectedValue={selectedVoice.displayName}
                             onValueChange={(value) => {
                                 const voice = selectedLanguage.voices.find(v => v.name === value);
                                 if (voice) {
@@ -672,8 +642,8 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                 }
                             }}
                         >
-                            <SelectTrigger variant="outline" size="md">
-                                <SelectInput placeholder="Select Voice" />
+                            <SelectTrigger variant="outline" size="lg">
+                                <SelectInput placeholder="Select Voice" className='h-[50px] px-4 text-gray-600 text-md' />
                                 <SelectIcon className="mr-3">
                                     <ChevronDownIcon />
                                 </SelectIcon>
@@ -687,7 +657,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                     {selectedLanguage.voices.map((voice) => (
                                         <SelectItem
                                             key={voice.name}
-                                            label={`${voice.displayName} - ${voice.gender}`}
+                                            label={`${voice.displayName}`}
                                             value={voice.name}
                                         />
                                     ))}
@@ -705,8 +675,8 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             selectedValue={audioFormat}
                             onValueChange={(value) => setAudioFormat(value)}
                         >
-                            <SelectTrigger variant="outline" size="md">
-                                <SelectInput placeholder="Select Quality" />
+                            <SelectTrigger variant="outline" size="lg">
+                                <SelectInput placeholder="Select Quality" className='h-[50px] px-4 text-gray-600 text-md' />
                                 <SelectIcon className="mr-3">
                                     <ChevronDownIcon />
                                 </SelectIcon>
@@ -721,7 +691,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         <SelectItem
                                             key={format.value}
                                             label={`${format.quality} - ${format.display}`}
-                                            value={format.value}
+                                            value={format.quality}
                                         />
                                     ))}
                                 </SelectContent>
@@ -735,7 +705,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151' }}>
                                 Speech Rate
                             </Text>
-                            <Text style={{ fontSize: 14, fontWeight: '600', color: '#667eea' }}>
+                            <Text style={{ fontSize: 14, fontWeight: '600' }} className='text-primary-500'>
                                 {speechRate.toFixed(1)}x
                             </Text>
                         </View>
@@ -773,9 +743,9 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         paddingHorizontal: 8,
                                         marginHorizontal: 4,
                                         borderRadius: 10,
-                                        backgroundColor: speechPitch === pitch ? '#667eea' : '#f1f5f9',
+                                        backgroundColor: speechPitch === pitch ? 'teal' : '#f1f5f9',
                                         borderWidth: 1,
-                                        borderColor: speechPitch === pitch ? '#667eea' : '#e2e8f0',
+                                        borderColor: speechPitch === pitch ? 'teal' : '#e2e8f0',
                                     }}
                                     onPress={() => setSpeechPitch(pitch)}
                                 >
@@ -803,23 +773,22 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                 {/* Generate Button */}
                 <TouchableOpacity
                     style={{
-                        backgroundColor: isGenerating ? '#94a3b8' : '#667eea',
                         borderRadius: 16,
                         padding: 18,
                         marginBottom: 20,
-                        shadowColor: '#667eea',
                         shadowOffset: { width: 0, height: 4 },
                         shadowOpacity: isGenerating ? 0 : 0.3,
                         shadowRadius: 8,
-                        elevation: isGenerating ? 0 : 8,
+                        elevation: isGenerating ? 0 : 3,
                     }}
+                    className={`${isGenerating || isTranslating ? 'bg-gray-300' : 'bg-primary-400'}`}
                     onPress={generateSpeech}
-                    disabled={isGenerating}
+                    disabled={isGenerating || isTranslating}
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {isGenerating ? (
                             <>
-                                <Ionicons name="hourglass" size={20} color="#ffffff" />
+                                <Ionicons name="hourglass" size={24} color="#ffffff" />
                                 <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '600', marginLeft: 8 }}>
                                     Generating Speech...
                                 </Text>
@@ -835,6 +804,17 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     </View>
                 </TouchableOpacity>
 
+                {
+                    isTranslating && (
+                        <View className='flex-row items-center gap-2 justify-center'>
+                            <ActivityIndicator size="small" color="#00b894" />
+                            <Text className='text-center text-gray-500 text-sm'>
+                                Translating & Narrating your prescription into {selectedVoice.languageDisplay}
+                            </Text>
+                        </View>
+                    )
+                }
+
                 {/* Enhanced Audio Player */}
                 {audioUriRef.current && audioFileInfo && (
                     <View style={{
@@ -849,22 +829,6 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     }}>
                         {/* Player Header */}
                         <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                            <View style={{
-                                width: 80,
-                                height: 80,
-                                borderRadius: 40,
-                                backgroundColor: '#f0f4ff',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginBottom: 12,
-                            }}>
-                                <Ionicons
-                                    name={playbackState.isPlaying ? "pause" : "play"}
-                                    size={36}
-                                    color="#667eea"
-                                />
-                            </View>
-
                             <Text style={{ fontSize: 18, fontWeight: '600', color: '#1e293b', textAlign: 'center' }}>
                                 {selectedVoice.displayName}
                             </Text>
@@ -946,15 +910,15 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         width: 70,
                                         height: 70,
                                         borderRadius: 35,
-                                        backgroundColor: playbackState.isLoading ? '#94a3b8' : '#667eea',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        shadowColor: '#667eea',
+                                        shadowColor: 'teal',
                                         shadowOffset: { width: 0, height: 4 },
                                         shadowOpacity: playbackState.isLoading ? 0 : 0.3,
                                         shadowRadius: 8,
                                         elevation: playbackState.isLoading ? 0 : 8,
                                     }}
+                                    className={"bg-primary-400"}
                                     onPress={togglePlayback}
                                     disabled={playbackState.isLoading}
                                 >
@@ -977,7 +941,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         width: 50,
                                         height: 50,
                                         borderRadius: 25,
-                                        backgroundColor: showSpeedControl ? '#667eea' : '#f1f5f9',
+                                        backgroundColor: showSpeedControl ? 'teal' : '#f1f5f9',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}
@@ -1021,7 +985,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         width: 40,
                                         height: 40,
                                         borderRadius: 20,
-                                        backgroundColor: showVolumeControl ? '#667eea' : '#f1f5f9',
+                                        backgroundColor: showVolumeControl ? 'teal' : '#f1f5f9',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}
@@ -1057,7 +1021,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                 marginBottom: 16,
                             }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                                    <Ionicons name="speedometer" size={16} color="#667eea" />
+                                    <Ionicons name="speedometer" size={16} color="teal" />
                                     <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151', marginLeft: 6 }}>
                                         Playback Speed: {playbackState.rate.toFixed(1)}x
                                     </Text>
@@ -1076,9 +1040,9 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                                 paddingVertical: 8,
                                                 paddingHorizontal: 12,
                                                 borderRadius: 8,
-                                                backgroundColor: playbackState.rate === speed ? '#667eea' : '#ffffff',
+                                                backgroundColor: playbackState.rate === speed ? 'teal' : '#ffffff',
                                                 borderWidth: 1,
-                                                borderColor: playbackState.rate === speed ? '#667eea' : '#e2e8f0',
+                                                borderColor: playbackState.rate === speed ? 'teal' : '#e2e8f0',
                                             }}
                                             onPress={() => changePlaybackSpeed(speed)}
                                         >
@@ -1104,7 +1068,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                 marginBottom: 16,
                             }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                                    <Ionicons name={getVolumeIcon(playbackState.volume)} size={16} color="#667eea" />
+                                    <Ionicons name={getVolumeIcon(playbackState.volume)} size={16} color="teal" />
                                     <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151', marginLeft: 6 }}>
                                         Volume: {Math.round(playbackState.volume * 100)}%
                                     </Text>
@@ -1138,9 +1102,9 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                                 flex: 1,
                                                 paddingVertical: 6,
                                                 borderRadius: 6,
-                                                backgroundColor: Math.abs(playbackState.volume - vol) < 0.01 ? '#667eea' : '#ffffff',
+                                                backgroundColor: Math.abs(playbackState.volume - vol) < 0.01 ? 'teal' : '#ffffff',
                                                 borderWidth: 1,
-                                                borderColor: Math.abs(playbackState.volume - vol) < 0.01 ? '#667eea' : '#e2e8f0',
+                                                borderColor: Math.abs(playbackState.volume - vol) < 0.01 ? 'teal' : '#e2e8f0',
                                                 alignItems: 'center',
                                             }}
                                             onPress={() => changeVolume(vol)}
@@ -1165,7 +1129,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             padding: 16,
                         }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                                <Ionicons name="information-circle" size={16} color="#667eea" />
+                                <Ionicons name="information-circle" size={16} color="teal" />
                                 <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151', marginLeft: 6 }}>
                                     File Details
                                 </Text>

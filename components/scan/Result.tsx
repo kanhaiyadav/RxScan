@@ -25,6 +25,7 @@ import { HStack } from "../ui/hstack";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { getSeverityColor, getSeverityTextColor } from "@/lib/utils";
 import { MedicineSearchResult, PrescriptionData } from "@/types/prescription";
+import { useRouter } from "expo-router";
 
 interface Props {
     ocrResult: PrescriptionData;
@@ -32,10 +33,13 @@ interface Props {
     resetToStart?: () => void;
     loading?: boolean;
     savePrescription?: () => void;
+    prescriptionId?: string;
 }
 
-const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loading, savePrescription }) => {
+const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loading, savePrescription, prescriptionId }) => {
     console.log(JSON.stringify(ocrResult, null, 2));
+
+    const router = useRouter();
 
     const [selectedMedicine, setSelectedMedicine] = useState(0);
     const [activeSection, setActiveSection] = useState<string>('overview');
@@ -578,7 +582,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 {result.medicines.length > 1 && renderMedicineSelector()}
 
                 {/* Additional Notes */}
-                {ocrResult.additional_notes && (
+                {ocrResult.additional_notes?.follow_up || ocrResult.additional_notes?.special_instructions || ocrResult.additional_notes?.warnings && (
                     <View className="mt-4">
                         <View className="flex-row items-center mb-4">
                             <LinearGradient
@@ -608,6 +612,18 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                         <Text className="text-gray-800">{ocrResult.extraction_notes}</Text>
                     </View>
                 )}
+
+                <TouchableOpacity className="bg-primary-400 text-white flex-row items-center rounded-lg p-4 w-full justify-center gap-2 mt-4 mb-8"
+                    onPress={() => {
+                        router.push({
+                            pathname: '/(dashboard)/prescription/tts',
+                            params: { prescriptionId: prescriptionId }
+                        })
+                    }}
+                >
+                    <Ionicons name='volume-high' size={24} color={'white'} />
+                    <Text className="text-xl font-semibold text-white">Hear Out</Text>
+                </TouchableOpacity>
 
                 {/* Bottom Actions */}
                 {

@@ -20,6 +20,13 @@ export default function PrescriptionDetails() {
     const { prescriptionId } = useLocalSearchParams();
     const data = useSelector((state: RootState) => selectPrescriptionById(state, Array.isArray(prescriptionId) ? prescriptionId[0] : prescriptionId));
 
+    const moveTotts = () => {
+        router.push({
+            pathname: '/(dashboard)/prescription/tts',
+            params: { prescriptionId: prescriptionId }
+        });
+    }
+
     return (
         <SafeAreaView className="flex-1">
 
@@ -45,6 +52,12 @@ export default function PrescriptionDetails() {
                             <Text className="text-2xl font-bold text-gray-900">Prescription Details</Text>
                             <Text className="text-sm text-gray-600">View and manage your prescription details</Text>
                         </View>
+                        <TouchableOpacity
+                            className="ml-auto h-[50px] w-[50px] bg-white rounded-full items-center justify-center elevation"
+                            onPress={moveTotts}
+                        >
+                            <Ionicons name="volume-high" size={26} color="teal" />
+                        </TouchableOpacity>
                     </View>
 
                 </View>
@@ -53,6 +66,7 @@ export default function PrescriptionDetails() {
                 ocrResult={data.ocrResult}
                 result={data.searchResult}
                 loading={false}
+                prescriptionId={Array.isArray(prescriptionId) ? prescriptionId[0] : prescriptionId}
             />
 
         </SafeAreaView>
