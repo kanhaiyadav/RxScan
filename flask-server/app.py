@@ -221,107 +221,32 @@ def index():
 def extract_prescription():
     """API endpoint to extract prescription details from uploaded image"""
     try:
-        # # Check if file is in request
-        # if 'file' not in request.files:
-        #     return jsonify({'success': False, 'error': 'No file provided'}), 400
+        # Check if file is in request
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'No file provided'}), 400
         
-        # file = request.files['file']
+        file = request.files['file']
         
-        # # Check if file is selected
-        # if file.filename == '':
-        #     return jsonify({'success': False, 'error': 'No file selected'}), 400
+        # Check if file is selected
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
         
-        # # Check if file type is allowed
-        # if not allowed_file(file.filename):
-        #     return jsonify({'success': False, 'error': 'Invalid file type. Allowed: PNG, JPG, JPEG, GIF, BMP, TIFF, WEBP'}), 400
+        # Check if file type is allowed
+        if not allowed_file(file.filename):
+            return jsonify({'success': False, 'error': 'Invalid file type. Allowed: PNG, JPG, JPEG, GIF, BMP, TIFF, WEBP'}), 400
         
-        # # Save uploaded file
-        # filename = secure_filename(file.filename)
-        # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        # file.save(filepath)
+        # Save uploaded file
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
         
-        # # Extract prescription details
-        # result = ocr.extract_prescription_details(filepath)
+        # Extract prescription details
+        result = ocr.extract_prescription_details(filepath)
         
-        # # Clean up uploaded file
-        # os.remove(filepath)
-        
-        tempResult = {
-            'success': True,
-            'data': {
-                'raw_response': '''```json
-        {
-            "doctor": {
-                "name": null,
-                "qualifications": null,
-                "registration_number": null,
-                "clinic_name": "THE White TUSK",
-                "address": null,
-                "phone": "+91 8108112511"
-            },
-            "patient": {
-                "name": "Sachin Sansare",
-                "age": "28",
-                "gender": "Male",
-                "address": null,
-                "prescription_date": "12/10/22"
-            },
-            "medications": [
-                {
-                    "name": "Augmentin 625mg",
-                    "dosage": "625mg",
-                    "quantity": null,
-                    "frequency": "Take once in the morning and once at night",
-                    "duration": "5 days",
-                    "instructions": "after meals",
-                    "uncertain": false
-                },
-                {
-                    "name": "Enzoflam",
-                    "dosage": null,
-                    "quantity": null,
-                    "frequency": "Take once in the morning and once at night",
-                    "duration": "5 days",
-                    "instructions": "after meals",
-                    "uncertain": false
-                },
-                {
-                    "name": "Pan-D 40mg",
-                    "dosage": "40mg",
-                    "quantity": null,
-                    "frequency": "Take once in the morning only",
-                    "duration": "5 days",
-                    "instructions": "before meals",
-                    "uncertain": false
-                },
-                {
-                    "name": "Hexigel gum paint",
-                    "dosage": null,
-                    "quantity": null,
-                    "frequency": "Take once in the morning and once at night",
-                    "duration": "1 week",
-                    "instructions": "Massage",
-                    "uncertain": false
-                }
-            ],
-            "additional_notes": {
-                "special_instructions": null,
-                "follow_up": null,
-                "warnings": null
-            },
-            "extraction_notes": null
-        }
-        ```''',
-                'note': 'Could not parse as JSON, returning raw text'
-            },
-            'extraction_date': '2025-07-09T17:51:31.175312',
-            'image_path': 'c3b9aeac-06a1-4571-8510-1a6aa3644195.jpeg'
-        }
+        # Clean up uploaded file
+        os.remove(filepath)
 
-
-        print('hello world');
-        
-        return jsonify(tempResult)
+        return jsonify(result)
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

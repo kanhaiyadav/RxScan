@@ -1,5 +1,5 @@
-'use client';
-import { vars } from 'nativewind';
+"use client";
+import { vars } from "nativewind";
 
 export const config = {
     light: vars({
@@ -15,6 +15,7 @@ export const config = {
         "--color-primary-800": "18 93 80",
         "--color-primary-900": "20 77 67",
         "--color-primary-950": "4 47 42",
+        "--color-primary-foreground": "0 0 0",
 
         /* Secondary  */
         "--color-secondary-0": "253 253 253",
@@ -167,6 +168,7 @@ export const config = {
         "--color-primary-800": "253 253 253",
         "--color-primary-900": "254 249 249",
         "--color-primary-950": "253 252 252",
+        "--color-primary-foreground": "0 0 0",
 
         /* Secondary  */
         "--color-secondary-0": "20 20 20",

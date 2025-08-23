@@ -36,7 +36,7 @@ const Index = () => {
       <View>
         <View className="flex flex-col items-center mt-10">
           <Text className="text-4xl text-center text-gray-800 font-bold">Let&apos;s Simplify Your Meds.</Text>
-          <Text className="text-xl text-gray-600 mt-4 text-center">PrescriptLens helps you scan, store, and manage prescriptions — so you can focus on feeling better.</Text>
+          <Text className="text-xl text-gray-600 mt-4 text-center">RxScan helps you scan, store, and manage prescriptions — so you can focus on feeling better.</Text>
         </View>
       </View>
     </View>
