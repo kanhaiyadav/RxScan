@@ -1,21 +1,22 @@
-import React from 'react';
-import {
-    View,
-    Text,
-    TouchableOpacity,
-    SafeAreaView,
-    StatusBar,
-} from 'react-native';
+import MedicineDisplay from '@/components/scan/Result';
+import { selectPrescriptionById } from '@/Store/slices/prescriptionSlice';
+import { RootState } from '@/Store/store';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import MedicineDisplay from '@/components/scan/Result';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+    SafeAreaView,
+    StatusBar,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { useSelector } from 'react-redux';
-import { selectPrescriptionById } from '@/Store/slices/prescriptionSlice';
-import { RootState } from '@/Store/store';
 
 export default function PrescriptionDetails() {
-
+    const { t } = useTranslation();
     const router = useRouter();
     const { prescriptionId } = useLocalSearchParams();
     const data = useSelector((state: RootState) => selectPrescriptionById(state, Array.isArray(prescriptionId) ? prescriptionId[0] : prescriptionId));
@@ -49,8 +50,8 @@ export default function PrescriptionDetails() {
                             <Ionicons name="arrow-back" size={26} color="#1f2937" />
                         </TouchableOpacity>
                         <View>
-                            <Text className="text-2xl font-bold text-gray-900">Prescription Details</Text>
-                            <Text className="text-sm text-gray-600">View and manage your prescription details</Text>
+                            <Text className="text-2xl font-bold text-gray-900">{t('prescription.details.title')}</Text>
+                            <Text className="text-sm text-gray-600">{t('prescription.details.subtitle')}</Text>
                         </View>
                         <TouchableOpacity
                             className="ml-auto h-[50px] w-[50px] bg-white rounded-full items-center justify-center elevation"

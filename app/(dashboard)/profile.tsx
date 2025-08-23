@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import {
     AlertDialog,
     AlertDialogContent,
@@ -35,8 +36,10 @@ import {
 } from "@/components/ui/accordion"
 import { Divider } from "@/components/ui/divider"
 import { ChevronUpIcon, ChevronDownIcon, Icon, EditIcon } from "@/components/ui/icon"
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function ProfileScreen() {
+    const { t } = useTranslation();
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [darkModeEnabled, setDarkModeEnabled] = useState(false);
     const [showAlertDialog, setShowAlertDialog] = React.useState(false)
@@ -89,46 +92,46 @@ export default function ProfileScreen() {
 
     // Function to format date
     const formatMemberSince = (dateString: string | undefined): string => {
-        if (!dateString) return 'Member';
+        if (!dateString) return t('member');
 
         const date = new Date(dateString);
         const month = date.toLocaleDateString('en-US', { month: 'short' });
         const year = date.getFullYear();
-        return `Member since ${month} ${year}`;
+        return t('memberSince', { month, year });
     };
 
     const profileSections = [
         {
-            title: 'Health Information',
+            title: t('healthInformation'),
             items: [
                 {
                     icon: 'warning',
-                    title: 'Allergies',
-                    subtitle: 'allergies listed',
+                    title: t('allergies'),
+                    subtitle: t('allergiesListed'),
                     color: 'bg-orange-500',
                     route: '/profile/allergies',
                     slug: 'allergies'
                 },
                 {
                     icon: 'medical',
-                    title: 'Medical Conditions',
-                    subtitle: 'medical conditions added',
+                    title: t('medicalConditions'),
+                    subtitle: t('medicalConditionsAdded'),
                     color: 'bg-red-500',
                     route: '/(onboarding)',
                     slug: 'medicalConditions'
                 },
                 {
                     icon: 'medkit',
-                    title: 'Current Medications',
-                    subtitle: 'active medicines',
+                    title: t('currentMedications'),
+                    subtitle: t('activeMedicines'),
                     color: 'bg-blue-500',
                     route: '/profile/medications',
                     slug: 'currentMedications'
                 },
                 {
                     icon: 'restaurant',
-                    title: 'Dietary Restrictions',
-                    subtitle: 'dietary restrictions',
+                    title: t('dietaryRestrictions'),
+                    subtitle: t('dietaryRestrictionsCount'),
                     color: 'bg-green-500',
                     route: '/profile/diet',
                     slug: 'dietaryRestrictions'
@@ -136,12 +139,12 @@ export default function ProfileScreen() {
             ]
         },
         {
-            title: 'App Settings',
+            title: t('appSettings'),
             items: [
                 {
                     icon: 'notifications',
-                    title: 'Notifications',
-                    subtitle: 'Manage your alerts',
+                    title: t('notifications'),
+                    subtitle: t('manageYourAlerts'),
                     color: 'bg-purple-500',
                     hasToggle: true,
                     toggleValue: notificationsEnabled,
@@ -149,57 +152,50 @@ export default function ProfileScreen() {
                 },
                 {
                     icon: 'moon',
-                    title: 'Dark Mode',
-                    subtitle: 'Switch to dark theme',
+                    title: t('darkMode'),
+                    subtitle: t('switchToDarkTheme'),
                     color: 'bg-gray-700',
                     hasToggle: true,
                     toggleValue: darkModeEnabled,
                     onToggle: setDarkModeEnabled
                 },
                 {
-                    icon: 'language',
-                    title: 'Language',
-                    subtitle: 'English',
-                    color: 'bg-indigo-500',
-                    route: '/profile/language'
-                },
-                {
                     icon: 'shield-checkmark',
-                    title: 'Privacy & Security',
-                    subtitle: 'Manage your data',
+                    title: t('privacySecurity'),
+                    subtitle: t('manageYourData'),
                     color: 'bg-teal-500',
                     route: '/profile/privacy'
                 }
             ]
         },
         {
-            title: 'Support & About',
+            title: t('supportAbout'),
             items: [
                 {
                     icon: 'help-circle',
-                    title: 'Help & Support',
-                    subtitle: 'Get help with the app',
+                    title: t('helpSupport'),
+                    subtitle: t('getHelpWithApp'),
                     color: 'bg-cyan-500',
                     route: '/profile/help'
                 },
                 {
                     icon: 'document-text',
-                    title: 'Terms of Service',
-                    subtitle: 'Read our terms',
+                    title: t('termsOfService'),
+                    subtitle: t('readOurTerms'),
                     color: 'bg-amber-500',
                     route: '/profile/terms'
                 },
                 {
                     icon: 'shield',
-                    title: 'Privacy Policy',
-                    subtitle: 'How we protect your data',
+                    title: t('privacyPolicy'),
+                    subtitle: t('howWeProtectData'),
                     color: 'bg-emerald-500',
                     route: '/profile/privacy-policy'
                 },
                 {
                     icon: 'information-circle',
-                    title: 'About RxScan',
-                    subtitle: 'Version 1.0.0',
+                    title: t('about'),
+                    subtitle: t('version'),
                     color: 'bg-pink-500',
                     route: '/profile/about'
                 }
@@ -226,8 +222,8 @@ export default function ProfileScreen() {
                 className='border-b border-gray-200'
             >
                 <View className="px-6 py-4 pt-8">
-                    <Text className="text-2xl font-bold text-gray-900">Profile</Text>
-                    <Text className="text-sm text-gray-600">Yyour profile information and settings</Text>
+                    <Text className="text-2xl font-bold text-gray-900">{t('profile')}</Text>
+                    <Text className="text-sm text-gray-600">{t('profileInformation')}</Text>
                 </View>
             </LinearGradient>
 
@@ -287,7 +283,7 @@ export default function ProfileScreen() {
                                     />
                                     <Text className={`text-xs ml-1 font-medium ${user?.emailVerification ? 'text-green-700' : 'text-yellow-700'
                                         }`}>
-                                        {user?.emailVerification ? 'Verified' : 'Unverified'}
+                                        {user?.emailVerification ? t('verified') : t('unverified')}
                                     </Text>
                                 </View>
                             </View>
@@ -308,7 +304,6 @@ export default function ProfileScreen() {
                         </TouchableOpacity>
                     </View>
                 </View>
-
 
                 {/* Profile Sections */}
                 <View className="mx-6 mt-4">
@@ -381,7 +376,7 @@ export default function ProfileScreen() {
                     </View>
                 </View>
 
-
+                {/* App Settings Section */}
                 <View className="mx-6 mt-4">
                     <Text className="text-lg font-semibold text-gray-900 mb-4">{profileSections[1].title}</Text>
                     <View className="bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -416,8 +411,15 @@ export default function ProfileScreen() {
                                 )}
                             </TouchableOpacity>
                         ))}
+                        
+                        {/* Language Switcher - Add after other settings */}
+                        <View className="border-t border-gray-100">
+                            <LanguageSwitcher />
+                        </View>
                     </View>
                 </View>
+
+                {/* Support & About Section */}
                 <View className="mx-6 mt-4">
                     <Text className="text-lg font-semibold text-gray-900 mb-4">{profileSections[2].title}</Text>
                     <View className="bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -440,16 +442,7 @@ export default function ProfileScreen() {
                                     <Text className="text-gray-900 font-medium">{item.title}</Text>
                                     <Text className="text-gray-500 text-sm mt-1">{item.subtitle}</Text>
                                 </View>
-                                {'hasToggle' in item && item.hasToggle ? (
-                                    <Switch
-                                        value={'toggleValue' in item ? item.toggleValue : false}
-                                        onValueChange={'onToggle' in item ? item.onToggle : undefined}
-                                        trackColor={{ false: '#E5E7EB', true: '#14B8A6' }}
-                                        thumbColor="#FFFFFF"
-                                    />
-                                ) : (
-                                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-                                )}
+                                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -462,19 +455,19 @@ export default function ProfileScreen() {
                         onPress={() => setShowAlertDialog(true)}
                     >
                         <Ionicons name="log-out" size={24} color="#EF4444" />
-                        <Text className="text-red-600 font-semibold ml-2 text-lg">Logout</Text>
+                        <Text className="text-red-600 font-semibold ml-2 text-lg">{t('logout')}</Text>
                     </TouchableOpacity>
                     <AlertDialog isOpen={showAlertDialog} onClose={handleClose} size="md">
                         <AlertDialogBackdrop />
                         <AlertDialogContent className='bg-red-100 border-0'>
                             <AlertDialogHeader>
                                 <Text className='text-xl font-bold'>
-                                    Log Out
+                                    {t('logoutTitle')}
                                 </Text>
                             </AlertDialogHeader>
                             <AlertDialogBody className="mt-3 mb-4">
                                 <Text className='text-gray-500'>
-                                    This actions will log you out of your account. Are you sure you want to proceed?
+                                    {t('logoutMessage')}
                                 </Text>
                             </AlertDialogBody>
                             <AlertDialogFooter className="">
@@ -484,16 +477,16 @@ export default function ProfileScreen() {
                                     size="sm"
                                     className='bg-white elevation-sm'
                                 >
-                                    <ButtonText>Cancel</ButtonText>
+                                    <ButtonText>{t('cancel')}</ButtonText>
                                 </Button>
                                 <Button size="sm" className='bg-red-600' onPress={handleLogout}>
-                                    <ButtonText>Log out</ButtonText>
+                                    <ButtonText>{t('logout')}</ButtonText>
                                 </Button>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                 </View>
-            </ScrollView>
+                </ScrollView>
         </SafeAreaView>
     );
 }

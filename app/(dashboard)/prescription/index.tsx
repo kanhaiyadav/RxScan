@@ -1,29 +1,31 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import {
-    View,
-    Text,
-    ScrollView,
-    TouchableOpacity,
-    SafeAreaView,
-    StatusBar,
-    TextInput,
-    Image
-} from 'react-native';
+import { openModal } from '@/Store/slices/modalSlice';
+import { deletePrescription, selectPrescriptionEntities, setPrescriptionStatus } from '@/Store/slices/prescriptionSlice';
+import notFoundAnimation from '@/assets/lottie/not_found.json';
+import searchingPrescriptionsAnimation from '@/assets/lottie/searching_prescriptions.json';
+import appwriteService from '@/lib/appwrite';
+import { Prescription } from '@/types/prescription';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import LottieView from 'lottie-react-native';
-import searchingPrescriptionsAnimation from '@/assets/lottie/searching_prescriptions.json';
-import notFoundAnimation from '@/assets/lottie/not_found.json';
 import { useRouter } from 'expo-router';
-import { Prescription } from '@/types/prescription';
-import { useSelector, useDispatch } from 'react-redux';
-import { deletePrescription, selectPrescriptionEntities, selectPrescriptionLoading, setPrescriptionStatus } from '@/Store/slices/prescriptionSlice';
-import { openModal } from '@/Store/slices/modalSlice';
-import appwriteService from '@/lib/appwrite';
+import LottieView from 'lottie-react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function PrescriptionsScreen() {
+    const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeFilter, setActiveFilter] = useState('All');
+    const [activeFilter, setActiveFilter] = useState(t('prescription.filters.all'));
     const prescriptionsEntities = useSelector(selectPrescriptionEntities);
     const loading = false; // Fixed: Use actual loading state
 
@@ -31,7 +33,12 @@ export default function PrescriptionsScreen() {
     const prescriptions = useMemo(() => Object.values(prescriptionsEntities), [prescriptionsEntities]);
 
     const [filteredPrescriptions, setFilteredPrescriptions] = useState<Prescription[]>([]);
-    const filters = ['All', 'Active', 'Completed', 'Abandoned'];
+    const filters = [
+        t('prescription.filters.all'),
+        t('prescription.filters.active'),
+        t('prescription.filters.completed'),
+        t('prescription.filters.abandoned')
+    ];
 
     const dispatch = useDispatch();
     const router = useRouter();
@@ -62,13 +69,13 @@ export default function PrescriptionsScreen() {
         let filtered = prescriptions;
 
         // Apply status filter
-        if (activeFilter !== 'All') {
+        if (activeFilter !== t('prescription.filters.all')) {
             filtered = filtered.filter((prescription) => {
-                if (activeFilter === 'Active') {
+                if (activeFilter === t('prescription.filters.active')) {
                     return prescription.status === 'active';
-                } else if (activeFilter === 'Completed') {
+                } else if (activeFilter === t('prescription.filters.completed')) {
                     return prescription.status === 'completed';
-                } else if (activeFilter === 'Abandoned') {
+                } else if (activeFilter === t('prescription.filters.abandoned')) {
                     return prescription.status === 'abandoned';
                 }
                 return true;
@@ -88,7 +95,7 @@ export default function PrescriptionsScreen() {
         }
 
         setFilteredPrescriptions(filtered);
-    }, [prescriptions, activeFilter, searchQuery]); // Fixed: Added all dependencies
+    }, [prescriptions, activeFilter, searchQuery, t]); // Added translation function dependency
 
     return (
         <SafeAreaView className="flex-1">
@@ -105,8 +112,8 @@ export default function PrescriptionsScreen() {
                 <View className="px-6 py-4">
                     <View className="flex-row items-center justify-between">
                         <View>
-                            <Text className="text-2xl font-bold text-gray-900">Prescriptions</Text>
-                            <Text className="text-gray-600">View and manage your prescriptions</Text>
+                            <Text className="text-2xl font-bold text-gray-900">{t('prescription.title')}</Text>
+                            <Text className="text-gray-600">{t('prescription.subtitle')}</Text>
                         </View>
                         <TouchableOpacity className="bg-white p-3 rounded-full elevation-sm"
                             onPress={() => {
@@ -122,7 +129,7 @@ export default function PrescriptionsScreen() {
                         <Ionicons name="search" size={20} color="#9CA3AF" />
                         <TextInput
                             className="flex-1 ml-3 text-gray-900"
-                            placeholder="Search prescriptions..."
+                            placeholder={t('prescription.searchPlaceholder')}
                             value={searchQuery}
                             onChangeText={setSearchQuery}
                             placeholderTextColor="#9CA3AF"
@@ -206,7 +213,7 @@ export default function PrescriptionsScreen() {
                                 <View className="flex-row items-center justify-between mb-3">
                                     <View className="flex-1">
                                         <Text className="text-lg font-semibold text-gray-900">
-                                            {prescription.ocrResult?.doctor?.name || prescription.ocrResult?.doctor?.clinic_name || 'Unknown Doctor'}
+                                            {prescription.ocrResult?.doctor?.name || prescription.ocrResult?.doctor?.clinic_name || t('prescription.unknownDoctor')}
                                         </Text>
                                         {
                                             prescription.ocrResult?.doctor?.name && prescription.ocrResult?.doctor?.clinic_name &&
@@ -235,7 +242,7 @@ export default function PrescriptionsScreen() {
                                         <View className="flex-row items-center bg-orange-50 px-3 py-1 rounded-full">
                                             <Ionicons name="warning" size={14} color="#F97316" />
                                             <Text className="text-orange-600 text-xs ml-1 font-medium">
-                                                {getWarning(prescription)} warnings
+                                                {getWarning(prescription)} {t('prescription.warnings')}
                                             </Text>
                                         </View>
                                     )}
@@ -243,7 +250,7 @@ export default function PrescriptionsScreen() {
 
                                 {/* Medicines */}
                                 <View className="bg-gray-50 rounded-xl p-3">
-                                    <Text className="text-gray-700 font-medium mb-2">Medicines:</Text>
+                                    <Text className="text-gray-700 font-medium mb-2">{t('prescription.medicines')}</Text>
                                     {prescription.ocrResult?.medications && prescription.ocrResult.medications.length > 0 ?
                                         prescription.ocrResult.medications.map((medicine, medicineIndex) => (
                                             <View key={medicineIndex} className="flex-row items-center mb-1">
@@ -251,7 +258,7 @@ export default function PrescriptionsScreen() {
                                                 <Text className="text-gray-600 text-sm">{medicine.name}</Text>
                                             </View>
                                         )) : (
-                                            <Text className="text-gray-500 text-sm">No medicines found</Text>
+                                            <Text className="text-gray-500 text-sm">{t('prescription.noMedicines')}</Text>
                                         )
                                     }
                                 </View>
@@ -272,7 +279,7 @@ export default function PrescriptionsScreen() {
                                                     }
                                                 }}
                                             >
-                                                <Text className="text-blue-600 font-medium text-center">Mark Completed</Text>
+                                                <Text className="text-blue-600 font-medium text-center">{t('prescription.actions.markCompleted')}</Text>
                                             </TouchableOpacity>
 
                                             <TouchableOpacity
@@ -286,7 +293,7 @@ export default function PrescriptionsScreen() {
                                                     }
                                                 }}
                                             >
-                                                <Text className="text-orange-700 font-medium ml-2">Abandon</Text>
+                                                <Text className="text-orange-700 font-medium ml-2">{t('prescription.actions.abandon')}</Text>
                                             </TouchableOpacity>
                                         </>
                                     )}
@@ -303,7 +310,7 @@ export default function PrescriptionsScreen() {
                                                 }
                                             }}
                                         >
-                                            <Text className="text-primary-600 font-medium ml-2">Set as Active</Text>
+                                            <Text className="text-primary-600 font-medium ml-2">{t('prescription.actions.setActive')}</Text>
                                         </TouchableOpacity>
                                     )}
 
@@ -320,7 +327,7 @@ export default function PrescriptionsScreen() {
                                     >
                                         <Ionicons size={20} color={'red'} name="trash" />
                                         <Text className={`text-red-600 font-medium ml-2 ${prescription.status === 'completed' ? 'block' : 'hidden'}`}>
-                                            Delete
+                                            {t('prescription.actions.delete')}
                                         </Text>
                                     </TouchableOpacity>
                                 </View>

@@ -1,23 +1,24 @@
-import React, { useEffect } from 'react';
-import {
-    View,
-    Text,
-    ScrollView,
-    TouchableOpacity,
-    SafeAreaView,
-    StatusBar,
-    Image
-} from 'react-native';
+import { selectActivePrescription, selectAllPrescriptions } from '@/Store/slices/prescriptionSlice';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as NavigationBar from 'expo-navigation-bar';
-import { persistor } from "../../Store/store"
-import { useSelector } from 'react-redux';
-import { selectActivePrescription, selectAllPrescriptions } from '@/Store/slices/prescriptionSlice';
 import { useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
+import { useSelector } from 'react-redux';
+import { persistor } from "../../Store/store";
 
 export default function HomeScreen() {
-
+    const { t } = useTranslation();
     const router = useRouter();
 
     const activePrescriptions = useSelector(selectActivePrescription);
@@ -34,26 +35,30 @@ export default function HomeScreen() {
         meds: 0
     });
 
+    // Updated reminders with translation keys
     const reminders = [
         {
             id: 2,
-            medicine: 'Paracetamol 650mg',
+            medicineKey: 'paracetamol',
+            dosage: '650mg',
             time: '02:00 PM',
             status: 'pending',
-            frequency: 'After lunch',
+            frequency: t('afterLunch'),
             color: 'bg-blue-500',
-            doctor: 'Dr. Sarah Johnson'
+            doctorKey: 'drSarahJohnson'
         },
         {
             id: 3,
-            medicine: 'Metformin 500mg',
+            medicineKey: 'metformin',
+            dosage: '500mg',
             time: '08:00 PM',
             status: 'pending',
-            frequency: 'After dinner',
+            frequency: t('afterDinner'),
             color: 'bg-purple-500',
-            doctor: 'Dr. Michael Chen'
+            doctorKey: 'drMichaelChen'
         }
     ];
+
     const getStatusIcon = (status: string) => {
         switch (status) {
             case 'taken':
@@ -70,14 +75,23 @@ export default function HomeScreen() {
     const getStatusText = (status: string) => {
         switch (status) {
             case 'taken':
-                return 'Taken';
+                return t('taken');
             case 'pending':
-                return 'Pending';
+                return t('pending');
             case 'missed':
-                return 'Missed';
+                return t('missed');
             default:
-                return 'Unknown';
+                return t('unknown');
         }
+    };
+
+    // Helper functions for translations
+    const getMedicineName = (medicineKey: string, dosage: string) => {
+        return `${t(`medicines.${medicineKey}`)} ${dosage}`;
+    };
+
+    const getDoctorName = (doctorKey: string) => {
+        return t(`doctors.${doctorKey}`);
     };
 
     useEffect(() => {
@@ -101,35 +115,36 @@ export default function HomeScreen() {
         });
     }, [prescriptions, activePrescriptions]);
 
+    // Updated quick actions with translations
     const quickActions = [
         {
             id: 1,
-            title: 'Scan Prescription',
-            subtitle: 'Upload & analyze prescription',
+            title: t('homeScreen.scanPrescription'),
+            subtitle: t('homeScreen.scanPrescriptionSubtitle'),
             icon: 'camera',
             color: 'bg-teal-500',
             route: '/scan'
         },
         {
             id: 2,
-            title: 'View Prescriptions',
-            subtitle: 'See your prescription history',
+            title: t('homeScreen.viewPrescriptions'),
+            subtitle: t('homeScreen.viewPrescriptionsSubtitle'),
             icon: 'document-text',
             color: 'bg-blue-500',
             route: '/prescriptions'
         },
         {
             id: 3,
-            title: 'Medicine Reminders',
-            subtitle: 'Set medication alerts',
+            title: t('homeScreen.medicineRemindersAction'),
+            subtitle: t('homeScreen.medicineRemindersSubtitle'),
             icon: 'alarm',
             color: 'bg-purple-500',
             route: '/reminders'
         },
         {
             id: 4,
-            title: 'Health Profile',
-            subtitle: 'Update your health info',
+            title: t('homeScreen.healthProfile'),
+            subtitle: t('homeScreen.healthProfileSubtitle'),
             icon: 'person',
             color: 'bg-green-500',
             route: '/profile'
@@ -140,21 +155,21 @@ export default function HomeScreen() {
         {
             id: 1,
             type: 'warning',
-            title: 'Drug Interaction Alert',
-            message: 'Avoid alcohol with your current medication',
-            time: '2 hours ago'
+            title: t('homeScreen.drugInteractionAlert'),
+            message: t('homeScreen.avoidAlcoholMessage'),
+            time: t('homeScreen.hoursAgo', { count: 2 })
         },
         {
             id: 2,
             type: 'info',
-            title: 'Prescription Scanned',
-            message: 'Successfully analyzed your prescription',
-            time: '1 day ago'
+            title: t('homeScreen.prescriptionScanned'),
+            message: t('homeScreen.prescriptionScannedMessage'),
+            time: t('homeScreen.dayAgo', { count: 1 })
         }
     ];
 
     useEffect(() => {
-        NavigationBar.setVisibilityAsync("hidden"); // or 'light'
+        NavigationBar.setVisibilityAsync("hidden");
     }, []);
 
     return (
@@ -163,7 +178,7 @@ export default function HomeScreen() {
 
             {/* Header */}
             <LinearGradient
-                colors={['#00ffc8', '#80f7ed']} // teal-500 to teal-600
+                colors={['#00ffc8', '#80f7ed']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
                 style={{ elevation: 3 }}
@@ -172,8 +187,8 @@ export default function HomeScreen() {
                 <View className="bg-transparent px-6 py-4 ">
                     <View className="flex-row items-center justify-between">
                         <View>
-                            <Text className="text-2xl font-bold text-gray-900">Welcome back!</Text>
-                            <Text className="text-gray-600 mt-1">Let&apos;s keep you healthy today</Text>
+                            <Text className="text-2xl font-bold text-gray-900">{t('homeScreen.welcomeBack')}</Text>
+                            <Text className="text-gray-600 mt-1">{t('homeScreen.keepHealthyToday')}</Text>
                         </View>
                         <TouchableOpacity className="bg-white p-3 rounded-full elevation-sm">
                             <Ionicons name="notifications" size={24} color="#14B8A6" />
@@ -185,45 +200,45 @@ export default function HomeScreen() {
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* Health Stats Card */}
                 <View className="mx-6 bg-transparent py-3 pb-4">
-                    <Text className="text-lg font-bold text-gray-600 mb-4">Health Summary</Text>
+                    <Text className="text-lg font-bold text-gray-600 mb-4">{t('homeScreen.healthSummary')}</Text>
                     <View className="flex-row justify-between gap-4">
                         <View className="items-center flex-1 bg-white py-4 elevation rounded-xl">
                             <View className="bg-teal-100 w-12 h-12 rounded-full items-center justify-center mb-2">
                                 <Ionicons name="document-text" size={24} color="#14B8A6" />
                             </View>
                             <Text className="text-2xl font-bold text-gray-900">{stats.totalPrescriptions}</Text>
-                            <Text className="text-gray-500 text-sm">Prescriptions</Text>
+                            <Text className="text-gray-500 text-sm">{t('homeScreen.prescriptions')}</Text>
                         </View>
                         <View className="items-center flex-1 bg-white py-4 elevation rounded-xl">
                             <View className="bg-blue-100 w-12 h-12 rounded-full items-center justify-center mb-2">
                                 <Ionicons name="medical" size={24} color="#3B82F6" />
                             </View>
                             <Text className="text-2xl font-bold text-gray-900">{stats.meds}</Text>
-                            <Text className="text-gray-500 text-sm">Active Meds</Text>
+                            <Text className="text-gray-500 text-sm">{t('homeScreen.activeMeds')}</Text>
                         </View>
                         <View className="items-center flex-1 bg-white py-4 elevation rounded-xl">
                             <View className="bg-orange-100 w-12 h-12 rounded-full items-center justify-center mb-2">
                                 <Ionicons name="warning" size={24} color="#F97316" />
                             </View>
                             <Text className="text-2xl font-bold text-gray-900">{stats.warnings}</Text>
-                            <Text className="text-gray-500 text-sm">Warnings</Text>
+                            <Text className="text-gray-500 text-sm">{t('homeScreen.warnings')}</Text>
                         </View>
                     </View>
                 </View>
 
-                {/* Active Perscriptions */}
+                {/* Active Prescriptions */}
                 {
                     activePrescriptions.length > 0 &&
                     <View className="mx-6 mt-2">
-                            <View className='flex-row w-full justify-between items-center'>
-                                <Text className="text-lg font-bold text-gray-600 mb-2 mt-2">Active Prescriptions</Text>
-                                <TouchableOpacity onPress={() => {
-                                    router.push('/(dashboard)/prescription');
-                                }} className='flex-row items-center'>
-                                    <Text className='font-bold text-teal-600 text-lg'>more</Text>
-                                    <Ionicons name="chevron-forward" size={16} color="teal" className='mb-[-3px] ml-1' />
-                                </TouchableOpacity>
-                            </View>
+                        <View className='flex-row w-full justify-between items-center'>
+                            <Text className="text-lg font-bold text-gray-600 mb-2 mt-2">{t('homeScreen.activePrescriptions')}</Text>
+                            <TouchableOpacity onPress={() => {
+                                router.push('/(dashboard)/prescription');
+                            }} className='flex-row items-center'>
+                                <Text className='font-bold text-teal-600 text-lg'>{t('homeScreen.more')}</Text>
+                                <Ionicons name="chevron-forward" size={16} color="teal" className='mb-[-3px] ml-1' />
+                            </TouchableOpacity>
+                        </View>
                         <View className="flex-col w-full gap-2">
                             {activePrescriptions.map((prescription) => (
                                 <TouchableOpacity
@@ -241,7 +256,7 @@ export default function HomeScreen() {
                                         <Text className="text-gray-900 font-semibold text-base">{prescription.ocrResult.doctor?.name || prescription.ocrResult.doctor?.clinic_name}</Text>
                                         <View className='flex-row gap-3'>
                                             <Text className="text-gray-500 text-sm mt-1">{prescription.ocrResult.patient?.prescription_date || prescription.$createdAt.split('T')[0]}</Text>
-                                            <Text className="text-gray-500 text-sm mt-1">{prescription.ocrResult.medications?.length} medications</Text>
+                                            <Text className="text-gray-500 text-sm mt-1">{prescription.ocrResult.medications?.length} {t('homeScreen.medications')}</Text>
                                         </View>
                                     </View>
                                     <Ionicons name="chevron-forward" size={24} color="#6B7280" className="ml-auto" />
@@ -251,13 +266,14 @@ export default function HomeScreen() {
                     </View>
                 }
 
+                {/* Upcoming Reminders */}
                 <View className="mx-6">
                     <View className='flex-row w-full justify-between items-center'>
-                        <Text className="text-lg font-bold text-gray-600 mb-2 mt-6">Upcoming Reminders</Text>
+                        <Text className="text-lg font-bold text-gray-600 mb-2 mt-6">{t('homeScreen.upcomingReminders')}</Text>
                         <TouchableOpacity onPress={() => {
                             router.push('/(dashboard)/reminder');
                         }} className='flex-row items-center mb-[-10px]'>
-                            <Text className='font-bold text-teal-600 text-lg'>more</Text>
+                            <Text className='font-bold text-teal-600 text-lg'>{t('homeScreen.more')}</Text>
                             <Ionicons name="chevron-forward" size={16} color="teal" className='mb-[-3px] ml-1' />
                         </TouchableOpacity>
                     </View>
@@ -274,10 +290,10 @@ export default function HomeScreen() {
                                         <View className={`${reminder.color} w-4 h-12 rounded-full mr-4`} />
                                         <View className="flex-1">
                                             <Text className="text-lg font-semibold text-gray-900">
-                                                {reminder.medicine}
+                                                {getMedicineName(reminder.medicineKey, reminder.dosage)}
                                             </Text>
                                             <Text className="text-gray-500 text-sm">
-                                                {reminder.frequency} • {reminder.doctor}
+                                                {reminder.frequency} • {getDoctorName(reminder.doctorKey)}
                                             </Text>
                                         </View>
                                     </View>
@@ -303,11 +319,11 @@ export default function HomeScreen() {
                                     <View className="flex-row gap-3 mt-4">
                                         <TouchableOpacity className="flex-1 bg-gray-100 py-3 px-4 rounded-xl flex-row items-center justify-center elevation-sm">
                                             <Ionicons name="time-outline" size={16} color="#6B7280" />
-                                            <Text className="text-gray-600 font-medium ml-2">Skip</Text>
+                                            <Text className="text-gray-600 font-medium ml-2">{t('skip')}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity className="flex-1 bg-teal-500 py-3 px-4 rounded-xl flex-row items-center justify-center elevation-sm">
                                             <Ionicons name="checkmark" size={16} color="white" />
-                                            <Text className="text-white font-medium ml-2">Mark as Taken</Text>
+                                            <Text className="text-white font-medium ml-2">{t('markAsTaken')}</Text>
                                         </TouchableOpacity>
                                     </View>
                                 )}
@@ -316,11 +332,11 @@ export default function HomeScreen() {
                                     <View className="flex-row gap-3 mt-4">
                                         <TouchableOpacity className="flex-1 bg-red-50 py-3 px-4 rounded-xl flex-row items-center justify-center">
                                             <Ionicons name="refresh" size={16} color="#EF4444" />
-                                            <Text className="text-red-600 font-medium ml-2">Reschedule</Text>
+                                            <Text className="text-red-600 font-medium ml-2">{t('reschedule')}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity className="flex-1 bg-teal-500 py-3 px-4 rounded-xl flex-row items-center justify-center">
                                             <Ionicons name="checkmark" size={16} color="white" />
-                                            <Text className="text-white font-medium ml-2">Take Now</Text>
+                                            <Text className="text-white font-medium ml-2">{t('takeNow')}</Text>
                                         </TouchableOpacity>
                                     </View>
                                 )}
@@ -331,7 +347,7 @@ export default function HomeScreen() {
 
                 {/* Quick Actions */}
                 <View className="mx-6 mt-8">
-                    <Text className="text-lg font-bold text-gray-600 mb-4">Quick Actions</Text>
+                    <Text className="text-lg font-bold text-gray-600 mb-4">{t('homeScreen.quickActions')}</Text>
                     <View className="flex-row flex-wrap justify-between">
                         {quickActions.map((action) => (
                             <TouchableOpacity
