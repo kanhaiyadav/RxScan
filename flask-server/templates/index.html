@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription OCR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            color: #666;
+            font-size: 1.2em;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            transition: transform 0.2s ease;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #28a745;
+        }
+        
+        .result h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        
+        .result-text {
+            font-size: 0.9em;
+            line-height: 1.5;
+            color: #333;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background: white;
+        }
+        
+        .json-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            background: #f8f9ff;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .json-section h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .info-item {
+            margin-bottom: 8px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            min-width: 120px;
+            margin-right: 10px;
+        }
+        
+        .info-value {
+            color: #333;
+            flex: 1;
+        }
+        
+        .medication-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .medication-name {
+            font-weight: bold;
+            color: #d63384;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .uncertain {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        
+        .raw-fallback {
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px dashed #ccc;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        
+        .error h3 {
+            color: #dc3545;
+        }
+        
+        .preview {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .file-info {
+            margin-top: 10px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Prescription OCR</h1>
+        
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">
+                    Click here to upload prescription image<br>
+                    <small>Supports: PNG, JPG, JPEG, GIF, BMP, TIFF, WEBP</small>
+                </div>
+            </div>
+            
+            <input type="file" id="fileInput" name="file" accept="image/*" required>
+            
+            <div class="preview" id="preview">
+                <img id="previewImg" alt="Preview">
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+            
+            <button type="submit" class="btn" id="submitBtn">Extract Prescription Details</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Processing prescription image...</div>
+        </div>
+        
+        <div class="result" id="result">
+            <h3 id="resultTitle">Extraction Results</h3>
+            <div class="result-text" id="resultText"></div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.querySelector('.upload-area');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const resultText = document.getElementById('resultText');
+        const resultTitle = document.getElementById('resultTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const preview = document.getElementById('preview');
+        const previewImg = document.getElementById('previewImg');
+        const fileInfo = document.getElementById('fileInfo');
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                showPreview(files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                showPreview(e.target.files[0]);
+            }
+        });
+
+        function showPreview(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                fileInfo.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file first');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Show loading
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/extract', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // Hide loading
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+
+                // Show result
+                result.style.display = 'block';
+                
+                if (data.success) {
+                    result.className = 'result';
+                    resultTitle.textContent = 'Extraction Results';
+                    resultText.innerHTML = formatPrescriptionData(data.data);
+                } else {
+                    result.className = 'result error';
+                    resultTitle.textContent = 'Error';
+                    resultText.textContent = data.error;
+                }
+
+            } catch (error) {
+                // Hide loading
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+
+                // Show error
+                result.style.display = 'block';
+                result.className = 'result error';
+                resultTitle.textContent = 'Error';
+                resultText.textContent = 'Network error: ' + error.message;
+            }
+        });
+
+        function formatPrescriptionData(data) {
+            // Handle fallback case where JSON parsing failed
+            if (data.raw_response) {
+                return `<div class="raw-fallback">
+                    <strong>Note:</strong> ${data.note}<br><br>
+                    ${data.raw_response}
+                </div>`;
+            }
+
+            let html = '';
+
+            // Doctor Information
+            if (data.doctor) {
+                html += '<div class="json-section">';
+                html += '<h4>👨‍⚕️ Doctor Information</h4>';
+                html += formatInfoItem('Name', data.doctor.name);
+                html += formatInfoItem('Qualifications', data.doctor.qualifications);
+                html += formatInfoItem('Registration', data.doctor.registration_number);
+                html += formatInfoItem('Clinic', data.doctor.clinic_name);
+                html += formatInfoItem('Address', data.doctor.address);
+                html += formatInfoItem('Phone', data.doctor.phone);
+                html += '</div>';
+            }
+
+            // Patient Information
+            if (data.patient) {
+                html += '<div class="json-section">';
+                html += '<h4>👤 Patient Information</h4>';
+                html += formatInfoItem('Name', data.patient.name);
+                html += formatInfoItem('Age', data.patient.age);
+                html += formatInfoItem('Gender', data.patient.gender);
+                html += formatInfoItem('Address', data.patient.address);
+                html += formatInfoItem('Date', data.patient.prescription_date);
+                html += '</div>';
+            }
+
+            // Medications
+            if (data.medications && data.medications.length > 0) {
+                html += '<div class="json-section">';
+                html += '<h4>💊 Medications</h4>';
+                
+                data.medications.forEach((med, index) => {
+                    const cardClass = med.uncertain ? 'medication-card uncertain' : 'medication-card';
+                    html += `<div class="${cardClass}">`;
+                    html += `<div class="medication-name">${med.name || 'Unknown Medicine'}</div>`;
+                    html += formatInfoItem('Dosage', med.dosage);
+                    html += formatInfoItem('Quantity', med.quantity);
+                    html += formatInfoItem('Frequency', med.frequency);
+                    html += formatInfoItem('Duration', med.duration);
+                    html += formatInfoItem('Instructions', med.instructions);
+                    if (med.uncertain) {
+                        html += '<div style="margin-top: 10px; color: #856404; font-style: italic;">⚠️ This medication information is uncertain</div>';
+                    }
+                    html += '</div>';
+                });
+                html += '</div>';
+            }
+
+            // Additional Notes
+            if (data.additional_notes) {
+                html += '<div class="json-section">';
+                html += '<h4>📝 Additional Notes</h4>';
+                html += formatInfoItem('Special Instructions', data.additional_notes.special_instructions);
+                html += formatInfoItem('Follow-up', data.additional_notes.follow_up);
+                html += formatInfoItem('Warnings', data.additional_notes.warnings);
+                html += '</div>';
+            }
+
+            // Extraction Notes
+            if (data.extraction_notes) {
+                html += '<div class="json-section">';
+                html += '<h4>ℹ️ Extraction Notes</h4>';
+                html += `<div class="info-value">${data.extraction_notes}</div>`;
+                html += '</div>';
+            }
+
+            return html || '<div class="info-value">No information could be extracted from the image.</div>';
+        }
+
+        function formatInfoItem(label, value) {
+            if (!value || value === 'null') {
+                return '';
+            }
+            return `<div class="info-item">
+                <span class="info-label">${label}:</span>
+                <span class="info-value">${value}</span>
+            </div>`;
+        }
+    </script>
+</body>
+</html>
