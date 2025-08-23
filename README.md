@@ -7,7 +7,7 @@
 [![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![Gemini AI](https://img.shields.io/badge/Gemini%20AI-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 
-## 🌟 Overview
+## 🌟 Overview 
 
 RxScan is an innovative healthcare application designed to bridge the gap in prescription accessibility. With **153 million seniors in India (60+)** and **70 million vision-impaired individuals**, our solution addresses a massive underserved market through AI-powered prescription reading and management.
 
