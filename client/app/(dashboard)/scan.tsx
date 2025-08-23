@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  Image,
-  Alert
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from 'react';
+import {
+  Alert,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 export default function ScanScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -115,13 +116,22 @@ export default function ScanScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar barStyle="dark-content" backgroundColor="#F9FAFB" />
+      <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
       {/* Header */}
-      <View className="bg-white px-6 py-4 border-b border-gray-100">
-        <Text className="text-2xl font-bold text-gray-900">Scan Prescription</Text>
-        <Text className="text-gray-600 mt-1">Upload your prescription to analyze medicines</Text>
-      </View>
+      <LinearGradient
+        colors={['#00ffc8', '#80f7ed']} // teal-500 to teal-600
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ elevation: 3 }}
+        className='border-b border-gray-200'
+      >
+
+        <View className="px-6 py-4">
+          <Text className="text-2xl font-bold text-gray-900">Scan Prescription</Text>
+          <Text className="text-gray-600 mt-1">Upload your prescription to analyze medicines</Text>
+        </View>
+      </LinearGradient>
 
       <View className="flex-1 px-6">
         {!selectedImage ? (

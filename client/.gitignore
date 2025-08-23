@@ -39,5 +39,6 @@ yarn-error.*
 app-example
 # Environment variables
 .env
+env
 .env.local
 .env.production

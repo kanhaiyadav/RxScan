@@ -1,28 +1,29 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
+
   return (
     <SafeAreaView
-      edges={['bottom']} // Only apply safe area to the bottom
-      style={{ flex: 1, backgroundColor: '#FFFFFF' }} // Set background if needed
+      edges={['bottom']}
+      style={{ flex: 1 }}
       className='pt-[30px]'
     >
       <Tabs
         initialRouteName='index'
         screenOptions={{
-          animation: 'shift',
+          animation: 'none',
           tabBarActiveTintColor: '#14B8A6',
           tabBarInactiveTintColor: '#9CA3AF',
           tabBarStyle: {
             backgroundColor: '#FFFFFF',
             borderTopWidth: 1,
             borderTopColor: '#E5E7EB',
-            height: Platform.OS === 'android' ? 80 : 70, // extra height for Android nav bar
-            paddingBottom: Platform.OS === 'android' ? 20 : 10, // adjust padding for Android
+            height: Platform.OS === 'android' ? 80 : 70,
+            paddingBottom: Platform.OS === 'android' ? 20 : 10,
             paddingTop: 10,
             shadowColor: '#000',
             shadowOffset: {

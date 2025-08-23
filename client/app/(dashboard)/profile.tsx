@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button, ButtonText } from "@/components/ui/button"
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ProfileScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -28,8 +29,58 @@ export default function ProfileScreen() {
   const [showAlertDialog, setShowAlertDialog] = React.useState(false)
   const handleClose = () => setShowAlertDialog(false)
 
-
   const router = useRouter();
+  const { signOut, user } = useAuth();
+
+  // Function to get user initials
+  const getUserInitials = (name: string | undefined): string => {
+    if (!name) return 'U';
+    const names = name.trim().split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    }
+    return names[0][0].toUpperCase();
+  };
+
+  const getProfileColor = (userId: string | undefined): string => {
+    if (!userId) return '#6B7280';
+
+    const colors: string[] = [
+      '#EF4444', // red-500
+      '#F97316', // orange-500
+      '#F59E0B', // amber-500
+      '#EAB308', // yellow-500
+      '#84CC16', // lime-500
+      '#22C55E', // green-500
+      '#10B981', // emerald-500
+      '#14B8A6', // teal-500
+      '#06B6D4', // cyan-500
+      '#0EA5E9', // sky-500
+      '#3B82F6', // blue-500
+      '#6366F1', // indigo-500
+      '#8B5CF6', // violet-500
+      '#A855F7', // purple-500
+      '#D946EF', // fuchsia-500
+      '#EC4899', // pink-500
+    ];
+
+    // Use the user ID to generate a consistent index
+    let hash: number = 0;
+    for (let i = 0; i < userId.length; i++) {
+      hash = userId.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
+  // Function to format date
+  const formatMemberSince = (dateString: string | undefined): string => {
+    if (!dateString) return 'Member';
+
+    const date = new Date(dateString);
+    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    const year = date.getFullYear();
+    return `Member since ${month} ${year}`;
+  };
 
   const profileSections = [
     {
@@ -138,46 +189,110 @@ export default function ProfileScreen() {
   ];
 
   const handleLogout = () => {
+    signOut();
     setShowAlertDialog(false);
+    router.replace('/(auth)/signin')
   };
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" />
+      <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
       {/* Header */}
-      <View className="bg-white px-6 py-4 border-b border-gray-200">
-        <Text className="text-2xl font-bold text-gray-900">Profile</Text>
-      </View>
+      <LinearGradient
+        colors={['#00ffc8', '#80f7ed']} // teal-500 to teal-600
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ elevation: 3 }}
+        className='border-b border-gray-200'
+      >
+        <View className="px-6 py-4 pt-8">
+          <Text className="text-2xl font-bold text-gray-900">Profile</Text>
+        </View>
+      </LinearGradient>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* User Info Card */}
-        <View>
-          <LinearGradient
-            colors={['#7de7db', '#19dca5']} // teal-500 to teal-600
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="mx-6 mt-6 p-6"
-            style={{ borderRadius: 16, elevation: 3 }}
-          >
-            <View className="flex-row items-center">
-              <View className="bg-black/20 w-16 h-16 rounded-full items-center justify-center mr-4">
-                <Ionicons name="person" size={32} color="white" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-black text-xl font-bold">John Doe</Text>
-                <Text className="text-black/80 text-sm mt-1">kanahiya@gmail.com</Text>
-                <Text className="text-black/80 text-sm">Member since Jan 2024</Text>
-              </View>
-              <TouchableOpacity className="bg-white/20 p-2 rounded-full">
-                <Ionicons name="create" size={20} color="white" />
-              </TouchableOpacity>
+        <View className='m-6 p-6 bg-white'
+          style={{
+            borderRadius: 20,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.12,
+            shadowRadius: 12,
+            elevation: 2
+          }}
+        >
+          <View className="flex-row items-center">
+            {/* Profile Picture with Initials */}
+            <View
+              className="w-20 h-20 rounded-full items-center justify-center mr-5"
+              style={{
+                backgroundColor: getProfileColor(user?.$id),
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 4,
+                elevation: 3
+              }}
+            >
+              <Text className="text-white text-3xl font-bold">
+                {getUserInitials(user?.name)}
+              </Text>
             </View>
-          </LinearGradient>
+
+            {/* User Details */}
+            <View className="flex-1">
+              <Text className="text-gray-900 text-xl font-bold mb-1">
+                {user?.name || 'User'}
+              </Text>
+              <Text className="text-gray-600 text-sm mb-1">
+                {user?.email || 'email@example.com'}
+              </Text>
+              <View className="flex-row items-center">
+                <Ionicons name="time-outline" size={14} color="#9CA3AF" />
+                <Text className="text-gray-500 text-xs ml-1">
+                  {formatMemberSince(user?.registration)}
+                </Text>
+              </View>
+
+              {/* Email Verification Badge */}
+              <View className="flex-row items-center mt-2">
+                <View className={`flex-row items-center px-2 py-1 rounded-full ${user?.emailVerification ? 'bg-green-100' : 'bg-yellow-100'
+                  }`}>
+                  <Ionicons
+                    name={user?.emailVerification ? "checkmark-circle" : "alert-circle"}
+                    size={12}
+                    color={user?.emailVerification ? "#10B981" : "#F59E0B"}
+                  />
+                  <Text className={`text-xs ml-1 font-medium ${user?.emailVerification ? 'text-green-700' : 'text-yellow-700'
+                    }`}>
+                    {user?.emailVerification ? 'Verified' : 'Unverified'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Edit Button */}
+            <TouchableOpacity
+              className="bg-gray-100 p-3 rounded-full ml-2"
+              style={{
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 2,
+                elevation: 2
+              }}
+            >
+              <Ionicons name="create-outline" size={20} color="#374151" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Health Summary */}
-        <View className="mx-6 mt-6 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <View className="mx-6 bg-white p-5"
+          style={{ borderRadius: 16, elevation: 2 }}
+        >
           <Text className="text-lg font-semibold text-gray-900 mb-4">Health Summary</Text>
           <View className="flex-row justify-between">
             <View className="items-center flex-1">

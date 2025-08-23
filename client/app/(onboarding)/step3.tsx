@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Modal } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useHealthProfile, Medication } from '@/context/HealthProfileContext';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useUserHealth } from '@/context/UserHealthContext';
+
 
 const MEDICATION_OPTIONS = [
   'Metformin', 'Atorvastatin', 'Amlodipine', 'Omeprazole', 'Levothyroxine',
@@ -30,8 +31,8 @@ interface MedicationLocal {
 }
 
 export default function Step3() {
-  const { healthProfile, updateMedications, updateStep } = useHealthProfile();
-  const [medications, setMedications] = useState<MedicationLocal[]>(healthProfile.currentMedications);
+  const { healthProfile, updateCurrentMedications, updateStep } = useUserHealth();
+  const [medications, setMedications] = useState<MedicationLocal[]>(healthProfile?.currentMedications || []);
   const [showModal, setShowModal] = useState(false);
   const [currentMed, setCurrentMed] = useState({ name: '', dosage: '', frequency: '' });
   const [searchText, setSearchText] = useState('');
@@ -40,8 +41,8 @@ export default function Step3() {
   const [activeField, setActiveField] = useState<'name' | 'dosage' | 'frequency' | null>(null);
 
   useEffect(() => {
-    setMedications(healthProfile.currentMedications);
-  }, [healthProfile.currentMedications]);
+    setMedications(healthProfile?.currentMedications || []);
+  }, [healthProfile?.currentMedications]);
 
   const filteredMedications = MEDICATION_OPTIONS.filter(med =>
     med.toLowerCase().includes(searchText.toLowerCase())
@@ -89,46 +90,77 @@ export default function Step3() {
   };
 
   const handleNext = () => {
-    updateMedications(medications);
+    updateCurrentMedications(medications);
     updateStep();
     router.push('/step4');
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1 px-6">
-        <View className="mb-6">
-          <Text className="text-2xl font-bold text-gray-800 mb-2">Current Medications</Text>
-          <Text className="text-gray-600">
-            Add any medications you&apos;re currently taking to check for interactions.
-          </Text>
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="always">
+        <View className="mt-4 mb-8">
+          <View className="flex-row items-center mb-4">
+            <View className="w-12 h-12 bg-emerald-100 rounded-full items-center justify-center mr-4">
+              <MaterialCommunityIcons name="pill" size={24} color="#10B981" />
+
+            </View>
+            <View className="flex-1">
+              <Text className="text-2xl font-bold text-gray-900 mb-1">Current Medications</Text>
+              <Text className="text-gray-500 text-sm leading-5">
+                Add your current medications to help us check for interactions and provide personalized health insights.
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Add Medication Button */}
         <TouchableOpacity
           onPress={() => setShowModal(true)}
-          className="border-2 border-dashed border-emerald-300 rounded-xl py-6 items-center mb-6"
+          className="bg-white border-2 border-dashed border-emerald-300 rounded-2xl py-8 items-center mb-6 shadow-sm"
+          style={{ elevation: 2 }}
         >
-          <Ionicons name="add-circle" size={32} color="#10B981" />
-          <Text className="text-emerald-600 font-medium mt-2">Add Medication</Text>
+          <View className="w-16 h-16 bg-emerald-50 rounded-full items-center justify-center mb-3">
+            <Ionicons name="add-circle" size={32} color="#10B981" />
+          </View>
+          <Text className="text-emerald-600 font-semibold text-lg">Add New Medication</Text>
+          <Text className="text-emerald-500 text-sm mt-1">Tap to add prescription details</Text>
         </TouchableOpacity>
 
         {/* Current Medications List */}
         <View className="mb-6">
           <Text className="text-lg font-semibold text-gray-800 mb-3">Current Medications</Text>
           {medications.map((med, index) => (
-            <View key={index} className="bg-purple-50 rounded-xl p-4 mb-3 border border-purple-200">
+            <View key={index} className="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-gray-100" style={{ elevation: 2 }}>
               <View className="flex-row justify-between items-start">
-                <View className="flex-1">
-                  <Text className="text-purple-800 font-semibold text-lg">{med.name}</Text>
-                  <Text className="text-purple-600 mt-1">Dosage: {med.dosage}</Text>
-                  <Text className="text-purple-600">Frequency: {med.frequency}</Text>
+                <View className="flex-1 mr-3">
+                  <View className="flex-row items-center mb-2">
+                    <View className="w-3 h-3 bg-purple-400 rounded-full mr-2" />
+                    <Text className="text-gray-900 font-bold text-lg flex-1">{med.name}</Text>
+                  </View>
+                  <View className="ml-5">
+                    <View className="flex-row items-center mb-2">
+                      <Ionicons name="flask-outline" size={16} color="#6B7280" />
+                      <Text className="text-gray-600 ml-2 text-sm">
+                        <Text className="font-medium">Dosage:</Text> {med.dosage}
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <Ionicons name="time-outline" size={16} color="#6B7280" />
+                      <Text className="text-gray-600 ml-2 text-sm">
+                        <Text className="font-medium">Frequency:</Text> {med.frequency}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
-                <TouchableOpacity onPress={() => handleRemoveMedication(index)}>
-                  <Ionicons name="close-circle" size={24} color="#7C3AED" />
+                <TouchableOpacity
+                  onPress={() => handleRemoveMedication(index)}
+                  className="w-9 h-9 bg-red-50 rounded-full items-center justify-center"
+                >
+                  <Ionicons name="trash-outline" size={18} color="#EF4444" />
                 </TouchableOpacity>
               </View>
             </View>
+
           ))}
           {medications.length === 0 && (
             <Text className="text-gray-500 italic text-center py-4">No medications added yet</Text>
@@ -142,12 +174,13 @@ export default function Step3() {
       </ScrollView>
 
       {/* Bottom Button */}
-      <View className="px-6 pb-6">
+      <View className="p-6 bg-white elevation">
         <TouchableOpacity
           onPress={handleNext}
-          className="bg-emerald-400 rounded-xl py-4 items-center"
+          className="bg-primary-500 rounded-xl py-4 items-center flex-row justify-center gap-2"
         >
           <Text className="text-white font-semibold text-lg">Continue</Text>
+          <Ionicons name="arrow-forward" size={20} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -162,7 +195,7 @@ export default function Step3() {
               </TouchableOpacity>
             </View>
 
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="always">
               {/* Medication Name */}
               <View className="mb-4">
                 <Text className="text-gray-700 font-medium mb-2">Medication Name *</Text>
@@ -178,7 +211,10 @@ export default function Step3() {
                     className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                   />
                   {activeField === 'name' && (
-                    <ScrollView className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10">
+                    <ScrollView
+                      className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10"
+                      keyboardShouldPersistTaps="handled"
+                    >
                       {filteredMedications.map((med, index) => (
                         <TouchableOpacity
                           key={index}
@@ -208,7 +244,10 @@ export default function Step3() {
                     className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                   />
                   {activeField === 'dosage' && (
-                    <ScrollView className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10">
+                    <ScrollView
+                      className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10"
+                      keyboardShouldPersistTaps="handled"
+                    >
                       {filteredDosages.map((dosage, index) => (
                         <TouchableOpacity
                           key={index}
@@ -238,7 +277,10 @@ export default function Step3() {
                     className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                   />
                   {activeField === 'frequency' && (
-                    <ScrollView className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10">
+                    <ScrollView
+                      className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-1 max-h-32 z-10"
+                      keyboardShouldPersistTaps="handled"
+                    >
                       {filteredFrequencies.map((freq, index) => (
                         <TouchableOpacity
                           key={index}

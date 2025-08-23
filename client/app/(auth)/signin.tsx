@@ -1,17 +1,17 @@
 // app/(auth)/signin.tsx
-import React, { useState } from 'react';
-import { Pressable, Text, TextInput, View, Alert, ActivityIndicator } from 'react-native';
-import Fontisto from '@expo/vector-icons/Fontisto';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Button } from '@/components/ui/button';
 import {
   Checkbox,
+  CheckboxIcon,
   CheckboxIndicator,
   CheckboxLabel,
-  CheckboxIcon,
-} from "@/components/ui/checkbox"
-import { Link, useRouter } from 'expo-router';
+} from "@/components/ui/checkbox";
 import { useAuth } from '@/context/AuthContext';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Link, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, Text, TextInput, View } from 'react-native';
 
 const SignIn = () => {
   const router = useRouter();

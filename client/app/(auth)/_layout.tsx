@@ -1,7 +1,7 @@
-import { Stack } from "expo-router";
-import * as NavigationBar from 'expo-navigation-bar';
-import React from 'react';
 import { images } from '@/constants/images';
+import * as NavigationBar from 'expo-navigation-bar';
+import { Stack } from "expo-router";
+import React from 'react';
 import { Image, View } from 'react-native';
 
 export default function AuthLayout() {

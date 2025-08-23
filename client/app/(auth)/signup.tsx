@@ -1,28 +1,23 @@
-// app/(auth)/signup.tsx
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const SignUp = () => {
   const router = useRouter();
   const { signUp, isLoading, error } = useAuth();
-  
+
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = async () => {
-    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+    if (!name.trim() || !email.trim() || !password.trim()) {
       Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
       return;
     }
 
@@ -31,8 +26,8 @@ const SignUp = () => {
       return;
     }
 
-    const success = await signUp(email.trim(), password);
-    
+    const success = await signUp(email.trim(), password, name.trim());
+
     if (success) {
       // Navigation will be handled by the auth state change in index.tsx
       router.replace('/(onboarding)');
@@ -51,9 +46,20 @@ const SignUp = () => {
       {/* Form Content */}
       <View className='px-8 gap-6'>
         <View className='flex flex-row items-center gap-4 border-b border-primary-500 py-2 px-2'>
+          <Ionicons name="person-outline" size={24} color="gray" />
+          <TextInput
+            className='flex-1 text-lg p-0 m-0'
+            placeholder='Name'
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="words"
+            autoCorrect={false}
+          />
+        </View>
+        <View className='flex flex-row items-center gap-4 border-b border-primary-500 py-2 px-2'>
           <Fontisto name="email" size={24} color={"gray"} />
-          <TextInput 
-            className='flex-1 text-lg p-0 m-0' 
+          <TextInput
+            className='flex-1 text-lg p-0 m-0'
             placeholder='Email'
             value={email}
             onChangeText={setEmail}
@@ -64,26 +70,23 @@ const SignUp = () => {
         </View>
         <View className='flex flex-row items-center gap-4 border-b border-primary-500 py-2 px-2'>
           <Ionicons name="lock-closed-outline" size={24} color="gray" />
-          <TextInput 
-            className='flex-1 text-lg p-0 m-0' 
+          <TextInput
+            className='flex-1 text-lg p-0 m-0'
             placeholder='Password'
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
+            secureTextEntry={!showPassword}
           />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? "eye-outline" : "eye-off-outline"}
+              size={24}
+              color="gray"
+            />
+          </TouchableOpacity>
         </View>
-        <View className='flex flex-row items-center gap-4 border-b border-primary-500 py-2 px-2'>
-          <Ionicons name="lock-closed-outline" size={24} color="gray" />
-          <TextInput 
-            className='flex-1 text-lg p-0 m-0' 
-            placeholder='Confirm Password'
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
-        </View>
-        <Button 
-          size='xl' 
+        <Button
+          size='xl'
           className='h-[50px]'
           onPress={handleSignUp}
           disabled={isLoading}
