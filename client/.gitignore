@@ -42,3 +42,30 @@ app-example
 env
 .env.local
 .env.production
+
+
+#Server
+# Ignore Python virtual environment
+Flask-server/venv/
+
+# Ignore environment variables file
+Flask-server/.env
+
+# Ignore Python cache
+Flask-server/__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Ignore uploaded files (if dynamically generated)
+Flask-server/uploads/
+
+# Ignore log files (optional)
+Flask-server/*.log
+
+# Ignore SQLite or other local DBs (optional)
+Flask-server/*.sqlite3
+Flask-server/*.db
+
+# Optional: pipenv or poetry lock files
+Flask-server/Pipfile.lock
+Flask-server/poetry.lock

@@ -99,7 +99,7 @@ export default function Step4() {
               text: 'OK',
               onPress: () => {
                 // Navigate to login screen
-                router.replace('/login');
+                router.replace('/signin');
               }
             }
           ]
@@ -128,15 +128,9 @@ export default function Step4() {
             onPress: () => {
               // Navigate to main app or dashboard - try different routes
               try {
-                // Try common dashboard routes
-                router.replace('/(tabs)'); // If you have tabs layout
-                // router.replace('/dashboard'); // Original route
-                // router.replace('/home'); // Alternative route
-                // router.replace('/(main)/dashboard'); // If nested in main group
+                router.replace('/(dashboard)');
               } catch (error) {
                 console.error('Navigation error:', error);
-                // Fallback navigation
-                router.replace('/');
               }
             }
           }

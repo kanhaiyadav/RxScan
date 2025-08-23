@@ -1,9 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, Image, Text } from 'react-native'
 import slide1 from "@/assets/images/slide1.png";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const index = () => {
+const Index = () => {
 
+  const asyncStorage = AsyncStorage;
+  
+  useEffect(() => {
+    asyncStorage.getItem("hasSeenWelcome").then((value) => {
+      if (value === null) {
+        // If the user has not seen the welcome screen, set it to true
+        asyncStorage.setItem("hasSeenWelcome", "true");
+      }
+    }).catch((error) => {
+      console.error("Error accessing AsyncStorage:", error);
+    });
+  }, [asyncStorage]);
+  
   return (
     <View className='flex-1 flex'>
       <View className='flex-1 items-center justify-center'>
@@ -29,4 +43,4 @@ const index = () => {
   )
 }
 
-export default index
+export default Index

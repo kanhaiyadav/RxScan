@@ -122,7 +122,7 @@ export default function HomeScreen() {
               <TouchableOpacity
                 key={action.id}
                 className="bg-white rounded-2xl p-4 w-[48%] mb-4 border border-gray-100 elevation-sm"
-                onPress={() => router.push('/(onboarding)' as any)}
+                onPress={() => router.push('/(temp)/ocr2' as any)}
               >
                 <View className={`${action.color} w-12 h-12 rounded-xl items-center justify-center mb-3`}>
                   <Ionicons name={action.icon as any} size={24} color="white" />

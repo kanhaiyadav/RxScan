@@ -10,7 +10,7 @@ export default function TabLayout() {
     <SafeAreaView
       edges={['bottom']}
       style={{ flex: 1 }}
-      className='pt-[30px]'
+      className='pt-[30px] bg-[#00ffc8]'
     >
       <Tabs
         initialRouteName='index'

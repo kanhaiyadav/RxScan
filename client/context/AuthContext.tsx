@@ -57,10 +57,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setError(null);
       setIsLoading(true);
-      
+
       await appwriteService.signIn(email, password);
       const currentUser = await appwriteService.getCurrentUser();
-      
+
       if (currentUser) {
         setUser(currentUser);
         return true;
@@ -79,10 +79,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setError(null);
       setIsLoading(true);
-      
+
       await appwriteService.createAccount(email, password, name);
       const currentUser = await appwriteService.getCurrentUser();
-      
+
       if (currentUser) {
         setUser(currentUser);
         return true;

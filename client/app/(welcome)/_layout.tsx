@@ -3,6 +3,7 @@ import React from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import { useAuth } from "@/context/AuthContext";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -35,6 +36,7 @@ const WelcomeLayout = () => {
 
   const router = useRouter()
   const [index, setIndex] = React.useState(1);
+  const { user } = useAuth();
 
   return (
     <View className='bg-primary-500/5 flex-1 w-screen px-4 relative'>
@@ -65,8 +67,11 @@ const WelcomeLayout = () => {
         />
       </Stack>  
         <Pressable onPress={() => {
-          console.log(index);
           if (index === 3) {
+            if (user) {
+              router.push('/(dashboard)' as any);
+              return;
+            }
             router.push('/(auth)/signin' as any);
             return;
           } else {
