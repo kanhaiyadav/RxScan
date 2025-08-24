@@ -15,7 +15,7 @@ load_dotenv()
 
 # Your PrescriptionOCR class
 class PrescriptionOCR:
-    def _init_(self, api_key):
+    def __init__(self, api_key):
         """Initialize Prescription OCR with API key"""
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
@@ -86,10 +86,24 @@ class PrescriptionOCR:
             }
             
             Rules:
-            - Use null for any information that cannot be read or is not present
-            - For uncertain readings, include the text and set "uncertain": true
-            - Return ONLY the JSON object, no other text
-            - Ensure all JSON syntax is correct
+            
+            1. Use **null** for fields that are absent or unreadable.  
+            2. If any reading is doubtful, copy the raw text into `instructions` and set `"uncertain": true`.
+
+            3. **Interpreting timing codes**
+
+            • `1` or `X`  =  **take**  
+            • `0` or `O`  =  **skip** **unless** the code has **only O-O**, then treat each O as **take**.  
+            • Code length → times:  
+                - 1 slot → once daily  
+                - 2 slots → morning & night  
+                - 3 slots → morning, afternoon, night  
+                - 4 slots → every 6 hours  
+            • Expand the code into clear English in `frequency`, repeating any fractional dose in each phrase.
+
+            4. If brand name is given in prescription, output brand name. Don't convert it to generic drug name.
+                If dosage is mentioned with name, let it be mentioned in the name, besides giving it seperately in the output. For example, if "Rantac 300" is given, output that, not "Rantac" or "Ranitidine".
+            5. Output only the final JSON – no other text, commentary, or markup.
             """
             
             response = self.model.generate_content([prompt, image])
@@ -123,7 +137,7 @@ class PrescriptionOCR:
 
 # GeminiTranslator class
 class GeminiTranslator:
-    def _init_(self, api_key):
+    def __init__(self, api_key):
         """Initialize Gemini Translator with API key"""
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
@@ -175,7 +189,7 @@ class GeminiTranslator:
             }
 
 # Flask app setup
-app = Flask(_name_)
+app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
@@ -333,6 +347,6 @@ def health_check():
     """Health check endpoint"""
     return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()})
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     print("Starting Prescription OCR & Translation Flask Server...")
     app.run(debug=True, host='0.0.0.0', port=5000)

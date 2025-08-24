@@ -53,69 +53,55 @@ class PrescriptionNarrativeService {
 
         const effectivePatientName = ocrData.patient?.name || "the patient";
 
-        return `You are an experienced medical professional explaining a prescription to ${effectivePatientName}. 
-    
-Convert the following prescription information into a clear, comprehensive medical narrative in ${targetLanguage}.
+        return `You are a medical professional explaining a prescription to ${effectivePatientName}. Convert the following prescription information into a concise, clear medical narrative in ${targetLanguage}.
 
-PRESCRIPTION INFORMATION:
-${JSON.stringify(ocrData, null, 2)}
+PRESCRIPTION INFORMATION: ${JSON.stringify(ocrData, null, 2)}
 
 INSTRUCTIONS:
 1. Generate the narrative entirely in ${targetLanguage}
-2. Explain the prescription as if you're a doctor speaking directly to the patient
-3. Use clear, patient-friendly language while maintaining medical accuracy
-4. Address the patient by name when available
-5. Structure the narrative to include:
-   - Personal greeting with patient name, age, and date
-   - Doctor/clinic information
-   - Brief explanation of the treatment plan
-   - Detailed explanation of each medication including:
-     * Medication name and purpose
-     * Exact dosage and strength (when available)
-     * Frequency and timing instructions
-     * Duration of treatment
-     * Special instructions (before/after meals, massage technique, etc.)
-     * Important notes about the medication
-   - Summary of the complete treatment schedule
-   - General advice and encouragement
-   - Contact information for questions
+2. Use clear, conversational language suitable for voice output
+3. Prioritize essential medication information over formalities
+4. Keep total length under 300 words (1.5-2 minutes spoken)
 
-MEDICATION HANDLING GUIDELINES:
-- For Augmentin 625mg: Explain it's an antibiotic for bacterial infections
-- For Enzoflam: Explain it's an anti-inflammatory pain reliever  
-- For Pan-D 40mg: Explain it's for acid reduction and stomach protection
-- For Hexigel gum paint: Explain it's a topical antiseptic for oral care
-- Always mention the timing relative to meals clearly
-- Explain massage technique for topical applications
-- Emphasize completing the full course of antibiotics
+STRUCTURE (in order of priority):
+1. **Brief greeting** - Just name and basic context (1 sentence)
+2. **Core medications** - For each medication:
+   - Name and primary purpose
+   - Dosage and frequency 
+   - Key timing instructions (meals, etc.)
+   - Duration if specified
+3. **Important reminders** - Only critical points like completing antibiotic courses
+4. **Closing** - Brief encouragement and clinic contact if questions arise
 
-NARRATIVE STYLE GUIDELINES:
-- Start with a greeting and context
-- Use conversational but professional tone
-- Explain medical terms in simple language
-- Group related medications together
-- Provide practical guidance for taking medications
-- End with encouragement and next steps
-- Ensure cultural sensitivity for the target language
+MEDICATION GUIDELINES:
+- Augmentin 625mg: "antibiotic for infection"
+- Pan-D 40mg: "for acid reduction" 
+- Enzoflam: "anti-inflammatory for pain/swelling"
+- Hexigel: "antiseptic gel for mouth/gums"
 
-EXAMPLE STRUCTURE for the given prescription format:
-"Hello ${effectivePatientName}, this is your prescription from ${
-            ocrData.doctor?.clinic_name || "your clinic"
-        } dated ${
-            ocrData.patient?.prescription_date || "today"
-        }. You are a ${
-            ocrData.patient?.age
-        }-year-old ${ocrData.patient?.gender?.toLowerCase()} and I'm going to explain your complete treatment plan..."
+STYLE REQUIREMENTS:
+- Start immediately with: "Hello ${effectivePatientName}, here are your medications from ${ocrData.doctor?.clinic_name || "your doctor"}."
+- Group related medications naturally
+- Avoid repeating medication names unnecessarily
+- Use "this medication" or "it" for subsequent references
+- Skip patient age/gender unless medically relevant
+- No markdown formatting or bullet points
+- Natural speech flow for text-to-speech
 
-OUTPUT REQUIREMENTS:
-- Generate ONLY the narrative text
-- No JSON, markdown, or formatting
-- No markdown symbols like * or \` etc.
-- Complete sentences and proper grammar in ${targetLanguage}
-- Natural speech patterns suitable for text-to-speech
-- Length: 2-4 minutes when spoken (approximately 300-600 words)
+EXAMPLE FLOW:
+"Hello [Name], here are your medications from [Clinic]. You have [X] medications to take. 
 
-If any critical information is missing or unclear from the OCR data, mention it appropriately in the narrative.`;
+First, take Augmentin 625mg twice daily after meals for bacterial infection - continue the full course even if you feel better. 
+
+Pan-D should be taken once daily before breakfast for stomach acid control.
+
+For pain relief, take Enzoflam as directed when needed.
+
+[Additional specific instructions only if critical]
+
+Complete all medications as prescribed. Contact [clinic] if you have questions."
+
+OUTPUT: Generate ONLY the narrative text with no formatting, suitable for direct text-to-speech conversion.`    
     }
 
     // Alternative method for structured narrative with sections
