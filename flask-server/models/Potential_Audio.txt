@@ -1,0 +1,45 @@
+utils = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_tts_utils')
+sequences, lengths = utils.prepare_input_sequence([text])
+
+import torch
+from torch.nn.utils import remove_weight_norm
+
+# Load Tacotron2
+tacotron2 = torch.hub.load(
+    'NVIDIA/DeepLearningExamples:torchhub',
+    'nvidia_tacotron2',
+    model_math='fp16'
+).to('cuda').eval()
+
+# Load WaveGlow
+waveglow = torch.hub.load(
+    'NVIDIA/DeepLearningExamples:torchhub',
+    'nvidia_waveglow',
+    model_math='fp16'
+).to('cuda').eval()
+
+# Remove weight norm (no need to import glow)
+def remove_weightnorm(model):
+    for m in model.modules():
+        try:
+            remove_weight_norm(m)
+        except Exception:
+            pass
+    return model
+
+waveglow = remove_weightnorm(waveglow)
+
+with torch.no_grad():
+    mel, _, _ = tacotron2.infer(sequences, lengths)
+    audio = waveglow.infer(mel)
+audio_numpy = audio[0].data.cpu().numpy()
+rate = 22050
+
+from scipy.io.wavfile import write
+write("audio.wav", rate, audio_numpy)
+
+from IPython.display import Audio
+Audio(audio_numpy, rate=rate)
+
+
+
