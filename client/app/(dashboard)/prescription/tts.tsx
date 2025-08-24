@@ -235,9 +235,9 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
     const { generateNarrative } = usePrescriptionNarrative(process.env.EXPO_PUBLIC_GEMINI_API_KEY!);
     const [narrative, setNarrative] = useState<string | null>(null);
     const router = useRouter();
-    const { prescriptionId } = useLocalSearchParams();
-    const data = useSelector((state: RootState) => selectPrescriptionById(state, Array.isArray(prescriptionId) ? prescriptionId[0] : prescriptionId));
-
+    const { prescriptionId, ocrData } = useLocalSearchParams();
+    const data = useSelector((state: RootState) => selectPrescriptionById(state, Array.isArray(prescriptionId) ? prescriptionId[0] : prescriptionId)) || JSON.parse(Array.isArray(ocrData) ? ocrData[0] : ocrData);
+    console.log(data);
     useEffect(() => {
         (async () => {
             setIsTranslating(true);

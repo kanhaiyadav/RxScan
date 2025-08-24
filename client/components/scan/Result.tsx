@@ -29,7 +29,7 @@ import { useRouter } from "expo-router";
 
 interface Props {
     ocrResult: PrescriptionData;
-    result: MedicineSearchResult;
+    result: MedicineSearchResult | null;
     resetToStart?: () => void;
     loading?: boolean;
     savePrescription?: () => void;
@@ -37,24 +37,24 @@ interface Props {
 }
 
 const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loading, savePrescription, prescriptionId }) => {
-    console.log(JSON.stringify(ocrResult, null, 2));
 
     const router = useRouter();
 
     const [selectedMedicine, setSelectedMedicine] = useState(0);
     const [activeSection, setActiveSection] = useState<string>('overview');
 
-    const currentMedicine = result.medicines[selectedMedicine];
+    const currentMedicine = result?.medicines[selectedMedicine];
 
     const [showActionsheet, setShowActionsheet] = React.useState(false)
     const handleClose = () => setShowActionsheet(false)
 
     const getMedicineData = useMemo(() => {
         return (name: string, index: number) => {
+            if (!result) return null;
             let medicine = result.medicines.find(m => m.medicalInfo.name.toLowerCase() === name.toLowerCase());
             return medicine || result.medicines[index];
         };
-    }, [result.medicines]);
+    }, [result]);
 
     const sections = [
         { id: 'overview', title: 'Overview', icon: 'information-circle' },
@@ -79,6 +79,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
 
     const renderMedicineSelector = () => {
         const getMedSeverityColor = (name: string) => {
+            if (result === null) return 'bg-white border-gray-200';
             const medicine = result.medicines.find(m => m.medicalInfo.name.toLowerCase() === name.toLowerCase());
             if (!medicine) return 'bg-green-100 border-green-400';
 
@@ -136,44 +137,52 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                             <Text className='text-gray-500 text-sm'>{medicine.frequency}</Text>
                         )}
 
-                        {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.overallRisk !== 'minimal' && (
+                        {getMedicineData(medicine.name, index)?.medicalInfo.healthProfileInteraction.overallRisk !== 'minimal' && (
                             <Text className="mt-2 text-gray-600">Health Profile Conflicts:</Text>
                         )}
-
-                        <HStack className="gap-1 mt-1">
-                            {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount > 0 && (
-                                <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-red-500">
-                                    <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount}</Text>
-                                    <Text className="ml-2 font-medium text-sm text-white">
-                                        critical
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                            {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount > 0 && (
-                                <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-orange-500">
-                                    <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount}</Text>
-                                    <Text className="ml-2 font-medium text-sm text-white">
-                                        high
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                            {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount > 0 && (
-                                <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-yellow-500">
-                                    <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount}</Text>
-                                    <Text className="ml-2 font-medium text-sm text-white">
-                                        moderate
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                            {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount > 0 && (
-                                <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-cyan-500">
-                                    <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount}</Text>
-                                    <Text className="ml-2 font-medium text-sm text-white">
-                                        low
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                        </HStack>
+                        {
+                            result !== null ?
+                            <HStack className="gap-1 mt-1">
+                                {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount > 0 && (
+                                    <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-red-500">
+                                        <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount}</Text>
+                                        <Text className="ml-2 font-medium text-sm text-white">
+                                            critical
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                                {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount > 0 && (
+                                    <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-orange-500">
+                                        <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount}</Text>
+                                        <Text className="ml-2 font-medium text-sm text-white">
+                                            high
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                                {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount > 0 && (
+                                    <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-yellow-500">
+                                        <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount}</Text>
+                                        <Text className="ml-2 font-medium text-sm text-white">
+                                            moderate
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                                {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount > 0 && (
+                                    <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-cyan-500">
+                                        <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount}</Text>
+                                        <Text className="ml-2 font-medium text-sm text-white">
+                                            low
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                                </HStack>
+                                :
+                                <HStack className="gap-1 mt-1">
+                                    <Skeleton className="h-[25px] w-[80px] rounded-full" speed={4} />
+                                    <Skeleton className="h-[25px] w-[70px] rounded-full" speed={4} />
+                                    <Skeleton className="h-[25px] w-[70px] rounded-full" speed={4} />
+                                </HStack>
+                        }
                     </TouchableOpacity>
                 ))}
             </View>
@@ -392,7 +401,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 )}
 
                 {/* Food Interactions */}
-                {currentMedicine.medicalInfo.interactions.foodInteractions.length > 0 && (
+                {currentMedicine?.medicalInfo.interactions.foodInteractions.length > 0 && (
                     <View className="bg-green-50 border border-green-200 rounded-xl p-4">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="restaurant" size={20} color="#10b981" />
@@ -405,7 +414,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 )}
 
                 {/* Condition Interactions */}
-                {currentMedicine.medicalInfo.interactions.conditionInteractions.length > 0 && (
+                {currentMedicine?.medicalInfo.interactions.conditionInteractions?.length > 0 && (
                     <View className="bg-purple-50 border border-purple-200 rounded-xl p-4">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="fitness" size={20} color="#8b5cf6" />
@@ -444,7 +453,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     <Text className="text-red-700 font-semibold ml-2">Overdose Information</Text>
                 </View>
                 <Text className="text-red-700 leading-6">
-                    {currentMedicine.medicalInfo.overdoseMissedDose.overdose}
+                    {currentMedicine?.medicalInfo.overdoseMissedDose.overdose || 'No information available'}
                 </Text>
             </View>
 
@@ -455,7 +464,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     <Text className="text-blue-700 font-semibold ml-2">Missed Dose</Text>
                 </View>
                 <Text className="text-blue-700 leading-6">
-                    {currentMedicine.medicalInfo.overdoseMissedDose.missedDose}
+                    {currentMedicine?.medicalInfo.overdoseMissedDose.missedDose || 'No information available'}
                 </Text>
             </View>
         </View>
@@ -465,7 +474,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
         <ScrollView className="p-4" showsVerticalScrollIndicator={false}>
             <View className="gap-4">
                 {['allergy', 'medical_condition', 'current_medication', 'dietary_restriction'].map((type) => {
-                    const interactions = currentMedicine.medicalInfo.healthProfileInteraction.interactions.filter((interaction) => interaction.type === type);
+                    const interactions = currentMedicine?.medicalInfo.healthProfileInteraction.interactions.filter((interaction) => interaction.type === type) || [];
                     return (
                         <View key={type}>
                             {interactions.length > 0 && (
@@ -579,7 +588,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 </View>
 
                 {/* Medicine Selector */}
-                {result.medicines.length > 1 && renderMedicineSelector()}
+                {ocrResult && ocrResult.medications?.length > 0 && renderMedicineSelector()}
 
                 {/* Additional Notes */}
                 {ocrResult.additional_notes?.follow_up || ocrResult.additional_notes?.special_instructions || ocrResult.additional_notes?.warnings && (
@@ -615,9 +624,10 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
 
                 <TouchableOpacity className="bg-primary-400 text-white flex-row items-center rounded-lg p-4 w-full justify-center gap-2 mt-4 mb-8"
                     onPress={() => {
+                        console.log("********************", prescriptionId);
                         router.push({
                             pathname: '/(dashboard)/prescription/tts',
-                            params: { prescriptionId: prescriptionId }
+                            params: { prescriptionId: prescriptionId, ocrData: JSON.stringify(ocrResult) }
                         })
                     }}
                 >

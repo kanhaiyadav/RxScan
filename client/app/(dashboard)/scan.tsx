@@ -33,7 +33,7 @@ export default function EnhancedPrescriptionOCR() {
     const [ocrError, setOcrError] = useState<string | null>(null);
     const [currentStep, setCurrentStep] = useState<'select' | 'preview' | 'results'>('select');
     const { searchMedicines, loading, error, reset } = useMedicineSearch(process.env.EXPO_PUBLIC_GEMINI_API_KEY as string);
-    const [result, setResult] = useState<MedicineSearchResult | null>(dummyMedicineSearchResult);
+    const [result, setResult] = useState<MedicineSearchResult | null>(null);
 
     const dispatch = useDispatch();
 
@@ -129,6 +129,7 @@ export default function EnhancedPrescriptionOCR() {
     const resetResults = () => {
         setOcrResult(null);
         setOcrError(null);
+        setResult(null);
     };
 
     const extractPrescription = async (): Promise<void> => {
@@ -271,6 +272,7 @@ export default function EnhancedPrescriptionOCR() {
         setOcrResult(null);
         setOcrError(null);
         setCurrentStep('select');
+        setResult(null);
     };
 
     const isLoading = ocrLoading;
@@ -329,7 +331,7 @@ export default function EnhancedPrescriptionOCR() {
                 )}
 
                 {/* Results Screen */}
-                {currentStep === 'results' && ocrResult && result && (
+                {currentStep === 'results' && ocrResult && (
                     <MedicineDisplay ocrResult={ocrResult} result={result} resetToStart={resetToStart} loading={loading} savePrescription={savePrescription} />
                 )}
 
