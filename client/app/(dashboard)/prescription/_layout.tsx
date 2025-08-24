@@ -1,9 +1,10 @@
 import { Stack } from "expo-router";
 import React from 'react';
-
+import { useTranslation } from 'react-i18next';
 
 
 const PrescriptionLayout = () => {
+    const { t } = useTranslation();
 
     return (
         <Stack
@@ -18,6 +19,7 @@ const PrescriptionLayout = () => {
                 name="index"
                 options={{
                     headerShown: false,
+                    title: t('prescription.screens.index'),
                     animation: "ios_from_right",
                 }}
             />
@@ -25,6 +27,7 @@ const PrescriptionLayout = () => {
                 name="details"
                 options={{
                     headerShown: false,
+                    title: t('prescription.screens.details'),
                     animation: "ios_from_right",
                 }}
             />

@@ -1,4 +1,5 @@
 import "@/app/globals.css";
+import "@/app/i18n"; // Import i18n configuration
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { AuthProvider } from "@/context/AuthContext";
 import { UserHealthProvider } from "@/context/UserHealthContext";
