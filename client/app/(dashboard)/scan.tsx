@@ -187,9 +187,15 @@ export default function EnhancedPrescriptionOCR() {
                 setOcrResult(processedResult);
                 setCurrentStep('results');
 
-                if (processedResult.medications) {
+                if (processedResult.medications && healthProfile) {
                     reset();
-                    const res = await searchMedicines({ prescription_medications: processedResult.medications, health_profile: healthProfile });
+                    const res = await searchMedicines({ 
+                        prescription_medications: processedResult.medications, 
+                        health_profile: {
+                            ...healthProfile,
+                            additionalNotes: healthProfile.additionalNotes || ""
+                        }
+                    });
                     console.log(JSON.stringify(res, null, 2));
                     setResult(res);
                 }
