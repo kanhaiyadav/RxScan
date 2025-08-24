@@ -167,44 +167,55 @@ If any critical information is missing or unclear from the OCR data, mention it 
         const effectivePatientName =
             patientName || parsedData.patient?.name || "the patient";
 
-        return `You are a medical professional creating a structured audio narrative for ${effectivePatientName}.
+        return `You are a medical professional explaining a prescription to ${effectivePatientName}. Convert the following prescription information into a concise, clear medical narrative in ${targetLanguage}.
 
-PRESCRIPTION INFORMATION:
-${JSON.stringify(parsedData, null, 2)}
+PRESCRIPTION INFORMATION: ${JSON.stringify(ocrData, null, 2)}
 
-Create a structured medical narrative in ${targetLanguage} with clear sections:
+INSTRUCTIONS:
+1. Generate the narrative entirely in ${targetLanguage}
+2. Use clear, conversational language suitable for voice output
+3. Prioritize essential medication information over formalities
+4. Keep total length under 300 words (1.5-2 minutes spoken)
 
-SECTION 1 - INTRODUCTION (30-45 seconds):
-- Greeting and prescription overview
-- Doctor/clinic name and date
-- General purpose of the prescription
+STRUCTURE (in order of priority):
+1. **Brief greeting** - Just name and basic context (1 sentence)
+2. **Core medications** - For each medication:
+   - Name and primary purpose
+   - Dosage and frequency 
+   - Key timing instructions (meals, etc.)
+   - Duration if specified
+3. **Important reminders** - Only critical points like completing antibiotic courses
+4. **Closing** - Brief encouragement and clinic contact if questions arise
 
-SECTION 2 - MEDICATIONS (2-3 minutes):
-For each medication, explain:
-- Medication name and what it treats
-- Exact dosage and timing
-- How to take it properly
-- Duration of treatment
-- Any special instructions
+MEDICATION GUIDELINES:
+- Augmentin 625mg: "antibiotic for infection"
+- Pan-D 40mg: "for acid reduction" 
+- Enzoflam: "anti-inflammatory for pain/swelling"
+- Hexigel: "antiseptic gel for mouth/gums"
 
-SECTION 3 - IMPORTANT REMINDERS (30-45 seconds):
-- Key safety information
-- When to contact the doctor
-- Next appointment or follow-up
+STYLE REQUIREMENTS:
+- Start immediately with: "Hello ${effectivePatientName}, here are your medications from ${ocrData.doctor?.clinic_name || "your doctor"}."
+- Group related medications naturally
+- Avoid repeating medication names unnecessarily
+- Use "this medication" or "it" for subsequent references
+- Skip patient age/gender unless medically relevant
+- No markdown formatting or bullet points
+- Natural speech flow for text-to-speech
 
-SECTION 4 - CONCLUSION (15-30 seconds):
-- Encouragement
-- Reminder about adherence
-- Contact information for questions
+EXAMPLE FLOW:
+"Hello [Name], here are your medications from [Clinic]. You have [X] medications to take. 
 
-LANGUAGE REQUIREMENTS:
-- Use ${targetLanguage} exclusively
-- Natural conversational flow
-- Medical accuracy with simple explanations
-- Culturally appropriate expressions
-- Suitable for text-to-speech conversion
+First, take Augmentin 625mg twice daily after meals for bacterial infection - continue the full course even if you feel better. 
 
-OUTPUT: Only the narrative text, no section headers in the final output.`;
+Pan-D should be taken once daily before breakfast for stomach acid control.
+
+For pain relief, take Enzoflam as directed when needed.
+
+[Additional specific instructions only if critical]
+
+Complete all medications as prescribed. Contact [clinic] if you have questions."
+
+OUTPUT: Generate ONLY the narrative text with no formatting, suitable for direct text-to-speech conversion.` 
     }
 
     // Method to get supported languages (extend as needed)
