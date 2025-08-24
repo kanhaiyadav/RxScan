@@ -4,6 +4,7 @@ import * as FileSystem from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 // Import Gluestack components (add these to your components/ui folder)
@@ -210,6 +211,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
     subscriptionKey = process.env.EXPO_PUBLIC_AZURE_SUBSCRIPTION_KEY,
     region = process.env.EXPO_PUBLIC_AZURE_REGION,
 }) => {
+    const { t } = useTranslation();
     const [text, setText] = useState<string>('');
     const [selectedLanguage, setSelectedLanguage] = useState<LanguageGroup>(LANGUAGE_GROUPS[0]);
     const [selectedVoice, setSelectedVoice] = useState<VoiceOption>(LANGUAGE_GROUPS[0].voices[0]);
@@ -559,10 +561,10 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                 </TouchableOpacity>
                 <View>
                     <Text className="text-2xl font-bold text-gray-900">
-                        Hear Prescription
+                        {t('prescription.tts.title')}
                     </Text>
                     <Text className="text-base text-gray-600">
-                        Hear out what your prescription has to say
+                        {t('prescription.tts.subtitle')}
                     </Text>
                 </View>
             </LinearGradient>
@@ -584,14 +586,14 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
                         <Ionicons name="mic" size={20} color="teal" />
                         <Text style={{ fontSize: 18, fontWeight: '600', color: '#1e293b', marginLeft: 8 }}>
-                            Voice Settings
+                            {t('prescription.tts.voiceSettings')}
                         </Text>
                     </View>
 
                     {/* Language Selection */}
                     <View style={{ marginBottom: 20 }}>
                         <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151', marginBottom: 8 }}>
-                            Language
+                            {t('prescription.tts.language')}
                         </Text>
                         <Select
                             selectedValue={selectedLanguage.name}
@@ -631,7 +633,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     {/* Voice Selection */}
                     <View style={{ marginBottom: 20 }}>
                         <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151', marginBottom: 8 }}>
-                            Voice ({selectedLanguage.voices.length} available)
+                            {t('prescription.tts.voice')} ({selectedLanguage.voices.length} available)
                         </Text>
                         <Select
                             selectedValue={selectedVoice.displayName}
@@ -669,7 +671,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     {/* Audio Quality */}
                     <View style={{ marginBottom: 20 }}>
                         <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151', marginBottom: 8 }}>
-                            Audio Quality
+                            {t('prescription.tts.audioQuality')}
                         </Text>
                         <Select
                             selectedValue={audioFormat}
@@ -703,7 +705,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     <View style={{ marginBottom: 20 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                             <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151' }}>
-                                Speech Rate
+                                {t('prescription.tts.speechRate')}
                             </Text>
                             <Text style={{ fontSize: 14, fontWeight: '600' }} className='text-primary-500'>
                                 {speechRate.toFixed(1)}x
@@ -731,7 +733,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     {/* Speech Pitch */}
                     <View>
                         <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151', marginBottom: 12 }}>
-                            Speech Pitch
+                            {t('prescription.tts.speechPitch')}
                         </Text>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             {['-20%', '0%', '+20%'].map((pitch) => (
@@ -762,7 +764,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         color: speechPitch === pitch ? '#e2e8f0' : '#94a3b8',
                                         marginTop: 2,
                                     }}>
-                                        {pitch === '-20%' ? 'Lower' : pitch === '0%' ? 'Normal' : 'Higher'}
+                                        {pitch === '-20%' ? t('prescription.tts.pitchLabels.lower') : pitch === '0%' ? t('prescription.tts.pitchLabels.normal') : t('prescription.tts.pitchLabels.higher')}
                                     </Text>
                                 </TouchableOpacity>
                             ))}
@@ -790,14 +792,14 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             <>
                                 <Ionicons name="hourglass" size={24} color="#ffffff" />
                                 <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '600', marginLeft: 8 }}>
-                                    Generating Speech...
+                                    {t('prescription.tts.generatingText')}
                                 </Text>
                             </>
                         ) : (
                             <>
                                 <Ionicons name="play-circle" size={20} color="#ffffff" />
                                 <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '600', marginLeft: 8 }}>
-                                    Generate Speech
+                                    {t('prescription.tts.generateSpeech')}
                                 </Text>
                             </>
                         )}
@@ -809,7 +811,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                         <View className='flex-row items-center gap-2 justify-center'>
                             <ActivityIndicator size="small" color="#00b894" />
                             <Text className='text-center text-gray-500 text-sm'>
-                                Translating & Narrating your prescription into {selectedVoice.languageDisplay}
+                                {t('prescription.tts.translatingText', { language: selectedVoice.languageDisplay })}
                             </Text>
                         </View>
                     )
@@ -1131,37 +1133,37 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                                 <Ionicons name="information-circle" size={16} color="teal" />
                                 <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151', marginLeft: 6 }}>
-                                    File Details
+                                    {t('prescription.tts.fileDetails')}
                                 </Text>
                             </View>
 
                             <View style={{ gap: 4 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>Format:</Text>
+                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.format')}:</Text>
                                     <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
                                         {AUDIO_FORMATS.find(f => f.value === audioFormat)?.quality} MP3
                                     </Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>Size:</Text>
+                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.size')}:</Text>
                                     <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
                                         {audioFileInfo.size}
                                     </Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>Duration:</Text>
+                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.duration')}:</Text>
                                     <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
                                         {formatTime(playbackState.duration)}
                                     </Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>Speed:</Text>
+                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.speed')}:</Text>
                                     <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
                                         {playbackState.rate.toFixed(1)}x
                                     </Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>Volume:</Text>
+                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.volume')}:</Text>
                                     <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
                                         {Math.round(playbackState.volume * 100)}%
                                     </Text>

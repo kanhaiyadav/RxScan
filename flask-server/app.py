@@ -245,7 +245,7 @@ def extract_prescription():
         
         # Clean up uploaded file
         os.remove(filepath)
-
+        
         return jsonify(result)
         
     except Exception as e:
