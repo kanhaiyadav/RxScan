@@ -44,8 +44,8 @@ export default function LanguageSwitcher() {
                         <Ionicons name="language" size={20} color="white" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-gray-900 font-medium">{t('language')}</Text>
-                        <Text className="text-gray-500 text-sm mt-1">{currentLanguage.nativeName}</Text>
+                        <Text className="text-typography-900 font-medium">{t('language')}</Text>
+                        <Text className="text-typography-500 text-sm mt-1">{currentLanguage.nativeName}</Text>
                     </View>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
@@ -53,7 +53,7 @@ export default function LanguageSwitcher() {
 
             <AlertDialog isOpen={showLanguageDialog} onClose={() => setShowLanguageDialog(false)} size="md">
                 <AlertDialogBackdrop />
-                <AlertDialogContent className='bg-white border-0'>
+                <AlertDialogContent className='bg-background-0 border-0'>
                     <AlertDialogHeader>
                         <Text className='text-xl font-bold'>
                             {t('selectLanguage')}
@@ -63,18 +63,16 @@ export default function LanguageSwitcher() {
                         {languages.map((language) => (
                             <TouchableOpacity
                                 key={language.code}
-                                className={`p-4 rounded-lg mb-2 flex-row items-center justify-between ${
-                                    i18n.language === language.code ? 'bg-primary-100' : 'bg-gray-50'
-                                }`}
+                                className={`p-4 rounded-lg mb-2 flex-row items-center justify-between ${i18n.language === language.code ? 'bg-primary-100' : 'bg-gray-50'
+                                    }`}
                                 onPress={() => changeLanguage(language.code)}
                             >
                                 <View>
-                                    <Text className={`font-medium ${
-                                        i18n.language === language.code ? 'text-primary-600' : 'text-gray-900'
-                                    }`}>
+                                    <Text className={`font-medium ${i18n.language === language.code ? 'text-primary-600' : 'text-typography-900'
+                                        }`}>
                                         {language.nativeName}
                                     </Text>
-                                    <Text className="text-gray-500 text-sm">{language.name}</Text>
+                                    <Text className="text-typography-500 text-sm">{language.name}</Text>
                                 </View>
                                 {i18n.language === language.code && (
                                     <Ionicons name="checkmark-circle" size={24} color="#14B8A6" />

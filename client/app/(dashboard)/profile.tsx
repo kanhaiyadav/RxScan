@@ -220,14 +220,14 @@ export default function ProfileScreen() {
                 className='border-b border-gray-200'
             >
                 <View className="px-6 py-4 pt-8">
-                    <Text className="text-2xl font-bold text-gray-900">{t('profile')}</Text>
-                    <Text className="text-sm text-gray-600">{t('profileInformation')}</Text>
+                    <Text className="text-2xl font-bold text-typography-900">{t('profile')}</Text>
+                    <Text className="text-sm text-typography-600">{t('profileInformation')}</Text>
                 </View>
             </LinearGradient>
 
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* User Info Card */}
-                <View className='m-6 p-6 bg-white'
+                <View className='m-6 p-6 bg-background-0'
                     style={{
                         borderRadius: 20,
                         shadowColor: '#000',
@@ -257,15 +257,15 @@ export default function ProfileScreen() {
 
                         {/* User Details */}
                         <View className="flex-1">
-                            <Text className="text-gray-900 text-xl font-bold mb-1">
+                            <Text className="text-typography-900 text-xl font-bold mb-1">
                                 {user?.name || 'User'}
                             </Text>
-                            <Text className="text-gray-600 text-sm mb-1">
+                            <Text className="text-typography-600 text-sm mb-1">
                                 {user?.email || 'email@example.com'}
                             </Text>
                             <View className="flex-row items-center">
                                 <Ionicons name="time-outline" size={14} color="#9CA3AF" />
-                                <Text className="text-gray-500 text-xs ml-1">
+                                <Text className="text-typography-500 text-xs ml-1">
                                     {formatMemberSince(user?.registration)}
                                 </Text>
                             </View>
@@ -306,12 +306,12 @@ export default function ProfileScreen() {
                 {/* Profile Sections */}
                 <View className="mx-6 mt-4">
                     <View className='flex-row justify-between'>
-                        <Text className="text-lg font-semibold text-gray-900 mb-4">{profileSections[0].title}</Text>
+                        <Text className="text-lg font-semibold text-typography-900 mb-4">{profileSections[0].title}</Text>
                         <TouchableOpacity
                             className="flex-row items-center"
                             onPress={() => router.push('/(onboarding)/')}
                         >
-                            <Icon as={EditIcon} className='text-gray-900 mr-2' />
+                            <Icon as={EditIcon} className='text-typography-900 mr-2' />
                         </TouchableOpacity>
                     </View>
                     <View className="">
@@ -337,7 +337,7 @@ export default function ProfileScreen() {
                                                                 </View>
                                                                 <View>
                                                                     <Text className='text-md font-bold'>{item.title}</Text>
-                                                                    <Text className='text-sm text-gray-500'>{`${healthProfile && 'slug' in item && item.slug && (healthProfile as any)[item.slug] ? (healthProfile as any)[item.slug].length : 0} ${item.subtitle}`}</Text>
+                                                                    <Text className='text-sm text-typography-500'>{`${healthProfile && 'slug' in item && item.slug && (healthProfile as any)[item.slug] ? (healthProfile as any)[item.slug].length : 0} ${item.subtitle}`}</Text>
                                                                 </View>
                                                             </View>
                                                             {isExpanded ? (
@@ -356,10 +356,10 @@ export default function ProfileScreen() {
                                                     <View key={detailIndex} className='bg-gray-100 p-2 px-3 rounded-md'>
                                                         {
                                                             'slug' in item && item.slug !== 'currentMedications' ?
-                                                                <Text className='text-sm text-gray-700'>{detail}</Text>
+                                                                <Text className='text-sm text-typography-700'>{detail}</Text>
                                                                 : <View className='m-1'>
-                                                                    <Text className='text-sm text-gray-700'>{`${detail.name} ${detail.dosage ? `(${detail.dosage})` : ''}`}</Text>
-                                                                    <Text className='text-sm text-gray-700'>{detail.frequency}</Text>
+                                                                    <Text className='text-sm text-typography-700'>{`${detail.name} ${detail.dosage ? `(${detail.dosage})` : ''}`}</Text>
+                                                                    <Text className='text-sm text-typography-700'>{detail.frequency}</Text>
                                                                 </View>
                                                         }
                                                     </View>
@@ -376,8 +376,8 @@ export default function ProfileScreen() {
 
                 {/* App Settings Section */}
                 <View className="mx-6 mt-4">
-                    <Text className="text-lg font-semibold text-gray-900 mb-4">{profileSections[1].title}</Text>
-                    <View className="bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <Text className="text-lg font-semibold text-typography-900 mb-4">{profileSections[1].title}</Text>
+                    <View className="bg-background-0 rounded-2xl shadow-sm border border-gray-100">
                         {profileSections[1].items.map((item, itemIndex) => (
                             <TouchableOpacity
                                 key={itemIndex}
@@ -394,8 +394,8 @@ export default function ProfileScreen() {
                                     <Ionicons name={item.icon as any} size={20} color="white" />
                                 </View>
                                 <View className="flex-1">
-                                    <Text className="text-gray-900 font-medium">{item.title}</Text>
-                                    <Text className="text-gray-500 text-sm mt-1">{item.subtitle}</Text>
+                                    <Text className="text-typography-900 font-medium">{item.title}</Text>
+                                    <Text className="text-typography-500 text-sm mt-1">{item.subtitle}</Text>
                                 </View>
                                 {'hasToggle' in item && item.hasToggle ? (
                                     <Switch
@@ -409,7 +409,7 @@ export default function ProfileScreen() {
                                 )}
                             </TouchableOpacity>
                         ))}
-                        
+
                         {/* Language Switcher - Add after other settings */}
                         <View className="border-t border-gray-100">
                             <LanguageSwitcher />
@@ -419,8 +419,8 @@ export default function ProfileScreen() {
 
                 {/* Support & About Section */}
                 <View className="mx-6 mt-4">
-                    <Text className="text-lg font-semibold text-gray-900 mb-4">{profileSections[2].title}</Text>
-                    <View className="bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <Text className="text-lg font-semibold text-typography-900 mb-4">{profileSections[2].title}</Text>
+                    <View className="bg-background-0 rounded-2xl shadow-sm border border-gray-100">
                         {profileSections[2].items.map((item, itemIndex) => (
                             <TouchableOpacity
                                 key={itemIndex}
@@ -437,8 +437,8 @@ export default function ProfileScreen() {
                                     <Ionicons name={item.icon as any} size={20} color="white" />
                                 </View>
                                 <View className="flex-1">
-                                    <Text className="text-gray-900 font-medium">{item.title}</Text>
-                                    <Text className="text-gray-500 text-sm mt-1">{item.subtitle}</Text>
+                                    <Text className="text-typography-900 font-medium">{item.title}</Text>
+                                    <Text className="text-typography-500 text-sm mt-1">{item.subtitle}</Text>
                                 </View>
                                 <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                             </TouchableOpacity>
@@ -464,7 +464,7 @@ export default function ProfileScreen() {
                                 </Text>
                             </AlertDialogHeader>
                             <AlertDialogBody className="mt-3 mb-4">
-                                <Text className='text-gray-500'>
+                                <Text className='text-typography-500'>
                                     {t('logoutMessage')}
                                 </Text>
                             </AlertDialogBody>
@@ -473,7 +473,7 @@ export default function ProfileScreen() {
                                     action="secondary"
                                     onPress={handleClose}
                                     size="sm"
-                                    className='bg-white elevation-sm'
+                                    className='bg-background-0 elevation-sm'
                                 >
                                     <ButtonText>{t('cancel')}</ButtonText>
                                 </Button>
@@ -484,7 +484,7 @@ export default function ProfileScreen() {
                         </AlertDialogContent>
                     </AlertDialog>
                 </View>
-                </ScrollView>
+            </ScrollView>
         </SafeAreaView>
     );
 }

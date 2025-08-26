@@ -4,7 +4,7 @@ import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { AuthProvider } from "@/context/AuthContext";
 import { UserHealthProvider } from "@/context/UserHealthContext";
 import { Stack } from "expo-router";
-import { StatusBar } from "react-native";
+import { ActivityIndicator, StatusBar, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { store, persistor } from "@/Store/store";
@@ -12,17 +12,28 @@ import { PersistGate } from "redux-persist/integration/react";
 import ModalManager from "@/components/modal/ModalManager";
 import * as NavigationBar from 'expo-navigation-bar';
 import { useEffect } from "react";
+import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 
 if (__DEV__) {
     import('../lib/reactotron').then(() => console.log('Reactotron Configured'))
 }
 
-export default function RootLayout() {
+const RootLayoutContent = () => {
+
+    const { isDark, isLoading } = useTheme();
 
     useEffect(() => {
         NavigationBar.setVisibilityAsync("hidden");
     }, []);
-    
+
+    if (isLoading) {
+        return (
+            <View className={`flex-1 justify-center items-center ${isDark ? 'bg-gray-900' : 'bg-background-500'}`}>
+                <ActivityIndicator size="large" color={isDark ? '#ffffff' : '#000000'} />
+            </View>
+        );
+    }
+
     return (
         <SafeAreaProvider>
             <AuthProvider>
@@ -35,7 +46,7 @@ export default function RootLayout() {
                                 hidden={true}
                             // translucent={true}
                             />
-                            <GluestackUIProvider mode="light">
+                            <GluestackUIProvider mode={isDark ? "dark" : "light"}>
                                 <Stack initialRouteName="index">
                                     <Stack.Screen
                                         name="index"
@@ -81,5 +92,13 @@ export default function RootLayout() {
                 </Provider>
             </AuthProvider>
         </SafeAreaProvider>
+    );
+}
+
+export default function RootLayout() {
+    return (
+        <ThemeProvider>
+            <RootLayoutContent />
+        </ThemeProvider>
     );
 }

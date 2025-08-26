@@ -168,7 +168,7 @@ export default function HomeScreen() {
     ];
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <SafeAreaView className="flex-1 bg-background-50">
             <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
             {/* Header */}
@@ -177,15 +177,15 @@ export default function HomeScreen() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
                 style={{ elevation: 3 }}
-                className='border-b border-gray-200'
+                className='border-b border-gray-200 dark:border-outline-0'
             >
                 <View className="bg-transparent px-6 py-4 ">
                     <View className="flex-row items-center justify-between">
                         <View>
                             <Text className="text-2xl font-bold text-gray-900">{t('homeScreen.welcomeBack')}</Text>
-                            <Text className="text-gray-600 mt-1">{t('homeScreen.keepHealthyToday')}</Text>
+                            <Text className="text-gray-500 mt-1">{t('homeScreen.keepHealthyToday')}</Text>
                         </View>
-                        <TouchableOpacity className="bg-white p-3 rounded-full elevation-sm">
+                        <TouchableOpacity className="bg-background-0 p-3 rounded-full elevation-sm">
                             <Ionicons name="notifications" size={24} color="#14B8A6" />
                         </TouchableOpacity>
                     </View>
@@ -195,28 +195,28 @@ export default function HomeScreen() {
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* Health Stats Card */}
                 <View className="mx-6 bg-transparent py-3 pb-4">
-                    <Text className="text-lg font-bold text-gray-600 mb-4">{t('homeScreen.healthSummary')}</Text>
+                    <Text className="text-lg font-bold text-typography-600 mb-4">{t('homeScreen.healthSummary')}</Text>
                     <View className="flex-row justify-between gap-4">
-                        <View className="items-center flex-1 bg-white py-4 elevation rounded-xl">
+                        <View className="items-center flex-1 bg-background-0 py-4 elevation rounded-xl">
                             <View className="bg-teal-100 w-12 h-12 rounded-full items-center justify-center mb-2">
                                 <Ionicons name="document-text" size={24} color="#14B8A6" />
                             </View>
-                            <Text className="text-2xl font-bold text-gray-900">{stats.totalPrescriptions}</Text>
-                            <Text className="text-gray-500 text-sm">{t('homeScreen.prescriptions')}</Text>
+                            <Text className="text-2xl font-bold text-typography-900">{stats.totalPrescriptions}</Text>
+                            <Text className="text-typography-500 text-sm">{t('homeScreen.prescriptions')}</Text>
                         </View>
-                        <View className="items-center flex-1 bg-white py-4 elevation rounded-xl">
+                        <View className="items-center flex-1 bg-background-0 py-4 elevation rounded-xl">
                             <View className="bg-blue-100 w-12 h-12 rounded-full items-center justify-center mb-2">
                                 <Ionicons name="medical" size={24} color="#3B82F6" />
                             </View>
-                            <Text className="text-2xl font-bold text-gray-900">{stats.meds}</Text>
-                            <Text className="text-gray-500 text-sm">{t('homeScreen.activeMeds')}</Text>
+                            <Text className="text-2xl font-bold text-typography-900">{stats.meds}</Text>
+                            <Text className="text-typography-500 text-sm">{t('homeScreen.activeMeds')}</Text>
                         </View>
-                        <View className="items-center flex-1 bg-white py-4 elevation rounded-xl">
+                        <View className="items-center flex-1 bg-background-0 py-4 elevation rounded-xl">
                             <View className="bg-orange-100 w-12 h-12 rounded-full items-center justify-center mb-2">
                                 <Ionicons name="warning" size={24} color="#F97316" />
                             </View>
-                            <Text className="text-2xl font-bold text-gray-900">{stats.warnings}</Text>
-                            <Text className="text-gray-500 text-sm">{t('homeScreen.warnings')}</Text>
+                            <Text className="text-2xl font-bold text-typography-900">{stats.warnings}</Text>
+                            <Text className="text-typography-500 text-sm">{t('homeScreen.warnings')}</Text>
                         </View>
                     </View>
                 </View>
@@ -226,7 +226,7 @@ export default function HomeScreen() {
                     activePrescriptions.length > 0 &&
                     <View className="mx-6 mt-2">
                         <View className='flex-row w-full justify-between items-center'>
-                            <Text className="text-lg font-bold text-gray-600 mb-2 mt-2">{t('homeScreen.activePrescriptions')}</Text>
+                            <Text className="text-lg font-bold text-typography-600 mb-2 mt-2">{t('homeScreen.activePrescriptions')}</Text>
                             <TouchableOpacity onPress={() => {
                                 router.push('/(dashboard)/prescription');
                             }} className='flex-row items-center'>
@@ -238,7 +238,8 @@ export default function HomeScreen() {
                             {activePrescriptions.map((prescription) => (
                                 <TouchableOpacity
                                     key={prescription.$id}
-                                    className="w-full bg-white rounded-xl p-2 border border-gray-100 elevation-sm flex-row gap-2 items-center"
+                                    className="w-full bg-background-0 rounded-xl p-2 flex-row gap-2 items-center"
+                                    style={{elevation: 2}}
                                     onPress={() => {
                                         router.push({
                                             pathname: '/(dashboard)/prescription/details',
@@ -248,10 +249,10 @@ export default function HomeScreen() {
                                 >
                                     <Image source={{ uri: prescription.image }} className='w-[64px] h-[64px] rounded-md' />
                                     <View className='h-full'>
-                                        <Text className="text-gray-900 font-semibold text-base">{prescription.ocrResult.doctor?.name || prescription.ocrResult.doctor?.clinic_name}</Text>
+                                        <Text className="text-typography-900 font-semibold text-base">{prescription.ocrResult.doctor?.name || prescription.ocrResult.doctor?.clinic_name}</Text>
                                         <View className='flex-row gap-3'>
-                                            <Text className="text-gray-500 text-sm mt-1">{prescription.ocrResult.patient?.prescription_date || prescription.$createdAt.split('T')[0]}</Text>
-                                            <Text className="text-gray-500 text-sm mt-1">{prescription.ocrResult.medications?.length} {t('homeScreen.medications')}</Text>
+                                            <Text className="text-typography-500 text-sm mt-1">{prescription.ocrResult.patient?.prescription_date || prescription.$createdAt.split('T')[0]}</Text>
+                                            <Text className="text-typography-500 text-sm mt-1">{prescription.ocrResult.medications?.length} {t('homeScreen.medications')}</Text>
                                         </View>
                                     </View>
                                     <Ionicons name="chevron-forward" size={24} color="#6B7280" className="ml-auto" />
@@ -264,7 +265,7 @@ export default function HomeScreen() {
                 {/* Upcoming Reminders */}
                 <View className="mx-6">
                     <View className='flex-row w-full justify-between items-center'>
-                        <Text className="text-lg font-bold text-gray-600 mb-2 mt-6">{t('homeScreen.upcomingReminders')}</Text>
+                        <Text className="text-lg font-bold text-typography-600 mb-2 mt-6">{t('homeScreen.upcomingReminders')}</Text>
                         <TouchableOpacity onPress={() => {
                             router.push('/(dashboard)/reminder');
                         }} className='flex-row items-center mb-[-10px]'>
@@ -278,22 +279,23 @@ export default function HomeScreen() {
                         return (
                             <View
                                 key={reminder.id}
-                                className="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-gray-200"
+                                className="bg-background-0 rounded-2xl p-5 mb-4"
+                                style={{ elevation: 2}}
                             >
                                 <View className="flex-row items-center justify-between mb-3">
                                     <View className="flex-row items-center flex-1">
                                         <View className={`${reminder.color} w-4 h-12 rounded-full mr-4`} />
                                         <View className="flex-1">
-                                            <Text className="text-lg font-semibold text-gray-900">
+                                            <Text className="text-lg font-semibold text-typography-900">
                                                 {getMedicineName(reminder.medicineKey, reminder.dosage)}
                                             </Text>
-                                            <Text className="text-gray-500 text-sm">
+                                            <Text className="text-typography-500 text-sm">
                                                 {reminder.frequency} • {getDoctorName(reminder.doctorKey)}
                                             </Text>
                                         </View>
                                     </View>
                                     <View className="items-end">
-                                        <Text className="text-xl font-bold text-gray-900">
+                                        <Text className="text-xl font-bold text-typography-900">
                                             {reminder.time}
                                         </Text>
                                         <View className="flex-row items-center mt-1">
@@ -314,7 +316,7 @@ export default function HomeScreen() {
                                     <View className="flex-row gap-3 mt-4">
                                         <TouchableOpacity className="flex-1 bg-gray-100 py-3 px-4 rounded-xl flex-row items-center justify-center elevation-sm">
                                             <Ionicons name="time-outline" size={16} color="#6B7280" />
-                                            <Text className="text-gray-600 font-medium ml-2">{t('skip')}</Text>
+                                            <Text className="text-typography-600 font-medium ml-2">{t('skip')}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity className="flex-1 bg-teal-500 py-3 px-4 rounded-xl flex-row items-center justify-center elevation-sm">
                                             <Ionicons name="checkmark" size={16} color="white" />
@@ -342,12 +344,13 @@ export default function HomeScreen() {
 
                 {/* Quick Actions */}
                 <View className="mx-6 mt-8">
-                    <Text className="text-lg font-bold text-gray-600 mb-4">{t('homeScreen.quickActions')}</Text>
+                    <Text className="text-lg font-bold text-typography-600 mb-4">{t('homeScreen.quickActions')}</Text>
                     <View className="flex-row flex-wrap justify-between">
                         {quickActions.map((action) => (
                             <TouchableOpacity
                                 key={action.id}
-                                className="bg-white rounded-2xl p-4 w-[48%] mb-4 border border-gray-100 elevation-sm"
+                                className="bg-background-0 rounded-2xl p-4 w-[48%] mb-4"
+                                style={{ elevation: 2 }}
                                 onPress={() => {
                                     persistor.purge();
                                 }}
@@ -355,8 +358,8 @@ export default function HomeScreen() {
                                 <View className={`${action.color} w-12 h-12 rounded-xl items-center justify-center mb-3`}>
                                     <Ionicons name={action.icon as any} size={24} color="white" />
                                 </View>
-                                <Text className="text-gray-900 font-semibold text-base">{action.title}</Text>
-                                <Text className="text-gray-500 text-sm mt-1">{action.subtitle}</Text>
+                                <Text className="text-typography-900 font-semibold text-base">{action.title}</Text>
+                                <Text className="text-typography-500 text-sm mt-1">{action.subtitle}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>

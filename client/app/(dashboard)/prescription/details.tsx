@@ -44,17 +44,17 @@ export default function PrescriptionDetails() {
                 <View className="px-6 py-4">
                     <View className="flex-row items-center">
                         <TouchableOpacity
-                            className="mr-4 bg-white/20 w-10 h-10 rounded-full items-center justify-center"
+                            className="mr-4 bg-background-0/20 w-10 h-10 rounded-full items-center justify-center"
                             onPress={() => router.back()}
                         >
                             <Ionicons name="arrow-back" size={26} color="#1f2937" />
                         </TouchableOpacity>
                         <View>
-                            <Text className="text-2xl font-bold text-gray-900">{t('prescription.details.title')}</Text>
-                            <Text className="text-sm text-gray-600">{t('prescription.details.subtitle')}</Text>
+                            <Text className="text-2xl font-bold text-typography-900">{t('prescription.details.title')}</Text>
+                            <Text className="text-sm text-typography-600">{t('prescription.details.subtitle')}</Text>
                         </View>
                         <TouchableOpacity
-                            className="ml-auto h-[50px] w-[50px] bg-white rounded-full items-center justify-center elevation"
+                            className="ml-auto h-[50px] w-[50px] bg-background-0 rounded-full items-center justify-center elevation"
                             onPress={moveTotts}
                         >
                             <Ionicons name="volume-high" size={26} color="teal" />

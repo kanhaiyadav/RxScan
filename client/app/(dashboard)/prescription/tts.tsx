@@ -560,10 +560,10 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     <Ionicons name='arrow-back' size={24} />
                 </TouchableOpacity>
                 <View>
-                    <Text className="text-2xl font-bold text-gray-900">
+                    <Text className="text-2xl font-bold text-typography-900">
                         {t('prescription.tts.title')}
                     </Text>
-                    <Text className="text-base text-gray-600">
+                    <Text className="text-base text-typography-600">
                         {t('prescription.tts.subtitle')}
                     </Text>
                 </View>
@@ -607,7 +607,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             isDisabled={isTranslating}
                         >
                             <SelectTrigger variant="outline" size="lg">
-                                <SelectInput placeholder="Select Language" className='h-[50px] px-4 text-gray-600 text-md' />
+                                <SelectInput placeholder="Select Language" className='h-[50px] px-4 text-typography-600 text-md' />
                                 <SelectIcon className="mr-3">
                                     <ChevronDownIcon />
                                 </SelectIcon>
@@ -645,7 +645,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             }}
                         >
                             <SelectTrigger variant="outline" size="lg">
-                                <SelectInput placeholder="Select Voice" className='h-[50px] px-4 text-gray-600 text-md' />
+                                <SelectInput placeholder="Select Voice" className='h-[50px] px-4 text-typography-600 text-md' />
                                 <SelectIcon className="mr-3">
                                     <ChevronDownIcon />
                                 </SelectIcon>
@@ -678,7 +678,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             onValueChange={(value) => setAudioFormat(value)}
                         >
                             <SelectTrigger variant="outline" size="lg">
-                                <SelectInput placeholder="Select Quality" className='h-[50px] px-4 text-gray-600 text-md' />
+                                <SelectInput placeholder="Select Quality" className='h-[50px] px-4 text-typography-600 text-md' />
                                 <SelectIcon className="mr-3">
                                     <ChevronDownIcon />
                                 </SelectIcon>
@@ -810,7 +810,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     isTranslating && (
                         <View className='flex-row items-center gap-2 justify-center'>
                             <ActivityIndicator size="small" color="#00b894" />
-                            <Text className='text-center text-gray-500 text-sm'>
+                            <Text className='text-center text-typography-500 text-sm'>
                                 {t('prescription.tts.translatingText', { language: selectedVoice.languageDisplay })}
                             </Text>
                         </View>

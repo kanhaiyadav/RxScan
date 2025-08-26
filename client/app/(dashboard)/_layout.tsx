@@ -8,11 +8,14 @@ import { addManyPrescriptions, setLoading } from '@/Store/slices/prescriptionSli
 import { useDispatch } from 'react-redux';
 import { NotificationService } from "@/lib/notificationService";
 import * as Notifications from 'expo-notifications';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function TabLayout() {
     
 
     const dispatch = useDispatch();
+
+    const { isDark } = useTheme();
 
     useEffect(() => {
         (async () => {
@@ -58,9 +61,9 @@ export default function TabLayout() {
                     tabBarActiveTintColor: '#14B8A6',
                     tabBarInactiveTintColor: '#9CA3AF',
                     tabBarStyle: {
-                        backgroundColor: '#FFFFFF',
-                        borderTopWidth: 1,
-                        borderTopColor: '#E5E7EB',
+                        backgroundColor: isDark ? '#373737' : '#FFFFFF',
+                        borderTopWidth: isDark ? 0 : 1,
+                        borderTopColor: isDark ? '#0b0b0b' : '#E5E7EB',
                         height: Platform.OS === 'android' ? 80 : 70,
                         paddingBottom: Platform.OS === 'android' ? 20 : 10,
                         paddingTop: 10,
@@ -86,7 +89,7 @@ export default function TabLayout() {
                     options={{
                         title: 'Home',
                         tabBarIcon: ({ color, focused }) => (
-                            <View className={`rounded-full ${focused ? 'bg-teal-50' : ''}`}>
+                            <View className={`rounded-full`}>
                                 <Ionicons
                                     name={focused ? 'home' : 'home-outline'}
                                     size={24}
@@ -101,7 +104,7 @@ export default function TabLayout() {
                     options={{
                         title: 'Prescriptions',
                         tabBarIcon: ({ color, focused }) => (
-                            <View className={`rounded-full ${focused ? 'bg-teal-50' : ''}`}>
+                            <View className={`rounded-full`}>
                                 <Ionicons
                                     name={focused ? 'document-text' : 'document-text-outline'}
                                     size={24}
@@ -132,7 +135,7 @@ export default function TabLayout() {
                     options={{
                         title: 'Reminders',
                         tabBarIcon: ({ color, focused }) => (
-                            <View className={`rounded-full ${focused ? 'bg-teal-50' : ''}`}>
+                            <View className={`rounded-full`}>
                                 <Ionicons
                                     name={focused ? 'alarm' : 'alarm-outline'}
                                     size={24}
@@ -147,7 +150,7 @@ export default function TabLayout() {
                     options={{
                         title: 'Profile',
                         tabBarIcon: ({ color, focused }) => (
-                            <View className={`rounded-full ${focused ? 'bg-teal-50' : ''}`}>
+                            <View className={`rounded-full`}>
                                 <Ionicons
                                     name={focused ? 'person' : 'person-outline'}
                                     size={24}

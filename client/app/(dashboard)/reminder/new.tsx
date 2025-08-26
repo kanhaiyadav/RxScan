@@ -162,10 +162,10 @@ export default function AddReminderForm() {
                         <Ionicons name='arrow-back' size={24} />
                     </TouchableOpacity>
                     <View>
-                        <Text className="text-2xl font-bold text-gray-900">
+                        <Text className="text-2xl font-bold text-typography-900">
                             Create Reminder
                         </Text>
-                        <Text className="text-base text-gray-600">
+                        <Text className="text-base text-typography-600">
                             Set a reminder for your medication
                         </Text>
                     </View>
@@ -174,12 +174,12 @@ export default function AddReminderForm() {
                 <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                     <View className="p-6">
                         {/* Medicine Information */}
-                        <Text className="text-lg font-semibold text-gray-900 mb-2">Medicine Information</Text>
-                        <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-gray-200">
+                        <Text className="text-lg font-semibold text-typography-900 mb-2">Medicine Information</Text>
+                        <View className="bg-background-0 rounded-2xl p-5 mb-4 shadow-sm border border-gray-200">
 
 
                             <View className="mb-4">
-                                <Text className="text-gray-700 font-medium mb-2">Prescription*</Text>
+                                <Text className="text-typography-700 font-medium mb-2">Prescription*</Text>
                                 <SelectCustom
                                     selectedValue={prescription ? `${prescription?.ocrResult.doctor?.name || prescription?.ocrResult.doctor?.clinic_name || ""} (${prescription.ocrResult.patient?.name || ""}) - ${prescription.ocrResult.patient?.prescription_date || prescription.$createdAt}` : "Select a prescription"}
                                     onValueChange={(value) => {
@@ -197,7 +197,7 @@ export default function AddReminderForm() {
                             </View>
 
                             <View className="mb-4">
-                                <Text className="text-gray-700 font-medium mb-2">Medicine*</Text>
+                                <Text className="text-typography-700 font-medium mb-2">Medicine*</Text>
                                 <SelectCustom
                                     selectedValue={medicine ? `${medicine?.name} (${medicine?.dosage})` : "Select Medicine"}
                                     onValueChange={(value) => {
@@ -214,24 +214,24 @@ export default function AddReminderForm() {
                         </View>
 
                         {/* Schedule Settings */}
-                        <Text className="text-lg font-semibold text-gray-900 mb-2">Schedule Settings</Text>
-                        <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-gray-200">
+                        <Text className="text-lg font-semibold text-typography-900 mb-2">Schedule Settings</Text>
+                        <View className="bg-background-0 rounded-2xl p-5 mb-4 shadow-sm border border-gray-200">
 
                             {/* Time Selection */}
                             <View className="mb-4">
-                                <Text className="text-gray-700 font-medium mb-2">Reminder Time</Text>
+                                <Text className="text-typography-700 font-medium mb-2">Reminder Time</Text>
                                 <TouchableOpacity
                                     className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex-row items-center justify-between"
                                     onPress={() => setShowTimePicker(true)}
                                 >
-                                    <Text className="text-gray-900 text-base">{formatTime(selectedTime)}</Text>
+                                    <Text className="text-typography-900 text-base">{formatTime(selectedTime)}</Text>
                                     <Ionicons name="time-outline" size={20} color="#6B7280" />
                                 </TouchableOpacity>
                             </View>
 
                             {/* Frequency Selection */}
                             <View className="mb-4">
-                                <Text className="text-gray-700 font-medium mb-3">Frequency</Text>
+                                <Text className="text-typography-700 font-medium mb-3">Frequency</Text>
                                 {FREQUENCY_OPTIONS.map((option) => (
                                     <TouchableOpacity
                                         key={option.value}
@@ -243,8 +243,8 @@ export default function AddReminderForm() {
                                     >
                                         <View className="flex-row items-center justify-between">
                                             <View>
-                                                <Text className="text-gray-900 font-medium">{option.label}</Text>
-                                                <Text className="text-gray-500 text-sm">{option.description}</Text>
+                                                <Text className="text-typography-900 font-medium">{option.label}</Text>
+                                                <Text className="text-typography-500 text-sm">{option.description}</Text>
                                             </View>
                                             {frequency === option.value && (
                                                 <Ionicons name="checkmark-circle" size={20} color="#14B8A6" />
@@ -257,9 +257,9 @@ export default function AddReminderForm() {
                             {/* Custom Interval Input */}
                             {frequency === 'custom' && (
                                 <View className="mb-4">
-                                    <Text className="text-gray-700 font-medium mb-2">Every X Days</Text>
+                                    <Text className="text-typography-700 font-medium mb-2">Every X Days</Text>
                                     <TextInput
-                                        className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                                        className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-typography-900"
                                         placeholder="Enter number of days"
                                         value={customInterval}
                                         onChangeText={setCustomInterval}
@@ -271,23 +271,23 @@ export default function AddReminderForm() {
                             {/* Date Range */}
                             <View className="flex-row gap-3">
                                 <View className="flex-1">
-                                    <Text className="text-gray-700 font-medium mb-2">Start Date</Text>
+                                    <Text className="text-typography-700 font-medium mb-2">Start Date</Text>
                                     <TouchableOpacity
                                         className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex-row items-center justify-between"
                                         onPress={() => setShowStartDatePicker(true)}
                                     >
-                                        <Text className="text-gray-900 text-sm">{formatDate(startDate)}</Text>
+                                        <Text className="text-typography-900 text-sm">{formatDate(startDate)}</Text>
                                         <Ionicons name="calendar-outline" size={16} color="#6B7280" />
                                     </TouchableOpacity>
                                 </View>
 
                                 <View className="flex-1">
-                                    <Text className="text-gray-700 font-medium mb-2">End Date</Text>
+                                    <Text className="text-typography-700 font-medium mb-2">End Date</Text>
                                     <TouchableOpacity
                                         className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex-row items-center justify-between"
                                         onPress={() => setShowEndDatePicker(true)}
                                     >
-                                        <Text className="text-gray-900 text-sm">{formatDate(endDate)}</Text>
+                                        <Text className="text-typography-900 text-sm">{formatDate(endDate)}</Text>
                                         <Ionicons name="calendar-outline" size={16} color="#6B7280" />
                                     </TouchableOpacity>
                                 </View>
@@ -297,7 +297,7 @@ export default function AddReminderForm() {
                 </ScrollView>
 
                 {/* Action Buttons */}
-                <View className="bg-white border-t border-gray-200 p-6">
+                <View className="bg-background-0 border-t border-gray-200 p-6">
                     <View className="flex-row gap-3">
                         <TouchableOpacity
                             className="flex-1 bg-gray-100 py-4 px-6 rounded-xl"
@@ -306,7 +306,7 @@ export default function AddReminderForm() {
                                 router.back();
                             }}
                         >
-                            <Text className="text-gray-600 font-semibold text-center">Cancel</Text>
+                            <Text className="text-typography-600 font-semibold text-center">Cancel</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity

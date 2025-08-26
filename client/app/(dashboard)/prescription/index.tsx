@@ -48,7 +48,7 @@ export default function PrescriptionsScreen() {
             case 'active':
                 return 'bg-green-100 text-green-800';
             case 'inactive':
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-gray-100 text-typography-800';
             case 'abandoned':
                 return 'bg-red-100 text-red-800';
             case 'completed':
@@ -110,10 +110,10 @@ export default function PrescriptionsScreen() {
                 <View className="px-6 py-4">
                     <View className="flex-row items-center justify-between">
                         <View>
-                            <Text className="text-2xl font-bold text-gray-900">{t('prescription.title')}</Text>
-                            <Text className="text-gray-600">{t('prescription.subtitle')}</Text>
+                            <Text className="text-2xl font-bold text-typography-900">{t('prescription.title')}</Text>
+                            <Text className="text-typography-600">{t('prescription.subtitle')}</Text>
                         </View>
-                        <TouchableOpacity className="bg-white p-3 rounded-full elevation-sm"
+                        <TouchableOpacity className="bg-background-0 p-3 rounded-full elevation-sm"
                             onPress={() => {
                                 router.push('/scan');
                             }}
@@ -126,7 +126,7 @@ export default function PrescriptionsScreen() {
                     <View className="mt-4 bg-gray-50 rounded-xl flex-row items-center px-4 py-3 elevation">
                         <Ionicons name="search" size={20} color="#9CA3AF" />
                         <TextInput
-                            className="flex-1 ml-3 text-gray-900"
+                            className="flex-1 ml-3 text-typography-900"
                             placeholder={t('prescription.searchPlaceholder')}
                             value={searchQuery}
                             onChangeText={setSearchQuery}
@@ -137,7 +137,7 @@ export default function PrescriptionsScreen() {
             </LinearGradient>
 
             {/* Filter Tabs */}
-            <View className="bg-white px-6 py-4 border-b border-black/15">
+            <View className="bg-background-0 px-6 py-4 border-b border-black/15">
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View className="flex-row gap-2 pb-1">
                         {filters.map((filter) => (
@@ -151,7 +151,7 @@ export default function PrescriptionsScreen() {
                             >
                                 <Text className={`font-medium ${activeFilter === filter
                                     ? 'text-white'
-                                    : 'text-gray-600'
+                                    : 'text-typography-600'
                                     }`}>
                                     {filter}
                                 </Text>
@@ -162,7 +162,7 @@ export default function PrescriptionsScreen() {
             </View>
 
             {loading ? (
-                <View className='w-full flex-1 items-center bg-white'>
+                <View className='w-full flex-1 items-center bg-background-0'>
                     <LottieView
                         source={searchingPrescriptionsAnimation}
                         autoPlay
@@ -171,7 +171,7 @@ export default function PrescriptionsScreen() {
                     />
                 </View>
             ) : filteredPrescriptions.length === 0 ? (
-                <View className='w-full flex-1 items-center bg-white'>
+                <View className='w-full flex-1 items-center bg-background-0'>
                     <LottieView
                         source={notFoundAnimation}
                         autoPlay
@@ -185,7 +185,7 @@ export default function PrescriptionsScreen() {
                         {filteredPrescriptions.map((prescription, index) => (
                             <TouchableOpacity
                                 key={prescription.$id || index} // Fixed: Use unique ID as key
-                                className="bg-white p-5 mb-4 overflow-hidden"
+                                className="bg-background-0 p-5 mb-4 overflow-hidden"
                                 style={{ borderRadius: 16, elevation: 1 }}
                                 onPress={() => {
                                     router.push({
@@ -210,12 +210,12 @@ export default function PrescriptionsScreen() {
                                 {/* Header */}
                                 <View className="flex-row items-center justify-between mb-3">
                                     <View className="flex-1">
-                                        <Text className="text-lg font-semibold text-gray-900">
+                                        <Text className="text-lg font-semibold text-typography-900">
                                             {prescription.ocrResult?.doctor?.name || prescription.ocrResult?.doctor?.clinic_name || t('prescription.unknownDoctor')}
                                         </Text>
                                         {
                                             prescription.ocrResult?.doctor?.name && prescription.ocrResult?.doctor?.clinic_name &&
-                                            <Text className="text-gray-500 text-sm mt-1">
+                                            <Text className="text-typography-500 text-sm mt-1">
                                                 {prescription.ocrResult?.doctor?.clinic_name}
                                             </Text>
                                         }
@@ -231,7 +231,7 @@ export default function PrescriptionsScreen() {
                                 <View className="flex-row items-center justify-between mb-4">
                                     <View className="flex-row items-center">
                                         <Ionicons name="calendar-outline" size={16} color="#9CA3AF" />
-                                        <Text className="text-gray-500 ml-2">
+                                        <Text className="text-typography-500 ml-2">
                                             {prescription.ocrResult?.patient?.prescription_date ||
                                                 new Date(prescription.createdAt).toLocaleDateString()}
                                         </Text>
@@ -248,15 +248,15 @@ export default function PrescriptionsScreen() {
 
                                 {/* Medicines */}
                                 <View className="bg-gray-50 rounded-xl p-3">
-                                    <Text className="text-gray-700 font-medium mb-2">{t('prescription.medicines')}</Text>
+                                    <Text className="text-typography-700 font-medium mb-2">{t('prescription.medicines')}</Text>
                                     {prescription.ocrResult?.medications && prescription.ocrResult.medications.length > 0 ?
                                         prescription.ocrResult.medications.map((medicine, medicineIndex) => (
                                             <View key={medicineIndex} className="flex-row items-center mb-1">
                                                 <View className="w-1.5 h-1.5 bg-primary-500 rounded-full mr-2" />
-                                                <Text className="text-gray-600 text-sm">{medicine.name}</Text>
+                                                <Text className="text-typography-600 text-sm">{medicine.name}</Text>
                                             </View>
                                         )) : (
-                                            <Text className="text-gray-500 text-sm">{t('prescription.noMedicines')}</Text>
+                                            <Text className="text-typography-500 text-sm">{t('prescription.noMedicines')}</Text>
                                         )
                                     }
                                 </View>

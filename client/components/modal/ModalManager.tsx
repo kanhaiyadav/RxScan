@@ -30,7 +30,7 @@ const ModalManager = () => {
                 />
             </ModalContent>
         ) : modalState.content?.name === "status" ? (
-            <ModalContent size='md' className='bg-white h-fit rounded-xl items-center realtive'>
+            <ModalContent size='md' className='bg-background-0 h-fit rounded-xl items-center realtive'>
                 <LottieView
                     source={modalState.content.data.type === "error" ? errorAnimation : successAnimation}
                     autoPlay
@@ -38,7 +38,7 @@ const ModalManager = () => {
                     style={{ width: 200, height: 150 }}
                 />
                 <Text className='mt-4 text-2xl font-semibold'>{modalState.content.title}</Text>
-                <Text className='mt-2 text-gray-600 text-center text-wrap w-[90%]'>{modalState.content.description}</Text>
+                <Text className='mt-2 text-typography-600 text-center text-wrap w-[90%]'>{modalState.content.description}</Text>
                 <TouchableOpacity className='absolute top-2 right-2' onPress={() => dispatch(closeModal())}>
                     <Ionicons name="close" size={24} color="black" />
                 </TouchableOpacity>
@@ -53,7 +53,7 @@ const ModalManager = () => {
                 dispatch(closeModal());
             }}
             size="md"
-            style={{zIndex: 1100}}
+            style={{ zIndex: 1100 }}
         >
             <ModalBackdrop />
             <Content />

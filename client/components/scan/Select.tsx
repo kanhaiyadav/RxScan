@@ -46,10 +46,10 @@ const Select = ({
                 >
                     <Ionicons name="scan" size={64} color="white" />
                 </LinearGradient>
-                <Text className="text-xl font-semibold text-gray-900 text-center mb-2">
+                <Text className="text-xl font-semibold text-typography-900 text-center mb-2">
                     Ready to Scan
                 </Text>
-                <Text className="text-gray-600 text-center px-4">
+                <Text className="text-typography-600 text-center px-4">
                     Choose how you&apos;d like to upload your prescription
                 </Text>
             </View>
@@ -58,7 +58,7 @@ const Select = ({
                 {scanOptions.map((option) => (
                     <TouchableOpacity
                         key={option.id}
-                        className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex-row items-center"
+                        className="bg-background-0 rounded-2xl p-5 shadow-sm border border-gray-100 flex-row items-center"
                         onPress={() => handleScanAction(option.action)}
                         activeOpacity={0.7}
                     >
@@ -70,8 +70,8 @@ const Select = ({
                             <Ionicons name={option.icon as any} size={24} color="white" />
                         </LinearGradient>
                         <View className="flex-1">
-                            <Text className="text-gray-900 font-semibold text-lg">{option.title}</Text>
-                            <Text className="text-gray-500 text-sm mt-1">{option.subtitle}</Text>
+                            <Text className="text-typography-900 font-semibold text-lg">{option.title}</Text>
+                            <Text className="text-typography-500 text-sm mt-1">{option.subtitle}</Text>
                         </View>
                         <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                     </TouchableOpacity>

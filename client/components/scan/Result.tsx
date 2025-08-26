@@ -71,15 +71,15 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
 
         return (
             <View className="flex-row mb-3 px-1">
-                <Text className="font-semibold text-gray-700 min-w-[100px] mr-3">{label}:</Text>
-                <Text className="text-gray-900 flex-1 font-medium">{value}</Text>
+                <Text className="font-semibold text-typography-700 min-w-[100px] mr-3">{label}:</Text>
+                <Text className="text-typography-900 flex-1 font-medium">{value}</Text>
             </View>
         );
     };
 
     const renderMedicineSelector = () => {
         const getMedSeverityColor = (name: string) => {
-            if (result === null) return 'bg-white border-gray-200';
+            if (result === null) return 'bg-background-0 border-gray-200';
             const medicine = result.medicines.find(m => m.medicalInfo.name.toLowerCase() === name.toLowerCase());
             if (!medicine) return 'bg-green-100 border-green-400';
 
@@ -115,7 +115,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                         }}
                         className={`p-4 rounded-xl ${medicine.uncertain ? 'bg-red-100 border-red-400' : getMedSeverityColor(medicine.name)} border border-gray-200`}
                     >
-                        <Text className="font-medium text-black">
+                        <Text className="font-medium text-typography-950">
                             {medicine.name}
                         </Text>
                         <View className='flex-row mt-1'>
@@ -126,55 +126,55 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                 </View>
                             )}
                             {medicine.duration && (
-                                <Text className='text-gray-500 text-sm'>Duration: {medicine.duration}</Text>
+                                <Text className='text-typography-500 text-sm'>Duration: {medicine.duration}</Text>
                             )}
                             {medicine.instructions && (
-                                <Text className='text-gray-500 text-sm'> | {medicine.instructions}</Text>
+                                <Text className='text-typography-500 text-sm'> | {medicine.instructions}</Text>
                             )}
                         </View>
 
                         {medicine.frequency && (
-                            <Text className='text-gray-500 text-sm'>{medicine.frequency}</Text>
+                            <Text className='text-typography-500 text-sm'>{medicine.frequency}</Text>
                         )}
 
                         {getMedicineData(medicine.name, index)?.medicalInfo.healthProfileInteraction.overallRisk !== 'minimal' && (
-                            <Text className="mt-2 text-gray-600">Health Profile Conflicts:</Text>
+                            <Text className="mt-2 text-typography-600">Health Profile Conflicts:</Text>
                         )}
                         {
                             result !== null ?
-                            <HStack className="gap-1 mt-1">
-                                {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount > 0 && (
-                                    <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-red-500">
-                                        <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount}</Text>
-                                        <Text className="ml-2 font-medium text-sm text-white">
-                                            critical
-                                        </Text>
-                                    </TouchableOpacity>
-                                )}
-                                {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount > 0 && (
-                                    <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-orange-500">
-                                        <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount}</Text>
-                                        <Text className="ml-2 font-medium text-sm text-white">
-                                            high
-                                        </Text>
-                                    </TouchableOpacity>
-                                )}
-                                {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount > 0 && (
-                                    <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-yellow-500">
-                                        <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount}</Text>
-                                        <Text className="ml-2 font-medium text-sm text-white">
-                                            moderate
-                                        </Text>
-                                    </TouchableOpacity>
-                                )}
-                                {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount > 0 && (
-                                    <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-cyan-500">
-                                        <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount}</Text>
-                                        <Text className="ml-2 font-medium text-sm text-white">
-                                            low
-                                        </Text>
-                                    </TouchableOpacity>
-                                )}
+                                <HStack className="gap-1 mt-1">
+                                    {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount > 0 && (
+                                        <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-red-500">
+                                            <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.criticalCount}</Text>
+                                            <Text className="ml-2 font-medium text-sm text-white">
+                                                critical
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )}
+                                    {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount > 0 && (
+                                        <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-orange-500">
+                                            <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.highCount}</Text>
+                                            <Text className="ml-2 font-medium text-sm text-white">
+                                                high
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )}
+                                    {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount > 0 && (
+                                        <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-yellow-500">
+                                            <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.moderateCount}</Text>
+                                            <Text className="ml-2 font-medium text-sm text-white">
+                                                moderate
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )}
+                                    {getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount > 0 && (
+                                        <TouchableOpacity className="flex-row items-center px-3 py-1 rounded-xl bg-cyan-500">
+                                            <Text className="text-white">{getMedicineData(medicine.name, index).medicalInfo.healthProfileInteraction.lowCount}</Text>
+                                            <Text className="ml-2 font-medium text-sm text-white">
+                                                low
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )}
                                 </HStack>
                                 :
                                 <HStack className="gap-1 mt-1">
@@ -190,7 +190,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     };
 
     const renderSectionTabs = () => (
-        <View className="py-3 bg-white border-b border-gray-100">
+        <View className="py-3 bg-background-0 border-b border-gray-100">
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-2">
                     {sections.map((section) => (
@@ -210,7 +210,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                 size={16}
                                 color={activeSection === section.id ? '#000' : '#666'}
                             />
-                            <Text className={`ml-2 font-medium text-sm ${activeSection === section.id ? 'text-black' : 'text-gray-600'}`}>
+                            <Text className={`ml-2 font-medium text-sm ${activeSection === section.id ? 'text-typography-950' : 'text-typography-600'}`}>
                                 {section.title}
                             </Text>
                         </TouchableOpacity>
@@ -227,7 +227,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 {loading ? (
                     <SkeletonText _lines={1} className="h-[25px] mb-2 w-[60%] rounded-lg" speed={4} />
                 ) : (
-                    <Text className="text-2xl font-bold text-black mb-2">
+                    <Text className="text-2xl font-bold text-typography-950 mb-2">
                         {currentMedicine.medicalInfo.name}
                     </Text>
                 )}
@@ -240,18 +240,18 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 ) : (
                     <View className="flex-row flex-wrap gap-2 mb-3">
                         <View className="bg-black/10 rounded-full px-3 py-1">
-                            <Text className="text-black font-medium text-xs">
+                            <Text className="text-typography-950 font-medium text-xs">
                                 {currentMedicine.medicalInfo.dosageForm}
                             </Text>
                         </View>
                         {currentMedicine.medicalInfo.prescriptionRequired && (
                             <View className="bg-black/10 rounded-full px-3 py-1">
-                                <Text className="text-black font-medium text-xs">Prescription Required</Text>
+                                <Text className="text-typography-950 font-medium text-xs">Prescription Required</Text>
                             </View>
                         )}
                         {currentMedicine.medicalInfo.fdaApproved && (
                             <View className="bg-black/10 rounded-full px-3 py-1">
-                                <Text className="text-black font-medium text-xs">FDA Approved</Text>
+                                <Text className="text-typography-950 font-medium text-xs">FDA Approved</Text>
                             </View>
                         )}
                     </View>
@@ -259,7 +259,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 {loading ? (
                     <SkeletonText _lines={3} className="h-[18px] mb-[-1] w-full rounded-lg" speed={4} />
                 ) : (
-                    <Text className="text-black/80 text-base leading-6">
+                    <Text className="text-typography-950/80 text-base leading-6">
                         <Text className="font-bold">Primary uses:</Text>
                         <Text> {currentMedicine.medicalInfo.uses.join(', ')}</Text>
                     </Text>
@@ -300,13 +300,13 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 <Skeleton className="h-[80px] rounded-lg" />
             ) : (
                 currentMedicine.medicalInfo.approximatePrice &&
-                <View className="bg-white border border-gray-200 rounded-xl p-4">
+                <View className="bg-background-0 border border-gray-200 rounded-xl p-4">
                     <View className="flex-row items-center justify-between">
                         <View>
-                            <Text className="text-lg font-bold text-gray-900">
+                            <Text className="text-lg font-bold text-typography-900">
                                 {currentMedicine.medicalInfo.approximatePrice.priceRange}
                             </Text>
-                            <Text className="text-gray-600 text-sm">
+                            <Text className="text-typography-600 text-sm">
                                 {currentMedicine.medicalInfo.approximatePrice.unit}
                             </Text>
                         </View>
@@ -322,12 +322,12 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 <View className="bg-gray-50 border border-gray-200 rounded-xl p-4">
                     <View className="flex-row items-center mb-3">
                         <Ionicons name="business" size={20} color="#6b7280" />
-                        <Text className="text-gray-700 font-semibold ml-2">Manufacturers</Text>
+                        <Text className="text-typography-700 font-semibold ml-2">Manufacturers</Text>
                     </View>
                     <View className="flex-row flex-wrap gap-2">
                         {currentMedicine.medicalInfo.manufacturer.map((manufacturer, index) => (
-                            <View key={index} className="bg-white rounded-full px-3 py-1 border border-gray-200">
-                                <Text className="text-gray-700 text-sm">{manufacturer}</Text>
+                            <View key={index} className="bg-background-0 rounded-full px-3 py-1 border border-gray-200">
+                                <Text className="text-typography-700 text-sm">{manufacturer}</Text>
                             </View>
                         ))}
                     </View>
@@ -339,16 +339,16 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     const renderIngredients = () => (
         <View className="p-4 gap-3">
             {currentMedicine.medicalInfo.activeIngredients.map((ingredient, index) => (
-                <View key={index} className="bg-white border border-gray-200 rounded-xl p-4">
+                <View key={index} className="bg-background-0 border border-gray-200 rounded-xl p-4">
                     <View className="flex-row items-center justify-between mb-2">
-                        <Text className="text-lg font-semibold text-gray-900">
+                        <Text className="text-lg font-semibold text-typography-900">
                             {ingredient.name}
                         </Text>
                         <Text className="text-[#00ffc8] font-bold">
                             {ingredient.strength}
                         </Text>
                     </View>
-                    <Text className="text-gray-600 leading-5">
+                    <Text className="text-typography-600 leading-5">
                         {ingredient.purpose}
                     </Text>
                 </View>
@@ -483,7 +483,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                     {type === 'medical_condition' && <FontAwesome5 name="procedures" size={20} color="black" />}
                                     {type === 'current_medication' && <FontAwesome5 name="pills" size={20} color="black" />}
                                     {type === 'dietary_restriction' && <FontAwesome5 name="utensils" size={20} color="black" />}
-                                    <Text className="text-black font-semibold ml-2">{type}</Text>
+                                    <Text className="text-typography-950 font-semibold ml-2">{type}</Text>
                                 </View>
                             )}
                             {interactions.map((interaction, index) => (
@@ -491,7 +491,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                     <Text className={`${getSeverityTextColor(interaction.severity)} font-bold ml-2`}>{interaction.item}</Text>
                                     <Text className={`${getSeverityTextColor(interaction.severity)} mb-2 leading-5 ml-3`}>{interaction.description}</Text>
                                     <Text className="ml-2 font-semibold">Recommendation: </Text>
-                                    <Text className="text-gray-600 ml-3">{interaction.recommendation}</Text>
+                                    <Text className="text-typography-600 ml-3">{interaction.recommendation}</Text>
                                 </View>
                             ))}
                         </View>
@@ -538,9 +538,9 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                 >
                                     <FontAwesome6 name="user-doctor" size={24} color="white" />
                                 </LinearGradient>
-                                <Text className="text-lg font-bold text-gray-900">Doctor Information</Text>
+                                <Text className="text-lg font-bold text-typography-900">Doctor Information</Text>
                             </View>
-                            <View className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                            <View className="bg-background-0 border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
                                 {renderInfoItem('Name', ocrResult.doctor.name)}
                                 {renderInfoItem('Qualifications', ocrResult.doctor.qualifications)}
                                 {renderInfoItem('Registration', ocrResult.doctor.registration_number)}
@@ -562,9 +562,9 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                 >
                                     <Fontisto name="bed-patient" size={24} color="white" />
                                 </LinearGradient>
-                                <Text className="text-lg font-bold text-gray-900">Patient Information</Text>
+                                <Text className="text-lg font-bold text-typography-900">Patient Information</Text>
                             </View>
-                            <View className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                            <View className="bg-background-0 border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
                                 {renderInfoItem('Name', ocrResult.patient.name)}
                                 {renderInfoItem('Age', ocrResult.patient.age)}
                                 {renderInfoItem('Gender', ocrResult.patient.gender)}
@@ -584,7 +584,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     >
                         <MaterialCommunityIcons name="pill" size={24} color="white" />
                     </LinearGradient>
-                    <Text className="text-lg font-bold text-gray-900">Medicines Recognised</Text>
+                    <Text className="text-lg font-bold text-typography-900">Medicines Recognised</Text>
                 </View>
 
                 {/* Medicine Selector */}
@@ -601,9 +601,9 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                             >
                                 <Ionicons name="document-text" size={24} color="#6b7280" />
                             </LinearGradient>
-                            <Text className="text-lg font-bold text-gray-900">Additional Notes</Text>
+                            <Text className="text-lg font-bold text-typography-900">Additional Notes</Text>
                         </View>
-                        <View className="gap-2 bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                        <View className="gap-2 bg-background-0 border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
                             {renderInfoItem('Special Instructions', ocrResult.additional_notes.special_instructions)}
                             {renderInfoItem('Follow-up', ocrResult.additional_notes.follow_up)}
                             {renderInfoItem('Warnings', ocrResult.additional_notes.warnings)}
@@ -616,9 +616,9 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     <View className="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-12">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="information-circle" size={20} color="#6b7280" />
-                            <Text className="text-lg font-bold text-gray-700 ml-2">Extraction Notes</Text>
+                            <Text className="text-lg font-bold text-typography-700 ml-2">Extraction Notes</Text>
                         </View>
-                        <Text className="text-gray-800">{ocrResult.extraction_notes}</Text>
+                        <Text className="text-typography-800">{ocrResult.extraction_notes}</Text>
                     </View>
                 )}
 
@@ -640,12 +640,12 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     <View className="py-4">
                         <View className="flex-row gap-3">
                             <TouchableOpacity
-                                className="flex-1 bg-white rounded-2xl p-4 flex-row items-center justify-center"
+                                className="flex-1 bg-background-0 rounded-2xl p-4 flex-row items-center justify-center"
                                 style={{ elevation: 1 }}
                                 onPress={resetToStart}
                             >
                                 <Ionicons name="refresh" size={20} color="#6b7280" />
-                                <Text className="text-gray-700 font-medium ml-2">Scan New</Text>
+                                <Text className="text-typography-700 font-medium ml-2">Scan New</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
@@ -659,7 +659,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                     className="flex-row p-4 items-center justify-center"
                                 >
                                     <Feather name="download" size={20} color="#000" />
-                                    <Text className="text-black font-medium ml-2">Save Report</Text>
+                                    <Text className="text-typography-950 font-medium ml-2">Save Report</Text>
                                 </LinearGradient>
                             </TouchableOpacity>
                         </View>

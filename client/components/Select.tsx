@@ -15,7 +15,7 @@ const SelectCustom = ({ children, selectedValue, onValueChange, isDisabled, plac
             isDisabled={isDisabled}
         >
             <SelectTrigger variant="underlined" size="lg" >
-                <SelectInput placeholder={placeholder} className='h-[50px] px-4 text-gray-600 text-md' />
+                <SelectInput placeholder={placeholder} className='h-[50px] px-4 text-typography-600 text-md' />
                 <SelectIcon className="mr-3">
                     <ChevronDownIcon />
                 </SelectIcon>

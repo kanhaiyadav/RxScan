@@ -272,11 +272,11 @@ export default function RemindersScreen() {
                 <View className="px-6 py-4">
                     <View className="flex-row items-center justify-between">
                         <View>
-                            <Text className="text-2xl font-bold text-gray-900">Medicine Reminders</Text>
-                            <Text className="text-gray-600">Stay on top of your medications</Text>
+                            <Text className="text-2xl font-bold text-typography-900">Medicine Reminders</Text>
+                            <Text className="text-typography-600">Stay on top of your medications</Text>
                         </View>
                         <TouchableOpacity
-                            className="bg-white p-3 rounded-full elevation"
+                            className="bg-background-0 p-3 rounded-full elevation"
                             onPress={() => {
                                 router.push('/reminder/new');
                             }}
@@ -289,33 +289,33 @@ export default function RemindersScreen() {
 
             {/* Stats Cards */}
             <View className="flex-row mx-6 mt-6 gap-4">
-                <View className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                <View className="flex-1 bg-background-0 rounded-2xl p-4 shadow-sm border border-gray-100">
                     <View className="flex-row items-center">
                         <View className="bg-green-100 w-10 h-10 rounded-full items-center justify-center">
                             <Ionicons name="checkmark" size={20} color="#10B981" />
                         </View>
                         <View className="ml-3">
-                            <Text className="text-2xl font-bold text-gray-900">{takenToday}</Text>
-                            <Text className="text-gray-500 text-sm">Taken Today</Text>
+                            <Text className="text-2xl font-bold text-typography-900">{takenToday}</Text>
+                            <Text className="text-typography-500 text-sm">Taken Today</Text>
                         </View>
                     </View>
                 </View>
 
-                <View className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                <View className="flex-1 bg-background-0 rounded-2xl p-4 shadow-sm border border-gray-100">
                     <View className="flex-row items-center">
                         <View className="bg-orange-100 w-10 h-10 rounded-full items-center justify-center">
                             <Ionicons name="time" size={20} color="#F59E0B" />
                         </View>
                         <View className="ml-3">
-                            <Text className="text-2xl font-bold text-gray-900">{pendingToday}</Text>
-                            <Text className="text-gray-500 text-sm">Pending</Text>
+                            <Text className="text-2xl font-bold text-typography-900">{pendingToday}</Text>
+                            <Text className="text-typography-500 text-sm">Pending</Text>
                         </View>
                     </View>
                 </View>
             </View>
 
             {/* Filter Tabs */}
-            <View className="bg-white mx-6 mt-6 rounded-2xl p-1 shadow-sm border border-gray-100">
+            <View className="bg-background-0 mx-6 mt-6 rounded-2xl p-1 shadow-sm border border-gray-100">
                 <View className="flex-row">
                     {tabs.map((tab) => (
                         <TouchableOpacity
@@ -324,7 +324,7 @@ export default function RemindersScreen() {
                                 }`}
                             onPress={() => setActiveTab(tab)}
                         >
-                            <Text className={`text-center font-medium ${activeTab === tab ? 'text-white' : 'text-gray-600'
+                            <Text className={`text-center font-medium ${activeTab === tab ? 'text-white' : 'text-typography-600'
                                 }`}>
                                 {tab}
                             </Text>
@@ -343,16 +343,16 @@ export default function RemindersScreen() {
             >
                 <View className="mx-6">
                     {filteredReminders.length === 0 ? (
-                        <View className="bg-white rounded-2xl p-8 items-center">
+                        <View className="bg-background-0 rounded-2xl p-8 items-center">
                             <Ionicons name="medical-outline" size={48} color="#9CA3AF" />
-                            <Text className="text-gray-500 text-center mt-4">
+                            <Text className="text-typography-500 text-center mt-4">
                                 {activeTab === 'Today'
                                     ? 'No reminders for today'
                                     : `No ${activeTab.toLowerCase()} reminders`}
                             </Text>
                             <TouchableOpacity
                                 className="bg-teal-500 px-6 py-3 rounded-xl mt-4"
-                                onPress={() => {router.push('/reminder/new');}}
+                                onPress={() => { router.push('/reminder/new'); }}
                             >
                                 <Text className="text-white font-medium">Add First Reminder</Text>
                             </TouchableOpacity>
@@ -365,19 +365,19 @@ export default function RemindersScreen() {
                             return (
                                 <View
                                     key={reminder.id}
-                                    className="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-gray-200"
+                                    className="bg-background-0 rounded-2xl p-5 mb-4 shadow-sm border border-gray-200"
                                 >
                                     <View className="flex-row items-center justify-between mb-3">
                                         <View className="flex-row items-center flex-1">
                                             <View className="flex-1">
-                                                <Text className="text-lg font-semibold text-gray-900">
+                                                <Text className="text-lg font-semibold text-typography-900">
                                                     {reminder.medicine.name}
                                                 </Text>
-                                                <Text className="text-gray-500 text-sm">
+                                                <Text className="text-typography-500 text-sm">
                                                     {reminder.medicine.instructions} • {reminder.doctor}
                                                 </Text>
                                                 {!isToday && (
-                                                    <Text className="text-gray-400 text-xs mt-1">
+                                                    <Text className="text-typography-400 text-xs mt-1">
                                                         {reminder.frequency === 'daily' ? 'Daily' :
                                                             reminder.frequency === 'alternate' ? 'Every 2 days' :
                                                                 `Every ${reminder.customInterval} days`} •
@@ -388,7 +388,7 @@ export default function RemindersScreen() {
                                         </View>
 
                                         <View className="items-end">
-                                            <Text className="text-xl font-bold text-gray-900">
+                                            <Text className="text-xl font-bold text-typography-900">
                                                 {reminder.time}
                                             </Text>
                                             {isToday && (
@@ -414,7 +414,7 @@ export default function RemindersScreen() {
                                                 onPress={() => handleSkipMedicine(reminder.id, reminder.scheduledDateTime)}
                                             >
                                                 <Ionicons name="close-outline" size={16} color="#6B7280" />
-                                                <Text className="text-gray-600 font-medium ml-2">Skip</Text>
+                                                <Text className="text-typography-600 font-medium ml-2">Skip</Text>
                                             </TouchableOpacity>
 
                                             <TouchableOpacity
@@ -468,7 +468,7 @@ export default function RemindersScreen() {
                                                     size={16}
                                                     color="#6B7280"
                                                 />
-                                                <Text className="text-gray-600 font-medium ml-2">
+                                                <Text className="text-typography-600 font-medium ml-2">
                                                     {reminder.isActive ? 'Pause' : 'Resume'}
                                                 </Text>
                                             </TouchableOpacity>
@@ -485,7 +485,7 @@ export default function RemindersScreen() {
 
                                     {/* Active indicator */}
                                     <View className="flex-row items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                                        <Text className="text-gray-500 text-sm">
+                                        <Text className="text-typography-500 text-sm">
                                             {reminder.isActive ? 'Active' : 'Paused'} •
                                             {reminder.notificationIds.length} notifications scheduled
                                         </Text>
@@ -505,14 +505,14 @@ export default function RemindersScreen() {
 
                 {/* Settings Section */}
                 <View className="mx-6 mt-6 mb-8">
-                    <Text className="text-lg font-semibold text-gray-900 mb-4">Notification Settings</Text>
+                    <Text className="text-lg font-semibold text-typography-900 mb-4">Notification Settings</Text>
 
-                    <View className="bg-white rounded-2xl shadow-sm border border-gray-200">
+                    <View className="bg-background-0 rounded-2xl shadow-sm border border-gray-200">
                         <View className="p-5 border-b border-gray-200">
                             <View className="flex-row items-center justify-between">
                                 <View className="flex-1">
-                                    <Text className="text-gray-900 font-medium">Push Notifications</Text>
-                                    <Text className="text-gray-500 text-sm mt-1">
+                                    <Text className="text-typography-900 font-medium">Push Notifications</Text>
+                                    <Text className="text-typography-500 text-sm mt-1">
                                         Get notified when it&apos;s time to take medicine
                                     </Text>
                                 </View>
@@ -528,8 +528,8 @@ export default function RemindersScreen() {
                         <View className="p-5 border-b border-gray-200">
                             <View className="flex-row items-center justify-between">
                                 <View className="flex-1">
-                                    <Text className="text-gray-900 font-medium">Sound Alerts</Text>
-                                    <Text className="text-gray-500 text-sm mt-1">Play sound with notifications</Text>
+                                    <Text className="text-typography-900 font-medium">Sound Alerts</Text>
+                                    <Text className="text-typography-500 text-sm mt-1">Play sound with notifications</Text>
                                 </View>
                                 <Switch
                                     value={settings.soundAlerts}
@@ -542,8 +542,8 @@ export default function RemindersScreen() {
 
                         <TouchableOpacity className="p-5 flex-row items-center justify-between">
                             <View className="flex-1">
-                                <Text className="text-gray-900 font-medium">Snooze Duration</Text>
-                                <Text className="text-gray-500 text-sm mt-1">{settings.snoozeDuration} minutes</Text>
+                                <Text className="text-typography-900 font-medium">Snooze Duration</Text>
+                                <Text className="text-typography-500 text-sm mt-1">{settings.snoozeDuration} minutes</Text>
                             </View>
                             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                         </TouchableOpacity>

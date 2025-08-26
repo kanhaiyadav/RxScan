@@ -378,17 +378,17 @@ export default function EnhancedPrescriptionOCR() {
                         {currentStep !== 'select' && (
                             <TouchableOpacity
                                 onPress={resetToStart}
-                                className="mr-4 bg-white/20 w-10 h-10 rounded-full items-center justify-center"
+                                className="mr-4 bg-background-0/20 w-10 h-10 rounded-full items-center justify-center"
                             >
                                 <Ionicons name="arrow-back" size={26} color="#1f2937" />
                             </TouchableOpacity>
                         )}
                         <View className="flex-1">
-                            <Text className="text-2xl font-bold text-gray-900">
+                            <Text className="text-2xl font-bold text-typography-900">
                                 {currentStep === 'select' ? 'Scan Prescription' :
                                     currentStep === 'preview' ? 'Review & Analyze' : 'Analysis Results'}
                             </Text>
-                            <Text className="text-gray-700">
+                            <Text className="text-typography-700">
                                 {currentStep === 'select' ? 'Upload your prescription to analyze medicines' :
                                     currentStep === 'preview' ? 'Confirm your image and start analysis' : 'Prescription analysis with drug interactions'}
                             </Text>
