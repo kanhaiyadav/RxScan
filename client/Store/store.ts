@@ -15,6 +15,8 @@ import reactotron from "../lib/reactotron";
 import modalSlice from "./slices/modalSlice";
 import prescriptionSlice from "./slices/prescriptionSlice";
 import healthProfileSlice from "./slices/healthProfileSlice";
+import notificationSlice from "./slices/notificationSlice";
+import uiSlice from "./slices/UIslice";
 
 const persistConfig = {
     key: "root",
@@ -28,6 +30,12 @@ const prescriptionPersistConfig = {
     blacklist: ["isLoading", "error"],
 };
 
+const notificationPersistConfig = {
+    key: "notification",
+    storage: AsyncStorage,
+    blacklist: ["isLoading", "error"],
+};
+
 const healthProfilePersistConfig = {
     key: "healthProfile",
     storage: AsyncStorage,
@@ -37,7 +45,12 @@ const healthProfilePersistConfig = {
 const rootReducer = combineReducers({
     prescription: persistReducer(prescriptionPersistConfig, prescriptionSlice),
     modal: modalSlice,
-    healthProfile: persistReducer(healthProfilePersistConfig, healthProfileSlice),
+    ui: uiSlice,
+    healthProfile: persistReducer(
+        healthProfilePersistConfig,
+        healthProfileSlice
+    ),
+    notifications: persistReducer(notificationPersistConfig, notificationSlice),
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

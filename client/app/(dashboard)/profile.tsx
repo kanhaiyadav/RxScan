@@ -29,8 +29,6 @@ import {
     AccordionItem,
     AccordionHeader,
     AccordionTrigger,
-    AccordionTitleText,
-    AccordionContentText,
     AccordionIcon,
     AccordionContent,
 } from "@/components/ui/accordion"

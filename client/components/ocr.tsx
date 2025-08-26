@@ -205,8 +205,6 @@ const TranslationComponent: React.FC<TranslationComponentProps> = ({
 
       const result: TranslationResponse = await response.json();
 
-      console.log("**************************", result);
-
       if (result.success && result.translated_text) {
         setTranslatedText(result.translated_text);
       } else {

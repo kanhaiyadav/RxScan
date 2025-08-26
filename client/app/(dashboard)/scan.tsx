@@ -9,10 +9,10 @@ import {
     Text,
     TouchableOpacity,
     View,
+    Linking,
 } from 'react-native';
 import { useMedicineSearch } from '@/hooks/useMedicineSearch';
 import MedicineDisplay from '@/components/scan/Result';
-import { dummyMedicineSearchResult } from '@/constants/staticData';
 import Preview from '@/components/scan/Preview';
 import Select from '@/components/scan/Select';
 import { useHealthProfile } from '@/context/HealthProfileContext';
@@ -23,7 +23,6 @@ import s3Service from '@/lib/AWSS3Service';
 import { openModal } from '@/Store/slices/modalSlice';
 import { useDispatch } from 'react-redux';
 import { addPrescription } from '@/Store/slices/prescriptionSlice';
-
 
 export default function EnhancedPrescriptionOCR() {
     const { healthProfile } = useUserHealth();
@@ -51,19 +50,103 @@ export default function EnhancedPrescriptionOCR() {
         }
     };
 
+    // Enhanced permission handling function
+    const checkCameraPermission = async (): Promise<boolean> => {
+        try {
+            const { status, canAskAgain } = await ImagePicker.getCameraPermissionsAsync();
+
+            if (status === 'granted') {
+                return true;
+            }
+
+            // If permission was denied but we can still ask
+            if (status === 'denied' && canAskAgain) {
+                const { status: newStatus } = await ImagePicker.requestCameraPermissionsAsync();
+                return newStatus === 'granted';
+            }
+
+            // If permission was permanently denied or cannot ask again
+            if (status === 'denied' && !canAskAgain) {
+                Alert.alert(
+                    'Camera Permission Required',
+                    'Camera access has been permanently denied. Please enable it in your device settings to take photos.',
+                    [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                            text: 'Open Settings',
+                            onPress: () => Linking.openSettings()
+                        }
+                    ]
+                );
+                return false;
+            }
+
+            // For any other status, try to request permission
+            const { status: requestedStatus } = await ImagePicker.requestCameraPermissionsAsync();
+            return requestedStatus === 'granted';
+
+        } catch (error) {
+            console.error('Camera permission error:', error);
+            Alert.alert('Error', 'Failed to check camera permissions');
+            return false;
+        }
+    };
+
+    // Enhanced media library permission handling
+    const checkMediaLibraryPermission = async (): Promise<boolean> => {
+        try {
+            const { status, canAskAgain } = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+            if (status === 'granted') {
+                return true;
+            }
+
+            if (status === 'denied' && canAskAgain) {
+                const { status: newStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                return newStatus === 'granted';
+            }
+
+            if (status === 'denied' && !canAskAgain) {
+                Alert.alert(
+                    'Media Library Permission Required',
+                    'Media library access has been permanently denied. Please enable it in your device settings to select photos.',
+                    [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                            text: 'Open Settings',
+                            onPress: () => Linking.openSettings()
+                        }
+                    ]
+                );
+                return false;
+            }
+
+            const { status: requestedStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            return requestedStatus === 'granted';
+
+        } catch (error) {
+            console.error('Media library permission error:', error);
+            Alert.alert('Error', 'Failed to check media library permissions');
+            return false;
+        }
+    };
+
     const handleCameraLaunch = async () => {
         try {
-            const { status } = await ImagePicker.requestCameraPermissionsAsync();
-            if (status !== 'granted') {
-                Alert.alert('Permission Required', 'Please grant camera permissions to take photos.');
+            const hasPermission = await checkCameraPermission();
+            if (!hasPermission) {
                 return;
             }
 
             const result = await ImagePicker.launchCameraAsync({
                 allowsEditing: true,
-                aspect: [4, 3],
+                // Remove fixed aspect ratio to allow flexible cropping
+                // aspect: [4, 3], // Remove this line
                 quality: 0.8,
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                // Add these options for better cropping experience
+                allowsMultipleSelection: false,
+                selectionLimit: 1,
             });
 
             if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -84,9 +167,8 @@ export default function EnhancedPrescriptionOCR() {
 
     const handleImagePicker = async () => {
         try {
-            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-            if (status !== 'granted') {
-                Alert.alert('Permission Required', 'Please grant camera roll permissions to select images.');
+            const hasPermission = await checkMediaLibraryPermission();
+            if (!hasPermission) {
                 return;
             }
 
@@ -94,6 +176,10 @@ export default function EnhancedPrescriptionOCR() {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 quality: 0.8,
+                // Remove fixed aspect ratio for flexible cropping
+                // aspect: [4, 3], // Remove this line if it exists
+                allowsMultipleSelection: false,
+                selectionLimit: 1,
             });
 
             if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -190,8 +276,8 @@ export default function EnhancedPrescriptionOCR() {
 
                 if (processedResult.medications && healthProfile) {
                     reset();
-                    const res = await searchMedicines({ 
-                        prescription_medications: processedResult.medications, 
+                    const res = await searchMedicines({
+                        prescription_medications: processedResult.medications,
                         health_profile: {
                             ...healthProfile,
                             additionalNotes: healthProfile.additionalNotes || ""
@@ -241,7 +327,7 @@ export default function EnhancedPrescriptionOCR() {
             dispatch(openModal({ name: "status", data: { type: "error" }, title: "error", description: "Please log in to save prescriptions" }));
             return;
         }
-        
+
         try {
 
             const res = await s3Service.uploadViaBackend(selectedImage.uri, selectedImage.fileName);
@@ -260,11 +346,10 @@ export default function EnhancedPrescriptionOCR() {
             resetResults();
             setCurrentStep('select');
         } catch (error) {
-            dispatch(openModal({ name: "status", data: { type: "error" }, title: "Upload Failed", description: `Failed to upload prescription: ${error instanceof Error ? JSON.stringify(error.message) : 'Unknown error'}` }));
             console.error('Upload error:', error);
+            dispatch(openModal({ name: "status", data: { type: "error" }, title: "Upload Failed", description: `Failed to upload prescription: ${error instanceof Error ? JSON.stringify(error.message) : 'Unknown error'}` }));
         }
     }
-
 
     const resetToStart = () => {
         reset();

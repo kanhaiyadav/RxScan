@@ -27,7 +27,7 @@ export default function PrescriptionsScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState(t('prescription.filters.all'));
     const prescriptionsEntities = useSelector(selectPrescriptionEntities);
-    const loading = false; // Fixed: Use actual loading state
+    const loading = false;
 
     // Fixed: Memoize prescriptions array to prevent infinite re-renders
     const prescriptions = useMemo(() => Object.values(prescriptionsEntities), [prescriptionsEntities]);
@@ -64,11 +64,9 @@ export default function PrescriptionsScreen() {
         }, 0) || 0;
     }
 
-    // Fixed: Combined filtering logic with proper dependencies
     useEffect(() => {
         let filtered = prescriptions;
 
-        // Apply status filter
         if (activeFilter !== t('prescription.filters.all')) {
             filtered = filtered.filter((prescription) => {
                 if (activeFilter === t('prescription.filters.active')) {

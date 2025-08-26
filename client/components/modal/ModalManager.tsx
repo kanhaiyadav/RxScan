@@ -53,6 +53,7 @@ const ModalManager = () => {
                 dispatch(closeModal());
             }}
             size="md"
+            style={{zIndex: 1100}}
         >
             <ModalBackdrop />
             <Content />

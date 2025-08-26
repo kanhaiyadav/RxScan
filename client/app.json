@@ -1,57 +1,79 @@
 {
-  "expo": {
-    "name": "RxScan",
-    "slug": "rxscan",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/logo.jpg",
-    "scheme": "jsmfirstproject",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.jpg",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.rxscan"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/logo.jpg"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+    "expo": {
+        "name": "RxScan",
+        "slug": "rxscan",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/logo.jpg",
+        "scheme": "jsmfirstproject",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": true,
+        "ios": {
+            "supportsTablet": true
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/images/logo.jpg",
+                "backgroundColor": "#ffffff"
+            },
+            "edgeToEdgeEnabled": true,
+            "package": "com.anonymous.rxscan",
+            "permissions": [
+                "android.permission.RECORD_AUDIO"
+            ]
+        },
+        "web": {
+            "bundler": "metro",
+            "output": "static",
+            "favicon": "./assets/images/logo.jpg"
+        },
+        "plugins": [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./assets/images/splash.png",
+                    "imageWidth": 200,
+                    "resizeMode": "contain",
+                    "backgroundColor": "#ffffff"
+                }
+            ],
+            [
+                "expo-image-picker",
+                {
+                    "photosPermission": "The app accesses your photos to let you translate text from images.",
+                    "cameraPermission": "The app accesses your camera to let you take photos for text translation."
+                }
+            ],
+            [
+                "expo-document-picker",
+                {
+                    "iCloudContainerEnvironment": "Production"
+                }
+            ],
+            [
+                "expo-notifications",
+                {
+                    "icon": "./assets/images/logo.jpg",
+                    "color": "#ffffff",
+                    "defaultChannel": "default",
+                    "sounds": [
+                        "./assets/sounds/reminder.wav",
+                        "./assets/sounds/notification.wav"
+                    ],
+                    "enableBackgroundRemoteNotifications": true
+                }
+            ],
+            "expo-localization"
+        ],
+        "experiments": {
+            "typedRoutes": true
+        },
+        "extra": {
+            "router": {},
+            "eas": {
+                "projectId": "f52d181e-715e-4a13-94de-8c095569ad0a"
+            }
         }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to let you translate text from images.",
-          "cameraPermission": "The app accesses your camera to let you take photos for text translation."
-        }
-      ],
-      [
-        "expo-document-picker",
-        {
-          "iCloudContainerEnvironment": "Production"
-        }
-      ],
-      "expo-localization"
-    ],
-    "experiments": {
-      "typedRoutes": true
     }
-  }
 }

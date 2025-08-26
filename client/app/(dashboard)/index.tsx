@@ -1,7 +1,6 @@
 import { selectActivePrescription, selectAllPrescriptions } from '@/Store/slices/prescriptionSlice';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as NavigationBar from 'expo-navigation-bar';
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -167,10 +166,6 @@ export default function HomeScreen() {
             time: t('homeScreen.dayAgo', { count: 1 })
         }
     ];
-
-    useEffect(() => {
-        NavigationBar.setVisibilityAsync("hidden");
-    }, []);
 
     return (
         <SafeAreaView className="flex-1 bg-gray-50">

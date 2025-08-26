@@ -6,9 +6,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import appwriteService from '@/lib/appwrite';
 import { addManyPrescriptions, setLoading } from '@/Store/slices/prescriptionSlice';
 import { useDispatch } from 'react-redux';
-
+import { NotificationService } from "@/lib/notificationService";
+import * as Notifications from 'expo-notifications';
 
 export default function TabLayout() {
+    
 
     const dispatch = useDispatch();
 
@@ -23,6 +25,25 @@ export default function TabLayout() {
             }
         })();
     }, [dispatch])
+
+    useEffect(() => {
+        // Initialize notification service on app startup
+        const initializeApp = async () => {
+            const notificationService = NotificationService.getInstance();
+            await notificationService.requestPermissions();
+        };
+
+        initializeApp();
+
+        // Handle notification when app is launched from notification
+        const subscription = Notifications.getLastNotificationResponseAsync().then(response => {
+            if (response?.notification.request.content.data?.type === 'medicine-reminder') {
+                console.log('App launched from notification:', response.notification.request.content.data);
+                // Handle the notification data here if needed
+            }
+        });
+
+    }, []);
 
     return (
         <SafeAreaView

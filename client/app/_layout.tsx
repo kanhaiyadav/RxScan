@@ -10,12 +10,19 @@ import { Provider } from "react-redux";
 import { store, persistor } from "@/Store/store";
 import { PersistGate } from "redux-persist/integration/react";
 import ModalManager from "@/components/modal/ModalManager";
+import * as NavigationBar from 'expo-navigation-bar';
+import { useEffect } from "react";
 
 if (__DEV__) {
     import('../lib/reactotron').then(() => console.log('Reactotron Configured'))
 }
 
 export default function RootLayout() {
+
+    useEffect(() => {
+        NavigationBar.setVisibilityAsync("hidden");
+    }, []);
+    
     return (
         <SafeAreaProvider>
             <AuthProvider>

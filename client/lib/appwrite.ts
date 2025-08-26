@@ -289,7 +289,6 @@ class AppwriteService {
   async createOrUpdateHealthProfile(userId: string, healthProfile: UserHealthProfile) {
     try {
       // First, check if a health profile already exists for this user
-      console.log("******************healthProfile", healthProfile);
       const existingProfile = await this.getHealthProfile(userId);
 
       if (existingProfile) {

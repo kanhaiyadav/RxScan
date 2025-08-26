@@ -624,7 +624,6 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
 
                 <TouchableOpacity className="bg-primary-400 text-white flex-row items-center rounded-lg p-4 w-full justify-center gap-2 mt-4 mb-8"
                     onPress={() => {
-                        console.log("********************", prescriptionId);
                         router.push({
                             pathname: '/(dashboard)/prescription/tts',
                             params: { prescriptionId: prescriptionId, ocrData: JSON.stringify(ocrResult) }
