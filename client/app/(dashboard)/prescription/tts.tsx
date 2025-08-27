@@ -242,11 +242,11 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
         (async () => {
             setIsTranslating(true);
             const { raw_response, ...withoutRaw } = data.ocrResult;
-            const result = await generateNarrative(withoutRaw, { language: selectedLanguage.name });
-            // const result = {
-            //     narrative: "Generated narrative text",
-            //     // Add any other properties you need
-            // }
+            // const result = await generateNarrative(withoutRaw, { language: selectedLanguage.name });
+            const result = {
+                narrative: "Generated narrative text",
+                // Add any other properties you need
+            }
             if (result.narrative) {
                 setText(result.narrative);
             }
@@ -546,7 +546,9 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
     }, []);
 
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+        <ScrollView style={{ flex: 1 }}
+            className='bg-background-50'
+        >
             {/* Header with Gradient */}
             <LinearGradient
                 colors={['#00ffc8', '#80f7ed']}
@@ -560,10 +562,10 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     <Ionicons name='arrow-back' size={24} />
                 </TouchableOpacity>
                 <View>
-                    <Text className="text-2xl font-bold text-typography-900">
+                    <Text className="text-2xl font-bold text-gray-900">
                         {t('prescription.tts.title')}
                     </Text>
-                    <Text className="text-base text-typography-600">
+                    <Text className="text-base text-gray-500">
                         {t('prescription.tts.subtitle')}
                     </Text>
                 </View>
@@ -573,26 +575,28 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
 
                 {/* Voice Settings Card */}
                 <View style={{
-                    backgroundColor: '#ffffff',
                     borderRadius: 16,
                     padding: 20,
                     marginBottom: 20,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
                     shadowRadius: 8,
                     elevation: 2,
-                }}>
+                }}
+                    className='bg-background-0'
+                >
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
                         <Ionicons name="mic" size={20} color="teal" />
-                        <Text style={{ fontSize: 18, fontWeight: '600', color: '#1e293b', marginLeft: 8 }}>
+                        <Text style={{ fontSize: 18, fontWeight: '600', marginLeft: 8 }}
+                            className='text-typography-600'
+                        >
                             {t('prescription.tts.voiceSettings')}
                         </Text>
                     </View>
 
                     {/* Language Selection */}
                     <View style={{ marginBottom: 20 }}>
-                        <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151', marginBottom: 8 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '500', marginBottom: 8 }}
+                        className='text-typography-600'
+                        >
                             {t('prescription.tts.language')}
                         </Text>
                         <Select
@@ -607,7 +611,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             isDisabled={isTranslating}
                         >
                             <SelectTrigger variant="outline" size="lg">
-                                <SelectInput placeholder="Select Language" className='h-[50px] px-4 text-typography-600 text-md' />
+                                <SelectInput placeholder="Select Language" className='h-[50px] px-4 text-typography-800 text-md' />
                                 <SelectIcon className="mr-3">
                                     <ChevronDownIcon />
                                 </SelectIcon>
@@ -632,7 +636,9 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
 
                     {/* Voice Selection */}
                     <View style={{ marginBottom: 20 }}>
-                        <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151', marginBottom: 8 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '500', marginBottom: 8 }}
+                        className='text-typography-600'
+                        >
                             {t('prescription.tts.voice')} ({selectedLanguage.voices.length} available)
                         </Text>
                         <Select
@@ -645,7 +651,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             }}
                         >
                             <SelectTrigger variant="outline" size="lg">
-                                <SelectInput placeholder="Select Voice" className='h-[50px] px-4 text-typography-600 text-md' />
+                                <SelectInput placeholder="Select Voice" className='h-[50px] px-4 text-typography-800 text-md' />
                                 <SelectIcon className="mr-3">
                                     <ChevronDownIcon />
                                 </SelectIcon>
@@ -670,7 +676,9 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
 
                     {/* Audio Quality */}
                     <View style={{ marginBottom: 20 }}>
-                        <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151', marginBottom: 8 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '500', marginBottom: 8 }}
+                        className='text-typography-600'
+                        >
                             {t('prescription.tts.audioQuality')}
                         </Text>
                         <Select
@@ -678,7 +686,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             onValueChange={(value) => setAudioFormat(value)}
                         >
                             <SelectTrigger variant="outline" size="lg">
-                                <SelectInput placeholder="Select Quality" className='h-[50px] px-4 text-typography-600 text-md' />
+                                <SelectInput placeholder="Select Quality" className='h-[50px] px-4 text-typography-800 text-md' />
                                 <SelectIcon className="mr-3">
                                     <ChevronDownIcon />
                                 </SelectIcon>
@@ -704,7 +712,9 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                     {/* Speech Rate */}
                     <View style={{ marginBottom: 20 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                            <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151' }}>
+                            <Text style={{ fontSize: 14, fontWeight: '500' }}
+                            className='text-typography-600'
+                            >
                                 {t('prescription.tts.speechRate')}
                             </Text>
                             <Text style={{ fontSize: 14, fontWeight: '600' }} className='text-primary-500'>
@@ -725,14 +735,16 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             <SliderThumb />
                         </Slider>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
-                            <Text style={{ fontSize: 12, color: '#64748b' }}>0.5x (Slow)</Text>
-                            <Text style={{ fontSize: 12, color: '#64748b' }}>2.0x (Fast)</Text>
+                            <Text style={{ fontSize: 12, color: '#a1a3a6' }}>0.5x (Slow)</Text>
+                            <Text style={{ fontSize: 12, color: '#a1a3a6' }}>2.0x (Fast)</Text>
                         </View>
                     </View>
 
                     {/* Speech Pitch */}
                     <View>
-                        <Text style={{ fontSize: 14, fontWeight: '500', color: '#374151', marginBottom: 12 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '500', marginBottom: 12 }}
+                        className='text-typography-600'
+                        >
                             {t('prescription.tts.speechPitch')}
                         </Text>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -745,16 +757,14 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         paddingHorizontal: 8,
                                         marginHorizontal: 4,
                                         borderRadius: 10,
-                                        backgroundColor: speechPitch === pitch ? 'teal' : '#f1f5f9',
-                                        borderWidth: 1,
-                                        borderColor: speechPitch === pitch ? 'teal' : '#e2e8f0',
                                     }}
+                                    className={speechPitch === pitch ? 'bg-primary-500 border-primary-500' : 'bg-background-50 dark:bg-background-50/60 elevation-sm dark:elevation-none'}
                                     onPress={() => setSpeechPitch(pitch)}
                                 >
                                     <Text style={{
                                         textAlign: 'center',
                                         fontWeight: '600',
-                                        color: speechPitch === pitch ? '#ffffff' : '#64748b'
+                                        color: speechPitch === pitch ? '#ffffff' : '#a1a3a6'
                                     }}>
                                         {pitch}
                                     </Text>
@@ -808,7 +818,7 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
 
                 {
                     isTranslating && (
-                        <View className='flex-row items-center gap-2 justify-center'>
+                        <View className='flex-row items-center gap-2 justify-center mb-4'>
                             <ActivityIndicator size="small" color="#00b894" />
                             <Text className='text-center text-typography-500 text-sm'>
                                 {t('prescription.tts.translatingText', { language: selectedVoice.languageDisplay })}
@@ -820,21 +830,20 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                 {/* Enhanced Audio Player */}
                 {audioUriRef.current && audioFileInfo && (
                     <View style={{
-                        backgroundColor: '#ffffff',
                         borderRadius: 20,
                         padding: 24,
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 4 },
-                        shadowOpacity: 0.15,
-                        shadowRadius: 12,
-                        elevation: 8,
-                    }}>
+                        elevation: 3,
+                    }}
+                    className='bg-background-0 elevation'
+                    >
                         {/* Player Header */}
                         <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                            <Text style={{ fontSize: 18, fontWeight: '600', color: '#1e293b', textAlign: 'center' }}>
+                            <Text style={{ fontSize: 18, fontWeight: '600', textAlign: 'center' }}
+                                className='text-typography-700 mb-1'
+                            >
                                 {selectedVoice.displayName}
                             </Text>
-                            <Text style={{ fontSize: 14, color: '#64748b', textAlign: 'center' }}>
+                            <Text style={{ fontSize: 14, color: '#818385', textAlign: 'center' }}>
                                 {selectedVoice.languageDisplay} • {selectedVoice.gender}
                             </Text>
                         </View>
@@ -857,10 +866,10 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                             </Slider>
 
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
-                                <Text style={{ fontSize: 12, color: '#64748b' }}>
+                                <Text style={{ fontSize: 12, color: '#a1a3a6' }}>
                                     {formatTime(playbackState.position)}
                                 </Text>
-                                <Text style={{ fontSize: 12, color: '#64748b' }}>
+                                <Text style={{ fontSize: 12, color: '#a1a3a6' }}>
                                     {formatTime(playbackState.duration)}
                                 </Text>
                             </View>
@@ -882,13 +891,13 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         width: 50,
                                         height: 50,
                                         borderRadius: 25,
-                                        backgroundColor: '#f1f5f9',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}
+                                    className='bg-background-50 dark:bg-white/10'
                                     onPress={() => skipTime(-10)}
                                 >
-                                    <Ionicons name="play-back" size={24} color="#64748b" />
+                                    <Ionicons name="play-back" size={24} color="#a1a3a6" />
                                 </TouchableOpacity>
 
                                 {/* Stop */}
@@ -897,13 +906,13 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         width: 50,
                                         height: 50,
                                         borderRadius: 25,
-                                        backgroundColor: '#f1f5f9',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}
+                                    className='bg-background-50 dark:bg-white/10'
                                     onPress={stopPlayback}
                                 >
-                                    <Ionicons name="stop" size={24} color="#64748b" />
+                                    <Ionicons name="stop" size={24} color="#a1a3a6" />
                                 </TouchableOpacity>
 
                                 {/* Play/Pause */}
@@ -943,16 +952,16 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         width: 50,
                                         height: 50,
                                         borderRadius: 25,
-                                        backgroundColor: showSpeedControl ? 'teal' : '#f1f5f9',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}
+                                    className={`${showSpeedControl ? 'bg-teal-500' : 'bg-background-50 dark:bg-white/10'}`}
                                     onPress={() => setShowSpeedControl(!showSpeedControl)}
                                 >
                                     <Text style={{
                                         fontSize: 12,
                                         fontWeight: '600',
-                                        color: showSpeedControl ? '#ffffff' : '#64748b'
+                                        color: showSpeedControl ? '#ffffff' : '#a1a3a6'
                                     }}>
                                         {playbackState.rate.toFixed(1)}x
                                     </Text>
@@ -964,13 +973,13 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         width: 50,
                                         height: 50,
                                         borderRadius: 25,
-                                        backgroundColor: '#f1f5f9',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}
+                                    className='bg-background-50 dark:bg-white/10'
                                     onPress={() => skipTime(10)}
                                 >
-                                    <Ionicons name="play-forward" size={24} color="#64748b" />
+                                    <Ionicons name="play-forward" size={24} color="#a1a3a6" />
                                 </TouchableOpacity>
                             </View>
 
@@ -987,16 +996,16 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                         width: 40,
                                         height: 40,
                                         borderRadius: 20,
-                                        backgroundColor: showVolumeControl ? 'teal' : '#f1f5f9',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}
+                                    className={`${showVolumeControl ? 'bg-teal-500' : 'bg-background-50 dark:bg-white/10'}`}
                                     onPress={() => setShowVolumeControl(!showVolumeControl)}
                                 >
                                     <Ionicons
                                         name={getVolumeIcon(playbackState.volume)}
                                         size={20}
-                                        color={showVolumeControl ? '#ffffff' : '#64748b'}
+                                        color={showVolumeControl ? '#ffffff' : '#a1a3a6'}
                                     />
                                 </TouchableOpacity>
 
@@ -1017,14 +1026,17 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                         {/* Speed Control Panel */}
                         {showSpeedControl && (
                             <View style={{
-                                backgroundColor: '#f8fafc',
                                 borderRadius: 12,
                                 padding: 16,
                                 marginBottom: 16,
-                            }}>
+                            }}
+                            className='bg-background-50 dark:bg-background-50/60 elevation-sm dark:elevation-none'
+                            >
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
                                     <Ionicons name="speedometer" size={16} color="teal" />
-                                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151', marginLeft: 6 }}>
+                                    <Text style={{ fontSize: 14, fontWeight: '600', marginLeft: 6 }}
+                                    className='text-typography-600'
+                                    >
                                         Playback Speed: {playbackState.rate.toFixed(1)}x
                                     </Text>
                                 </View>
@@ -1042,16 +1054,16 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                                 paddingVertical: 8,
                                                 paddingHorizontal: 12,
                                                 borderRadius: 8,
-                                                backgroundColor: playbackState.rate === speed ? 'teal' : '#ffffff',
-                                                borderWidth: 1,
-                                                borderColor: playbackState.rate === speed ? 'teal' : '#e2e8f0',
                                             }}
+
+                                            className={`${playbackState.rate === speed ? 'bg-teal-500' : 'bg-background-100 border border-outline-200 dark:bg-white/10'}`}
+
                                             onPress={() => changePlaybackSpeed(speed)}
                                         >
                                             <Text style={{
                                                 fontSize: 12,
                                                 fontWeight: '600',
-                                                color: playbackState.rate === speed ? '#ffffff' : '#64748b'
+                                                color: playbackState.rate === speed ? '#ffffff' : '#a1a3a6'
                                             }}>
                                                 {speed}x
                                             </Text>
@@ -1064,14 +1076,15 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                         {/* Volume Control Panel */}
                         {showVolumeControl && (
                             <View style={{
-                                backgroundColor: '#f8fafc',
-                                borderRadius: 12,
                                 padding: 16,
                                 marginBottom: 16,
-                            }}>
+                            }}
+                                className='bg-background-50 dark:bg-background-50/60 rounded-2xl elevation-sm dark:elevation-none'
+                            >
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                                    <Ionicons name={getVolumeIcon(playbackState.volume)} size={16} color="teal" />
-                                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151', marginLeft: 6 }}>
+                                    <Text style={{ fontSize: 14, fontWeight: '600', marginLeft: 6 }}
+                                    className='text-typography-600'
+                                    >
                                         Volume: {Math.round(playbackState.volume * 100)}%
                                     </Text>
                                 </View>
@@ -1104,17 +1117,16 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
                                                 flex: 1,
                                                 paddingVertical: 6,
                                                 borderRadius: 6,
-                                                backgroundColor: Math.abs(playbackState.volume - vol) < 0.01 ? 'teal' : '#ffffff',
                                                 borderWidth: 1,
-                                                borderColor: Math.abs(playbackState.volume - vol) < 0.01 ? 'teal' : '#e2e8f0',
                                                 alignItems: 'center',
                                             }}
+                                            className={`${Math.abs(playbackState.volume - vol) < 0.01 ? 'border-teal-500 bg-primary-500' : 'border-outline-200 bg-background-0'} border rounded-md`}
                                             onPress={() => changeVolume(vol)}
                                         >
                                             <Text style={{
                                                 fontSize: 11,
                                                 fontWeight: '500',
-                                                color: Math.abs(playbackState.volume - vol) < 0.01 ? '#ffffff' : '#64748b'
+                                                color: Math.abs(playbackState.volume - vol) < 0.01 ? '#ffffff' : '#a1a3a6'
                                             }}>
                                                 {Math.round(vol * 100)}%
                                             </Text>
@@ -1126,45 +1138,58 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
 
                         {/* File Information */}
                         <View style={{
-                            backgroundColor: '#f8fafc',
                             borderRadius: 12,
                             padding: 16,
-                        }}>
+                        }}
+                            className='bg-background-50 dark:bg-background-50/60 elevation-sm dark:elevation-none'
+                        >
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                                 <Ionicons name="information-circle" size={16} color="teal" />
-                                <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151', marginLeft: 6 }}>
+                                <Text style={{ fontSize: 14, fontWeight: '600', marginLeft: 6 }}
+                                className='text-typography-600'
+                                >
                                     {t('prescription.tts.fileDetails')}
                                 </Text>
                             </View>
 
                             <View style={{ gap: 4 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.format')}:</Text>
-                                    <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
+                                    <Text style={{ fontSize: 12, color: '#a1a3a6' }}>{t('prescription.tts.controls.format')}:</Text>
+                                    <Text style={{ fontSize: 12, fontWeight: '500' }}
+                                    className='text-typography-600'
+                                    >
                                         {AUDIO_FORMATS.find(f => f.value === audioFormat)?.quality} MP3
                                     </Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.size')}:</Text>
-                                    <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
+                                    <Text style={{ fontSize: 12, color: '#a1a3a6' }}>{t('prescription.tts.controls.size')}:</Text>
+                                    <Text style={{ fontSize: 12, fontWeight: '500' }}
+                                    className='text-typography-600'
+                                    >
                                         {audioFileInfo.size}
                                     </Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.duration')}:</Text>
-                                    <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
+                                    <Text style={{ fontSize: 12, color: '#a1a3a6' }}>{t('prescription.tts.controls.duration')}:</Text>
+                                    <Text style={{ fontSize: 12, fontWeight: '500' }}
+                                    className='text-typography-600'
+                                    >
                                         {formatTime(playbackState.duration)}
                                     </Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.speed')}:</Text>
-                                    <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
+                                    <Text style={{ fontSize: 12, color: '#a1a3a6' }}>{t('prescription.tts.controls.speed')}:</Text>
+                                    <Text style={{ fontSize: 12, fontWeight: '500' }}
+                                    className='text-typography-600'
+                                    >
                                         {playbackState.rate.toFixed(1)}x
                                     </Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 12, color: '#64748b' }}>{t('prescription.tts.controls.volume')}:</Text>
-                                    <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
+                                    <Text style={{ fontSize: 12, color: '#a1a3a6' }}>{t('prescription.tts.controls.volume')}:</Text>
+                                    <Text style={{ fontSize: 12, fontWeight: '500' }}
+                                    className='text-typography-600'
+                                    >
                                         {Math.round(playbackState.volume * 100)}%
                                     </Text>
                                 </View>

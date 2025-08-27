@@ -35,6 +35,7 @@ import {
 import { Divider } from "@/components/ui/divider"
 import { ChevronUpIcon, ChevronDownIcon, Icon, EditIcon } from "@/components/ui/icon"
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import AppSettings from '@/components/profile/AppSettings';
 
 export default function ProfileScreen() {
     const { t } = useTranslation();
@@ -208,7 +209,7 @@ export default function ProfileScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <SafeAreaView className="flex-1 bg-background-50">
             <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
             {/* Header */}
@@ -217,11 +218,11 @@ export default function ProfileScreen() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
                 style={{ elevation: 3 }}
-                className='border-b border-gray-200'
+                className='border-b border-gray-200 dark:border-outline-0'
             >
-                <View className="px-6 py-4 pt-8">
-                    <Text className="text-2xl font-bold text-typography-900">{t('profile')}</Text>
-                    <Text className="text-sm text-typography-600">{t('profileInformation')}</Text>
+                <View className="px-6 py-4">
+                    <Text className="text-2xl font-bold text-gray-900">{t('profile')}</Text>
+                    <Text className="text-sm text-gray-500">{t('profileInformation')}</Text>
                 </View>
             </LinearGradient>
 
@@ -306,7 +307,7 @@ export default function ProfileScreen() {
                 {/* Profile Sections */}
                 <View className="mx-6 mt-4">
                     <View className='flex-row justify-between'>
-                        <Text className="text-lg font-semibold text-typography-900 mb-4">{profileSections[0].title}</Text>
+                        <Text className="text-lg font-semibold text-typography-600 mb-4">{profileSections[0].title}</Text>
                         <TouchableOpacity
                             className="flex-row items-center"
                             onPress={() => router.push('/(onboarding)/')}
@@ -336,7 +337,7 @@ export default function ProfileScreen() {
                                                                     <Ionicons name={item.icon as any} size={20} color="white" />
                                                                 </View>
                                                                 <View>
-                                                                    <Text className='text-md font-bold'>{item.title}</Text>
+                                                                    <Text className='text-md font-bold text-typography-950'>{item.title}</Text>
                                                                     <Text className='text-sm text-typography-500'>{`${healthProfile && 'slug' in item && item.slug && (healthProfile as any)[item.slug] ? (healthProfile as any)[item.slug].length : 0} ${item.subtitle}`}</Text>
                                                                 </View>
                                                             </View>
@@ -375,56 +376,16 @@ export default function ProfileScreen() {
                 </View>
 
                 {/* App Settings Section */}
-                <View className="mx-6 mt-4">
-                    <Text className="text-lg font-semibold text-typography-900 mb-4">{profileSections[1].title}</Text>
-                    <View className="bg-background-0 rounded-2xl shadow-sm border border-gray-100">
-                        {profileSections[1].items.map((item, itemIndex) => (
-                            <TouchableOpacity
-                                key={itemIndex}
-                                className={`p-5 flex-row items-center ${itemIndex < profileSections[1].items.length - 1 ? 'border-b border-gray-100' : ''
-                                    }`}
-                                onPress={() => {
-                                    if (item.route) {
-                                        // Navigate to route
-                                        router.push(item.route as any);
-                                    }
-                                }}
-                            >
-                                <View className={`${item.color} w-10 h-10 rounded-full items-center justify-center mr-4`}>
-                                    <Ionicons name={item.icon as any} size={20} color="white" />
-                                </View>
-                                <View className="flex-1">
-                                    <Text className="text-typography-900 font-medium">{item.title}</Text>
-                                    <Text className="text-typography-500 text-sm mt-1">{item.subtitle}</Text>
-                                </View>
-                                {'hasToggle' in item && item.hasToggle ? (
-                                    <Switch
-                                        value={'toggleValue' in item ? item.toggleValue : false}
-                                        onValueChange={'onToggle' in item ? item.onToggle : undefined}
-                                        trackColor={{ false: '#E5E7EB', true: '#14B8A6' }}
-                                        thumbColor="#FFFFFF"
-                                    />
-                                ) : (
-                                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-                                )}
-                            </TouchableOpacity>
-                        ))}
-
-                        {/* Language Switcher - Add after other settings */}
-                        <View className="border-t border-gray-100">
-                            <LanguageSwitcher />
-                        </View>
-                    </View>
-                </View>
+                <AppSettings />
 
                 {/* Support & About Section */}
                 <View className="mx-6 mt-4">
-                    <Text className="text-lg font-semibold text-typography-900 mb-4">{profileSections[2].title}</Text>
-                    <View className="bg-background-0 rounded-2xl shadow-sm border border-gray-100">
+                    <Text className="text-lg font-semibold text-typography-600 mb-4">{profileSections[2].title}</Text>
+                    <View className="bg-background-0 rounded-2xl shadow-sm border border-outline-200">
                         {profileSections[2].items.map((item, itemIndex) => (
                             <TouchableOpacity
                                 key={itemIndex}
-                                className={`p-5 flex-row items-center ${itemIndex < profileSections[2].items.length - 1 ? 'border-b border-gray-100' : ''
+                                className={`p-5 flex-row items-center ${itemIndex < profileSections[2].items.length - 1 ? 'border-b border-outline-200' : ''
                                     }`}
                                 onPress={() => {
                                     if (item.route) {
@@ -449,7 +410,7 @@ export default function ProfileScreen() {
                 {/* Logout Button */}
                 <View className="mx-6 mt-8 mb-8">
                     <TouchableOpacity
-                        className="bg-red-50 border border-red-200 rounded-2xl p-3 flex-row items-center justify-center"
+                        className="bg-red-500/15 border border-red-500 rounded-2xl p-3 flex-row items-center justify-center"
                         onPress={() => setShowAlertDialog(true)}
                     >
                         <Ionicons name="log-out" size={24} color="#EF4444" />

@@ -39,19 +39,19 @@ export default function PrescriptionDetails() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
                 style={{ elevation: 3 }}
-                className='border-b border-gray-200'
+                className="border-b border-gray-200 dark:border-outline-0"
             >
                 <View className="px-6 py-4">
                     <View className="flex-row items-center">
                         <TouchableOpacity
-                            className="mr-4 bg-background-0/20 w-10 h-10 rounded-full items-center justify-center"
+                            className="mr-4 w-10 h-10 rounded-full items-center justify-center"
                             onPress={() => router.back()}
                         >
                             <Ionicons name="arrow-back" size={26} color="#1f2937" />
                         </TouchableOpacity>
                         <View>
-                            <Text className="text-2xl font-bold text-typography-900">{t('prescription.details.title')}</Text>
-                            <Text className="text-sm text-typography-600">{t('prescription.details.subtitle')}</Text>
+                            <Text className="text-2xl font-bold text-gray-900">{t('prescription.details.title')}</Text>
+                            <Text className="text-sm text-gray-500">{t('prescription.details.subtitle')}</Text>
                         </View>
                         <TouchableOpacity
                             className="ml-auto h-[50px] w-[50px] bg-background-0 rounded-full items-center justify-center elevation"

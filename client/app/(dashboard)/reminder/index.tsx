@@ -258,7 +258,7 @@ export default function RemindersScreen() {
     const pendingToday = todaysReminders.filter(r => r.status === 'pending').length;
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <SafeAreaView className="flex-1 bg-background-50">
             <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
             {/* Header */}
@@ -267,13 +267,13 @@ export default function RemindersScreen() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
                 style={{ elevation: 3 }}
-                className="border-b border-gray-200"
+                className="border-b border-gray-200 dark:border-outline-0"
             >
                 <View className="px-6 py-4">
                     <View className="flex-row items-center justify-between">
                         <View>
-                            <Text className="text-2xl font-bold text-typography-900">Medicine Reminders</Text>
-                            <Text className="text-typography-600">Stay on top of your medications</Text>
+                            <Text className="text-2xl font-bold text-gray-900">Medicine Reminders</Text>
+                            <Text className="text-gray-500">Stay on top of your medications</Text>
                         </View>
                         <TouchableOpacity
                             className="bg-background-0 p-3 rounded-full elevation"
@@ -289,7 +289,7 @@ export default function RemindersScreen() {
 
             {/* Stats Cards */}
             <View className="flex-row mx-6 mt-6 gap-4">
-                <View className="flex-1 bg-background-0 rounded-2xl p-4 shadow-sm border border-gray-100">
+                <View className="flex-1 bg-background-0 rounded-2xl p-4 elevation">
                     <View className="flex-row items-center">
                         <View className="bg-green-100 w-10 h-10 rounded-full items-center justify-center">
                             <Ionicons name="checkmark" size={20} color="#10B981" />
@@ -301,7 +301,7 @@ export default function RemindersScreen() {
                     </View>
                 </View>
 
-                <View className="flex-1 bg-background-0 rounded-2xl p-4 shadow-sm border border-gray-100">
+                <View className="flex-1 bg-background-0 rounded-2xl p-4 elevation">
                     <View className="flex-row items-center">
                         <View className="bg-orange-100 w-10 h-10 rounded-full items-center justify-center">
                             <Ionicons name="time" size={20} color="#F59E0B" />
@@ -315,7 +315,7 @@ export default function RemindersScreen() {
             </View>
 
             {/* Filter Tabs */}
-            <View className="bg-background-0 mx-6 mt-6 rounded-2xl p-1 shadow-sm border border-gray-100">
+            <View className="bg-background-0 mx-6 mt-6 rounded-2xl p-1 elevation">
                 <View className="flex-row">
                     {tabs.map((tab) => (
                         <TouchableOpacity
@@ -365,7 +365,7 @@ export default function RemindersScreen() {
                             return (
                                 <View
                                     key={reminder.id}
-                                    className="bg-background-0 rounded-2xl p-5 mb-4 shadow-sm border border-gray-200"
+                                    className="bg-background-0 rounded-2xl p-5 mb-4 elevation"
                                 >
                                     <View className="flex-row items-center justify-between mb-3">
                                         <View className="flex-row items-center flex-1">
@@ -507,8 +507,8 @@ export default function RemindersScreen() {
                 <View className="mx-6 mt-6 mb-8">
                     <Text className="text-lg font-semibold text-typography-900 mb-4">Notification Settings</Text>
 
-                    <View className="bg-background-0 rounded-2xl shadow-sm border border-gray-200">
-                        <View className="p-5 border-b border-gray-200">
+                    <View className="bg-background-0 rounded-2xl border border-outline-200">
+                        <View className="p-5 border-b border-outline-200">
                             <View className="flex-row items-center justify-between">
                                 <View className="flex-1">
                                     <Text className="text-typography-900 font-medium">Push Notifications</Text>
@@ -525,7 +525,7 @@ export default function RemindersScreen() {
                             </View>
                         </View>
 
-                        <View className="p-5 border-b border-gray-200">
+                        <View className="p-5 border-b border-outline-200">
                             <View className="flex-row items-center justify-between">
                                 <View className="flex-1">
                                     <Text className="text-typography-900 font-medium">Sound Alerts</Text>

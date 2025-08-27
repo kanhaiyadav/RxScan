@@ -85,17 +85,17 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
 
             if (medicine.medicalInfo.healthProfileInteraction.hasInteractions) {
                 if (medicine.medicalInfo.healthProfileInteraction.overallRisk === 'critical') {
-                    return 'bg-red-200 border-red-600 border-2';
+                    return 'bg-red-200 dark:bg-red-500/20 border-red-600 border-2';
                 } else if (medicine.medicalInfo.healthProfileInteraction.overallRisk === 'high') {
-                    return 'bg-red-100 border-red-400';
+                    return 'bg-red-100 dark:bg-red-500/15 border-red-400';
                 } else if (medicine.medicalInfo.healthProfileInteraction.overallRisk === 'moderate') {
-                    return 'bg-orange-200 border-orange-600';
+                    return 'bg-orange-200 dark:bg-orange-500/20 border-orange-600';
                 } else if (medicine.medicalInfo.healthProfileInteraction.overallRisk === 'low') {
-                    return 'bg-yellow-100 border-yellow-400';
+                    return 'bg-yellow-100 dark:bg-yellow-500/20 border-yellow-400';
                 }
             }
 
-            return 'bg-green-100 border-green-400';
+            return 'bg-green-100 dark:bg-green-500/20 border-green-400';
         };
 
         return (
@@ -523,7 +523,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <SafeAreaView className="flex-1 bg-background-50">
             <ScrollView showsVerticalScrollIndicator={false} className="px-6">
                 <View className="pt-[20px]">
 
@@ -538,9 +538,9 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                 >
                                     <FontAwesome6 name="user-doctor" size={24} color="white" />
                                 </LinearGradient>
-                                <Text className="text-lg font-bold text-typography-900">Doctor Information</Text>
+                                <Text className="text-lg font-bold text-typography-600">Doctor Information</Text>
                             </View>
-                            <View className="bg-background-0 border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                            <View className="bg-background-0 rounded-2xl p-5 mb-6 elevation">
                                 {renderInfoItem('Name', ocrResult.doctor.name)}
                                 {renderInfoItem('Qualifications', ocrResult.doctor.qualifications)}
                                 {renderInfoItem('Registration', ocrResult.doctor.registration_number)}
@@ -562,9 +562,9 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                                 >
                                     <Fontisto name="bed-patient" size={24} color="white" />
                                 </LinearGradient>
-                                <Text className="text-lg font-bold text-typography-900">Patient Information</Text>
+                                <Text className="text-lg font-bold text-typography-600">Patient Information</Text>
                             </View>
-                            <View className="bg-background-0 border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                            <View className="bg-background-0 rounded-2xl p-5 mb-6 elevation">
                                 {renderInfoItem('Name', ocrResult.patient.name)}
                                 {renderInfoItem('Age', ocrResult.patient.age)}
                                 {renderInfoItem('Gender', ocrResult.patient.gender)}
@@ -584,7 +584,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     >
                         <MaterialCommunityIcons name="pill" size={24} color="white" />
                     </LinearGradient>
-                    <Text className="text-lg font-bold text-typography-900">Medicines Recognised</Text>
+                    <Text className="text-lg font-bold text-typography-600">Medicines Recognised</Text>
                 </View>
 
                 {/* Medicine Selector */}
@@ -601,7 +601,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                             >
                                 <Ionicons name="document-text" size={24} color="#6b7280" />
                             </LinearGradient>
-                            <Text className="text-lg font-bold text-typography-900">Additional Notes</Text>
+                            <Text className="text-lg font-bold text-typography-600">Additional Notes</Text>
                         </View>
                         <View className="gap-2 bg-background-0 border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
                             {renderInfoItem('Special Instructions', ocrResult.additional_notes.special_instructions)}
@@ -616,7 +616,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     <View className="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-12">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="information-circle" size={20} color="#6b7280" />
-                            <Text className="text-lg font-bold text-typography-700 ml-2">Extraction Notes</Text>
+                            <Text className="text-lg font-bold text-typography-600 ml-2">Extraction Notes</Text>
                         </View>
                         <Text className="text-typography-800">{ocrResult.extraction_notes}</Text>
                     </View>

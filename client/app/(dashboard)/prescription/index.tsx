@@ -48,7 +48,7 @@ export default function PrescriptionsScreen() {
             case 'active':
                 return 'bg-green-100 text-green-800';
             case 'inactive':
-                return 'bg-gray-100 text-typography-800';
+                return 'bg-background-50 text-typography-800 border border-outline-200 rounded-xl';
             case 'abandoned':
                 return 'bg-red-100 text-red-800';
             case 'completed':
@@ -105,13 +105,13 @@ export default function PrescriptionsScreen() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
                 style={{ elevation: 3 }}
-                className='border-b border-gray-200'
+                className="border-b border-gray-200 dark:border-outline-0"
             >
                 <View className="px-6 py-4">
                     <View className="flex-row items-center justify-between">
                         <View>
-                            <Text className="text-2xl font-bold text-typography-900">{t('prescription.title')}</Text>
-                            <Text className="text-typography-600">{t('prescription.subtitle')}</Text>
+                            <Text className="text-2xl font-bold text-gray-900">{t('prescription.title')}</Text>
+                            <Text className="text-gray-500">{t('prescription.subtitle')}</Text>
                         </View>
                         <TouchableOpacity className="bg-background-0 p-3 rounded-full elevation-sm"
                             onPress={() => {
@@ -123,7 +123,7 @@ export default function PrescriptionsScreen() {
                     </View>
 
                     {/* Search Bar */}
-                    <View className="mt-4 bg-gray-50 rounded-xl flex-row items-center px-4 py-3 elevation">
+                    <View className="mt-4 bg-background-0 rounded-xl flex-row items-center px-4 py-3 elevation">
                         <Ionicons name="search" size={20} color="#9CA3AF" />
                         <TextInput
                             className="flex-1 ml-3 text-typography-900"
@@ -137,7 +137,7 @@ export default function PrescriptionsScreen() {
             </LinearGradient>
 
             {/* Filter Tabs */}
-            <View className="bg-background-0 px-6 py-4 border-b border-black/15">
+            <View className="bg-background-50/95 px-6 py-4 border-b border-black/15">
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View className="flex-row gap-2 pb-1">
                         {filters.map((filter) => (
@@ -145,7 +145,7 @@ export default function PrescriptionsScreen() {
                                 key={filter}
                                 className={`px-4 py-2 rounded-full elevation-sm ${activeFilter === filter
                                     ? 'bg-primary-500'
-                                    : 'bg-gray-100'
+                                    : 'bg-background-0'
                                     }`}
                                 onPress={() => setActiveFilter(filter)}
                             >
@@ -180,7 +180,7 @@ export default function PrescriptionsScreen() {
                     />
                 </View>
             ) :
-                <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+                <ScrollView className="flex-1 bg-background-50" showsVerticalScrollIndicator={false}>
                     <View className="mx-6 mt-6">
                         {filteredPrescriptions.map((prescription, index) => (
                             <TouchableOpacity
@@ -247,7 +247,7 @@ export default function PrescriptionsScreen() {
                                 </View>
 
                                 {/* Medicines */}
-                                <View className="bg-gray-50 rounded-xl p-3">
+                                <View className="bg-background-50/80 rounded-xl p-3 border border-outline-200">
                                     <Text className="text-typography-700 font-medium mb-2">{t('prescription.medicines')}</Text>
                                     {prescription.ocrResult?.medications && prescription.ocrResult.medications.length > 0 ?
                                         prescription.ocrResult.medications.map((medicine, medicineIndex) => (

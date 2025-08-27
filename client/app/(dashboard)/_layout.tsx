@@ -61,7 +61,7 @@ export default function TabLayout() {
                     tabBarActiveTintColor: '#14B8A6',
                     tabBarInactiveTintColor: '#9CA3AF',
                     tabBarStyle: {
-                        backgroundColor: isDark ? '#373737' : '#FFFFFF',
+                        backgroundColor: isDark ? '#505050' : '#FFFFFF',
                         borderTopWidth: isDark ? 0 : 1,
                         borderTopColor: isDark ? '#0b0b0b' : '#E5E7EB',
                         height: Platform.OS === 'android' ? 80 : 70,

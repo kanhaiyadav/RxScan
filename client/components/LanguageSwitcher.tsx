@@ -36,7 +36,7 @@ export default function LanguageSwitcher() {
     return (
         <>
             <TouchableOpacity
-                className="flex-row items-center justify-between p-4"
+                className="flex-row items-center justify-between p-4 pr-10"
                 onPress={() => setShowLanguageDialog(true)}
             >
                 <View className="flex-row items-center">
