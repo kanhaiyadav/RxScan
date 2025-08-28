@@ -363,7 +363,7 @@ export default function EnhancedPrescriptionOCR() {
     const isLoading = ocrLoading;
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <SafeAreaView className="flex-1 bg-background-50">
             <StatusBar barStyle="dark-content" backgroundColor="#00ffc8" />
 
             {/* Header */}
@@ -371,24 +371,24 @@ export default function EnhancedPrescriptionOCR() {
                 colors={['#00ffc8', '#80f7ed']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
-                className="border-b border-gray-200 shadow-sm"
+                className='border-b border-gray-200 dark:border-outline-0'
             >
                 <View className="px-6 py-6">
                     <View className="flex-row items-center">
                         {currentStep !== 'select' && (
                             <TouchableOpacity
                                 onPress={resetToStart}
-                                className="mr-4 bg-background-0/20 w-10 h-10 rounded-full items-center justify-center"
+                                className="mr-4 w-10 h-10 rounded-full items-center justify-center"
                             >
                                 <Ionicons name="arrow-back" size={26} color="#1f2937" />
                             </TouchableOpacity>
                         )}
                         <View className="flex-1">
-                            <Text className="text-2xl font-bold text-typography-900">
+                            <Text className="text-2xl font-bold text-gray-900">
                                 {currentStep === 'select' ? 'Scan Prescription' :
                                     currentStep === 'preview' ? 'Review & Analyze' : 'Analysis Results'}
                             </Text>
-                            <Text className="text-typography-700">
+                            <Text className="text-gray-500">
                                 {currentStep === 'select' ? 'Upload your prescription to analyze medicines' :
                                     currentStep === 'preview' ? 'Confirm your image and start analysis' : 'Prescription analysis with drug interactions'}
                             </Text>

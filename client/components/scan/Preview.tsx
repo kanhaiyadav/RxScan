@@ -19,12 +19,12 @@ const Preview = ({ selectedImage, isLoading, extractPrescription, setCurrentStep
 
     return (
         <View className="flex-1 p-6">
-            <View className="bg-background-0 flex-1 rounded-2xl p-4 mb-6 shadow-sm border border-gray-200">
+            <View className="bg-background-0 flex-1 rounded-2xl p-4 mb-6 elevation-sm">
                 <Text className="text-lg font-semibold text-typography-900 mb-4">Preview Image</Text>
                 {selectedImage && (
                     <Image
                         source={{ uri: selectedImage.uri }}
-                        className="w-full flex-1 bg-gray-100 rounded-xl mb-4"
+                        className="w-full flex-1 bg-background-100 dark:bg-background-50/60 rounded-xl mb-4"
                         resizeMode="contain"
                     />
                 )}
@@ -55,14 +55,14 @@ const Preview = ({ selectedImage, isLoading, extractPrescription, setCurrentStep
                         ) : (
                             <Ionicons name="scan" size={24} color="black" />
                         )}
-                        <Text className="text-typography-950 font-semibold text-lg ml-3">
+                        <Text className="text-gray-950 font-semibold text-lg ml-3">
                             {isLoading ? 'Analyzing...' : 'Start Analysis'}
                         </Text>
                     </LinearGradient>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    className="bg-background-0 border border-gray-300 rounded-2xl p-4 flex-row items-center justify-center"
+                    className="bg-background-0 elevation-sm rounded-2xl p-4 flex-row items-center justify-center"
                     onPress={() => setCurrentStep('select')}
                     disabled={isLoading}
                 >

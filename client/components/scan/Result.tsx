@@ -190,7 +190,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     };
 
     const renderSectionTabs = () => (
-        <View className="py-3 bg-background-0 border-b border-gray-100">
+        <View className="py-3 bg-background-50">
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-2">
                     {sections.map((section) => (
@@ -202,15 +202,15 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                             }}
                             className={`flex-row items-center px-4 py-2 rounded-xl ${activeSection === section.id
                                 ? 'bg-[#00ffc8]'
-                                : 'bg-gray-100'
+                                : 'bg-background-0'
                                 }`}
                         >
                             <Ionicons
                                 name={section.icon as any}
                                 size={16}
-                                color={activeSection === section.id ? '#000' : '#666'}
+                                color={activeSection === section.id ? '#1f1f1f' : '#7d7d7d'}
                             />
-                            <Text className={`ml-2 font-medium text-sm ${activeSection === section.id ? 'text-typography-950' : 'text-typography-600'}`}>
+                            <Text className={`ml-2 font-medium text-sm ${activeSection === section.id ? 'text-gray-700' : 'text-typography-600'}`}>
                                 {section.title}
                             </Text>
                         </TouchableOpacity>
@@ -239,19 +239,19 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                     </View>
                 ) : (
                     <View className="flex-row flex-wrap gap-2 mb-3">
-                        <View className="bg-black/10 rounded-full px-3 py-1">
-                            <Text className="text-typography-950 font-medium text-xs">
+                        <View className="bg-background-0 rounded-full px-3 py-1">
+                            <Text className="text-typography-600 font-medium text-xs">
                                 {currentMedicine.medicalInfo.dosageForm}
                             </Text>
                         </View>
                         {currentMedicine.medicalInfo.prescriptionRequired && (
-                            <View className="bg-black/10 rounded-full px-3 py-1">
-                                <Text className="text-typography-950 font-medium text-xs">Prescription Required</Text>
+                            <View className="bg-background-0 rounded-full px-3 py-1">
+                                <Text className="text-typography-600 font-medium text-xs">Prescription Required</Text>
                             </View>
                         )}
                         {currentMedicine.medicalInfo.fdaApproved && (
-                            <View className="bg-black/10 rounded-full px-3 py-1">
-                                <Text className="text-typography-950 font-medium text-xs">FDA Approved</Text>
+                            <View className="bg-background-0 rounded-full px-3 py-1">
+                                <Text className="text-typography-600 font-medium text-xs">FDA Approved</Text>
                             </View>
                         )}
                     </View>
@@ -275,19 +275,19 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 </View>
             ) : (
                 <View className="flex-row gap-3">
-                    <View className="flex-1 bg-red-100 rounded-xl p-4">
+                    <View className="flex-1 bg-red-100 dark:bg-red-500/15 rounded-xl p-4">
                         <MaterialIcons name="report-gmailerrorred" size={24} color="red" />
                         <Text className="text-red-600 font-semibold m-auto text-4xl">{currentMedicine.medicalInfo.healthProfileInteraction.criticalCount + currentMedicine.medicalInfo.healthProfileInteraction.moderateCount + currentMedicine.medicalInfo.healthProfileInteraction.highCount}</Text>
                         <Text className="text-red-600 text-sm">Health Conflicts</Text>
                     </View>
-                    <View className="flex-1 bg-orange-50 rounded-xl p-4">
+                    <View className="flex-1 bg-orange-50 dark:bg-orange-500/15 rounded-xl p-4">
                         <Ionicons name="warning" size={24} color="#f97316" />
                         <Text className="text-orange-600 font-semibold m-auto text-4xl">
                             {currentMedicine.medicalInfo.sideEffects.common.length + currentMedicine.medicalInfo.sideEffects.serious.length}
                         </Text>
                         <Text className="text-orange-600 text-sm text-center">Side Effects</Text>
                     </View>
-                    <View className="flex-1 bg-green-50 rounded-xl p-4">
+                    <View className="flex-1 bg-green-50 dark:bg-green-500/15 rounded-xl p-4">
                         <Ionicons name="business" size={24} color="#10b981" />
                         <Text className="text-green-600 font-semibold m-auto text-4xl">{currentMedicine.medicalInfo.manufacturer.length}</Text>
                         <Text className="text-green-600 text-sm text-center">Manufacturers</Text>
@@ -300,7 +300,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 <Skeleton className="h-[80px] rounded-lg" />
             ) : (
                 currentMedicine.medicalInfo.approximatePrice &&
-                <View className="bg-background-0 border border-gray-200 rounded-xl p-4">
+                <View className="bg-background-0 rounded-xl p-4 elevation-sm">
                     <View className="flex-row items-center justify-between">
                         <View>
                             <Text className="text-lg font-bold text-typography-900">
@@ -319,7 +319,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 <Skeleton className="h-[80px] rounded-lg" />
             ) : (
                 currentMedicine.medicalInfo.manufacturer.length > 0 &&
-                <View className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <View className="bg-background-0 rounded-xl p-4 elevation-sm">
                     <View className="flex-row items-center mb-3">
                         <Ionicons name="business" size={20} color="#6b7280" />
                         <Text className="text-typography-700 font-semibold ml-2">Manufacturers</Text>
@@ -339,7 +339,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     const renderIngredients = () => (
         <View className="p-4 gap-3">
             {currentMedicine.medicalInfo.activeIngredients.map((ingredient, index) => (
-                <View key={index} className="bg-background-0 border border-gray-200 rounded-xl p-4">
+                <View key={index} className="bg-background-0 elevation-sm rounded-xl p-4">
                     <View className="flex-row items-center justify-between mb-2">
                         <Text className="text-lg font-semibold text-typography-900">
                             {ingredient.name}
@@ -359,25 +359,25 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     const renderSideEffects = () => (
         <View className="p-4 gap-4">
             {currentMedicine.medicalInfo.sideEffects.common.length > 0 && (
-                <View className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <View className="bg-blue-50 dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500 rounded-xl p-4">
                     <View className="flex-row items-center mb-3">
                         <Ionicons name="information-circle" size={20} color="#3b82f6" />
-                        <Text className="text-blue-700 font-semibold ml-2">Common Side Effects</Text>
+                        <Text className="text-blue-700 dark:text-blue-500 font-semibold ml-2">Common Side Effects</Text>
                     </View>
                     {currentMedicine.medicalInfo.sideEffects.common.map((effect, index) => (
-                        <Text key={index} className="text-blue-700 mb-1">• {effect}</Text>
+                        <Text key={index} className="text-blue-700 dark:text-blue-500 mb-1">• {effect}</Text>
                     ))}
                 </View>
             )}
 
             {currentMedicine.medicalInfo.sideEffects.serious.length > 0 && (
-                <View className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <View className="bg-red-50 dark:bg-red-500/15 border border-red-200 dark:border-red-500 rounded-xl p-4">
                     <View className="flex-row items-center mb-3">
                         <Ionicons name="warning" size={20} color="#ef4444" />
-                        <Text className="text-red-700 font-semibold ml-2">Serious Side Effects</Text>
+                        <Text className="text-red-700 dark:text-red-500 font-semibold ml-2">Serious Side Effects</Text>
                     </View>
                     {currentMedicine.medicalInfo.sideEffects.serious.map((effect, index) => (
-                        <Text key={index} className="text-red-700 mb-1 leading-5">• {effect}</Text>
+                        <Text key={index} className="text-red-700 dark:text-red-500 mb-1 leading-5">• {effect}</Text>
                     ))}
                 </View>
             )}
@@ -389,39 +389,39 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
             <View className="gap-4">
                 {/* Drug Interactions */}
                 {currentMedicine.medicalInfo.interactions.drugInteractions.length > 0 && (
-                    <View className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                    <View className="bg-orange-50 dark:bg-orange-500/15 border border-orange-200 dark:border-orange-500 rounded-xl p-4">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="medical" size={20} color="#f97316" />
-                            <Text className="text-orange-700 font-semibold ml-2">Drug Interactions</Text>
+                            <Text className="text-orange-700 dark:text-orange-500 font-semibold ml-2">Drug Interactions</Text>
                         </View>
                         {currentMedicine.medicalInfo.interactions.drugInteractions.map((interaction, index) => (
-                            <Text key={index} className="text-orange-700 mb-2 leading-5">• {interaction}</Text>
+                            <Text key={index} className="text-orange-700 dark:text-orange-500 mb-2 leading-5">• {interaction}</Text>
                         ))}
                     </View>
                 )}
 
                 {/* Food Interactions */}
                 {currentMedicine?.medicalInfo.interactions.foodInteractions.length > 0 && (
-                    <View className="bg-green-50 border border-green-200 rounded-xl p-4">
+                    <View className="bg-green-50 dark:bg-green-500/15 border border-green-200 dark:border-green-500 rounded-xl p-4">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="restaurant" size={20} color="#10b981" />
-                            <Text className="text-green-700 font-semibold ml-2">Food Interactions</Text>
+                            <Text className="text-green-700 dark:text-green-500 font-semibold ml-2">Food Interactions</Text>
                         </View>
                         {currentMedicine.medicalInfo.interactions.foodInteractions.map((interaction, index) => (
-                            <Text key={index} className="text-green-700 mb-2 leading-5">• {interaction}</Text>
+                            <Text key={index} className="text-green-700 dark:text-green-500 mb-2 leading-5">• {interaction}</Text>
                         ))}
                     </View>
                 )}
 
                 {/* Condition Interactions */}
                 {currentMedicine?.medicalInfo.interactions.conditionInteractions?.length > 0 && (
-                    <View className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                    <View className="bg-purple-50 dark:bg-purple-500/15 border border-purple-200 dark:border-purple-500 rounded-xl p-4">
                         <View className="flex-row items-center mb-3">
                             <Ionicons name="fitness" size={20} color="#8b5cf6" />
-                            <Text className="text-purple-700 font-semibold ml-2">Medical Conditions</Text>
+                            <Text className="text-purple-700 dark:text-purple-500 font-semibold ml-2">Medical Conditions</Text>
                         </View>
                         {currentMedicine.medicalInfo.interactions.conditionInteractions.map((condition, index) => (
-                            <Text key={index} className="text-purple-700 mb-2 leading-5">• {condition}</Text>
+                            <Text key={index} className="text-purple-700 dark:text-purple-500 mb-2 leading-5">• {condition}</Text>
                         ))}
                     </View>
                 )}
@@ -432,10 +432,10 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     const renderPrecautions = () => (
         <View className="p-4 gap-3">
             {currentMedicine.medicalInfo.warningsAndPrecautions.map((precaution, index) => (
-                <View key={index} className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <View key={index} className="bg-yellow-50 dark:bg-yellow-500/15 border border-yellow-200 dark:border-yellow-500 rounded-xl p-4">
                     <View className="flex-row items-start">
                         <Ionicons name="shield-checkmark" size={20} color="#f59e0b" style={{ marginTop: 2, marginRight: 12 }} />
-                        <Text className="text-yellow-800 leading-6 flex-1">
+                        <Text className="text-yellow-800 dark:text-yellow-500 leading-6 flex-1">
                             {precaution}
                         </Text>
                     </View>
@@ -447,23 +447,23 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
     const renderDosageInfo = () => (
         <View className="p-4 gap-4">
             {/* Overdose Info */}
-            <View className="bg-red-50 border border-red-200 rounded-xl p-4">
+            <View className="bg-red-50 dark:bg-red-500/15 border border-red-200 dark:border-red-500 rounded-xl p-4">
                 <View className="flex-row items-center mb-3">
                     <Ionicons name="alert-circle" size={20} color="#ef4444" />
-                    <Text className="text-red-700 font-semibold ml-2">Overdose Information</Text>
+                    <Text className="text-red-700 dark:text-red-500 font-semibold ml-2">Overdose Information</Text>
                 </View>
-                <Text className="text-red-700 leading-6">
+                <Text className="text-red-700 dark:text-red-500 leading-6">
                     {currentMedicine?.medicalInfo.overdoseMissedDose.overdose || 'No information available'}
                 </Text>
             </View>
 
             {/* Missed Dose Info */}
-            <View className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <View className="bg-blue-50 dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500 rounded-xl p-4">
                 <View className="flex-row items-center mb-3">
                     <Ionicons name="time" size={20} color="#3b82f6" />
-                    <Text className="text-blue-700 font-semibold ml-2">Missed Dose</Text>
+                    <Text className="text-blue-700 dark:text-blue-500 font-semibold ml-2">Missed Dose</Text>
                 </View>
-                <Text className="text-blue-700 leading-6">
+                <Text className="text-blue-700 dark:text-blue-500 leading-6">
                     {currentMedicine?.medicalInfo.overdoseMissedDose.missedDose || 'No information available'}
                 </Text>
             </View>
@@ -479,19 +479,19 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                         <View key={type}>
                             {interactions.length > 0 && (
                                 <View className="flex-row items-center mb-3">
-                                    {type === 'allergy' && <Ionicons name="warning" size={20} color="black" />}
-                                    {type === 'medical_condition' && <FontAwesome5 name="procedures" size={20} color="black" />}
-                                    {type === 'current_medication' && <FontAwesome5 name="pills" size={20} color="black" />}
-                                    {type === 'dietary_restriction' && <FontAwesome5 name="utensils" size={20} color="black" />}
-                                    <Text className="text-typography-950 font-semibold ml-2">{type}</Text>
+                                    {type === 'allergy' && <Ionicons name="warning" size={20} color="#7b7b7b" />}
+                                    {type === 'medical_condition' && <FontAwesome5 name="procedures" size={20} color="#7b7b7b" />}
+                                    {type === 'current_medication' && <FontAwesome5 name="pills" size={20} color="#7b7b7b" />}
+                                    {type === 'dietary_restriction' && <FontAwesome5 name="utensils" size={20} color="#7b7b7b" />}
+                                    <Text className="text-typography-600 font-semibold ml-2">{type}</Text>
                                 </View>
                             )}
                             {interactions.map((interaction, index) => (
                                 <View key={index} className={`${getSeverityColor(interaction.severity)} border rounded-xl p-4 mb-2`}>
                                     <Text className={`${getSeverityTextColor(interaction.severity)} font-bold ml-2`}>{interaction.item}</Text>
                                     <Text className={`${getSeverityTextColor(interaction.severity)} mb-2 leading-5 ml-3`}>{interaction.description}</Text>
-                                    <Text className="ml-2 font-semibold">Recommendation: </Text>
-                                    <Text className="text-typography-600 ml-3">{interaction.recommendation}</Text>
+                                    <Text className="ml-2 font-semibold text-typography-600">Recommendation: </Text>
+                                    <Text className="text-typography-950 ml-3">{interaction.recommendation}</Text>
                                 </View>
                             ))}
                         </View>
@@ -588,7 +588,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
                 </View>
 
                 {/* Medicine Selector */}
-                {ocrResult && ocrResult.medications?.length > 0 && renderMedicineSelector()}
+                {ocrResult && ocrResult.medications && ocrResult.medications.length > 0 && renderMedicineSelector()}
 
                 {/* Additional Notes */}
                 {ocrResult.additional_notes?.follow_up || ocrResult.additional_notes?.special_instructions || ocrResult.additional_notes?.warnings && (
@@ -669,7 +669,7 @@ const MedicineDisplay: React.FC<Props> = ({ ocrResult, result, resetToStart, loa
 
             <Actionsheet isOpen={showActionsheet} onClose={handleClose}>
                 <ActionsheetBackdrop />
-                <ActionsheetContent>
+                <ActionsheetContent className="bg-background-50">
                     <ActionsheetDragIndicatorWrapper>
                         <ActionsheetDragIndicator />
                     </ActionsheetDragIndicatorWrapper>

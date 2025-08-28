@@ -19,14 +19,6 @@ const scanOptions = [
         icon: 'images',
         gradient: ['#4facfe', '#00f2fe'],
         action: 'gallery'
-    },
-    {
-        id: 3,
-        title: 'Document Scanner',
-        subtitle: 'Auto-detect document edges',
-        icon: 'document-text',
-        gradient: ['#a8edea', '#fed6e3'],
-        action: 'document'
     }
 ];
 
@@ -39,13 +31,18 @@ const Select = ({
     return (
         <View className="flex-1 justify-center px-6">
             <View className="items-center mb-8">
-                <LinearGradient
-                    colors={['#00ffc8', '#00e6b8']}
-                    className="w-32 h-32 items-center justify-center mb-6 shadow-lg"
-                    style={{ borderRadius: 900, elevation: 4 }}
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => handleScanAction('camera')}
                 >
-                    <Ionicons name="scan" size={64} color="white" />
-                </LinearGradient>
+                    <LinearGradient
+                        colors={['#00ffc8', '#00e6b8']}
+                        className="w-32 h-32 items-center justify-center mb-6 shadow-lg"
+                        style={{ borderRadius: 900, elevation: 4 }}
+                    >
+                        <Ionicons name="scan" size={64} color="white" />
+                    </LinearGradient>
+                </TouchableOpacity>
                 <Text className="text-xl font-semibold text-typography-900 text-center mb-2">
                     Ready to Scan
                 </Text>
@@ -58,7 +55,7 @@ const Select = ({
                 {scanOptions.map((option) => (
                     <TouchableOpacity
                         key={option.id}
-                        className="bg-background-0 rounded-2xl p-5 shadow-sm border border-gray-100 flex-row items-center"
+                        className="bg-background-0 rounded-2xl p-5 elevation flex-row items-center"
                         onPress={() => handleScanAction(option.action)}
                         activeOpacity={0.7}
                     >

@@ -242,11 +242,11 @@ const TTSComponent: React.FC<TTSComponentProps> = ({
         (async () => {
             setIsTranslating(true);
             const { raw_response, ...withoutRaw } = data.ocrResult;
-            // const result = await generateNarrative(withoutRaw, { language: selectedLanguage.name });
-            const result = {
-                narrative: "Generated narrative text",
-                // Add any other properties you need
-            }
+            const result = await generateNarrative(withoutRaw, { language: selectedLanguage.name });
+            // const result = {
+            //     narrative: "Generated narrative text",
+            //     // Add any other properties you need
+            // }
             if (result.narrative) {
                 setText(result.narrative);
             }

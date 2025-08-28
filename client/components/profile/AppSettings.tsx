@@ -61,7 +61,7 @@ const AppSettings = () => {
                 </TouchableOpacity>
 
                 {/* Language Switcher - Add after other settings */}
-                <View className="border-t border-outline-200">
+                <View>
                     <LanguageSwitcher />
                 </View>
             </View>
