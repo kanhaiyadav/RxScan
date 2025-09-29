@@ -1,17 +1,16 @@
 import express from "express";
-import "./config/database.ts";
 import path from "path";
 import router from "./Routes/index.js";
 import cors from "cors";
+import fs from "fs";
+import { errorHandler } from "./middleware/errorHandler.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const __dirname = path.resolve();
 
-const allowedOrigins = [
-    "http://localhost:5173",
-    "https://kisaansetu.kanhaiya.me",
-    "https://kisaansetufe.vercel.app",
-];
+const allowedOrigins = ["http://localhost:8000", "http://rxscan.kanhaiya.me"];
 
 interface CorsCallback {
     (err: Error | null, allow?: boolean): void;
@@ -49,7 +48,24 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Create uploads directory for OCR/Translation files
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Health check endpoint for OCR/Translation services
+app.get("/api/health", (req, res) => {
+    res.json({
+        status: "healthy",
+        timestamp: new Date().toISOString(),
+    });
+});
+
 app.use("/", router);
+
+// Error handling middleware (should be last)
+app.use(errorHandler);
 
 app.listen(3000, () => {
     console.log("Server is running on http://localhost:3000");

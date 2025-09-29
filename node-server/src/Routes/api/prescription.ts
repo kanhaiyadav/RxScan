@@ -5,6 +5,9 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
+import fs from 'fs/promises';
+import { prescriptionOCRService } from "@/services/prescription.service.js";
 
 const router: Router = express.Router();
 // Type definitions
@@ -227,6 +230,93 @@ router.get('/files/:userId', async (req: Request<{ userId: string }>, res: Respo
     });
   }
 });
+
+const storage = multer.diskStorage({
+    destination: "uploads/",
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(
+            null,
+            file.fieldname +
+                "-" +
+                uniqueSuffix +
+                path.extname(file.originalname)
+        );
+    },
+});
+
+const uploadDisk = multer({
+    storage,
+    limits: {
+        fileSize: 16 * 1024 * 1024, // 16MB
+    },
+    fileFilter: (req, file, cb) => {
+        const allowedExtensions = /png|jpg|jpeg|gif|bmp|tiff|webp/;
+        const extname = allowedExtensions.test(
+            path.extname(file.originalname).toLowerCase()
+        );
+        const mimetype = allowedExtensions.test(file.mimetype);
+
+        if (extname && mimetype) {
+            return cb(null, true);
+        } else {
+            cb(
+                new Error(
+                    "Invalid file type. Allowed: PNG, JPG, JPEG, GIF, BMP, TIFF, WEBP"
+                )
+            );
+        }
+    },
+});
+
+router.post(
+    "/extract",
+    uploadDisk.single("file"),
+    async (req: Request, res: Response): Promise<void> => {
+        try {
+            // Check if file was uploaded
+            if (!req.file) {
+                res.status(400).json({
+                    success: false,
+                    error: "No file provided",
+                });
+                return;
+            }
+
+            const filePath = req.file.path;
+
+            try {
+                // Extract prescription details
+                const result =
+                    await prescriptionOCRService.extractPrescriptionDetails(
+                        filePath
+                    );
+
+                // Clean up uploaded file
+                await fs.unlink(filePath);
+
+                res.json(result);
+            } catch (error: any) {
+                console.log("😂😂😂",error);
+                // Clean up file on error
+                try {
+                    await fs.unlink(filePath);
+                } catch {}
+
+                res.status(500).json({
+                    success: false,
+                    error: error.message,
+                });
+            }
+        } catch (error: any) {
+            console.error("😱😱😱", error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+            });
+        }
+    }
+);
 
 
 
