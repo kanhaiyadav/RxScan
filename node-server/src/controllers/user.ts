@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import User, { IUser } from "../Models/User";
-import { getPresignedUrl, uploadImageFromBuffer } from "@/utils/s3";
+import User, { IUser } from "../Models/User.js";
+import { getPresignedUrl, uploadImageFromBuffer } from "@/utils/s3.js";
 
 export const getUser = async (req: Request, res: Response) => {
     try {
