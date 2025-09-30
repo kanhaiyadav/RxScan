@@ -239,7 +239,7 @@ export default function EnhancedPrescriptionOCR() {
                 setTimeout(() => reject(new Error('Request timeout')), 60000)
             );
 
-            const fetchPromise = fetch(`${API_BASE_URL}/api/extract`, {
+            const fetchPromise = fetch(`${API_BASE_URL}/api/prescription/extract`, {
                 method: 'POST',
                 body: formData,
                 headers: {

@@ -60,7 +60,7 @@ export default function PrescriptionsScreen() {
 
     const getWarning = (prescription: Prescription) => {
         return prescription.searchResult?.medicines?.reduce((acc, medicine) => {
-            return acc + (medicine.medicalInfo?.healthProfileInteraction?.interactions?.length || 0);
+            return acc + (medicine?.medicalInfo?.healthProfileInteraction?.interactions?.length || 0);
         }, 0) || 0;
     }
 
