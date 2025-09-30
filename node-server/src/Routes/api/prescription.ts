@@ -7,7 +7,7 @@ import multerS3 from 'multer-s3';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import fs from 'fs/promises';
-import { prescriptionOCRService } from "@/services/prescription.service.js";
+import { prescriptionOCRService } from "../../services/prescription.service.js";
 
 const router: Router = express.Router();
 // Type definitions
