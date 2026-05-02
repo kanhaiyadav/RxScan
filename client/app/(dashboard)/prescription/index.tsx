@@ -2,7 +2,7 @@ import { openModal } from '@/Store/slices/modalSlice';
 import { deletePrescription, selectPrescriptionEntities, setPrescriptionStatus } from '@/Store/slices/prescriptionSlice';
 import notFoundAnimation from '@/assets/lottie/not_found.json';
 import searchingPrescriptionsAnimation from '@/assets/lottie/searching_prescriptions.json';
-import appwriteService from '@/lib/appwrite';
+import rxScanApiService from '@/lib/api';
 import { Prescription } from '@/types/prescription';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -270,7 +270,7 @@ export default function PrescriptionsScreen() {
                                                 onPress={async () => {
                                                     try {
                                                         dispatch(setPrescriptionStatus({ prescriptionId: prescription.$id, status: 'completed' }));
-                                                        await appwriteService.changePrescriptionStatus(prescription.$id, 'completed');
+                                                        await rxScanApiService.changePrescriptionStatus(prescription.$id, 'completed');
                                                     } catch (error) {
                                                         console.error('Error marking prescription as completed:', error);
                                                         // You might want to show an error message to the user
@@ -285,7 +285,7 @@ export default function PrescriptionsScreen() {
                                                 onPress={async () => {
                                                     try {
                                                         dispatch(setPrescriptionStatus({ prescriptionId: prescription.$id, status: 'abandoned' }));
-                                                        await appwriteService.changePrescriptionStatus(prescription.$id, 'abandoned');
+                                                        await rxScanApiService.changePrescriptionStatus(prescription.$id, 'abandoned');
                                                     } catch (error) {
                                                         console.error('Error abandoning prescription:', error);
                                                     }
@@ -302,7 +302,7 @@ export default function PrescriptionsScreen() {
                                             onPress={async () => {
                                                 try {
                                                     dispatch(setPrescriptionStatus({ prescriptionId: prescription.$id, status: 'active' }));
-                                                    await appwriteService.changePrescriptionStatus(prescription.$id, 'active');
+                                                    await rxScanApiService.changePrescriptionStatus(prescription.$id, 'active');
                                                 } catch (error) {
                                                     console.error('Error setting prescription as active:', error);
                                                 }
@@ -317,7 +317,7 @@ export default function PrescriptionsScreen() {
                                         onPress={async () => {
                                             try {
                                                 dispatch(deletePrescription(prescription.$id));
-                                                await appwriteService.deletePrescription(prescription.$id);
+                                                await rxScanApiService.deletePrescription(prescription.$id);
                                             } catch (error) {
                                                 console.error('Error deleting prescription:', error);
                                             }

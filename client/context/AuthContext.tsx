@@ -1,6 +1,6 @@
 // context/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import appwriteService from '@/lib/appwrite';
+import rxScanApiService from '@/lib/api';
 
 interface User {
   $id: string;
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const checkAuthState = async () => {
     try {
       setIsLoading(true);
-      const currentUser = await appwriteService.getCurrentUser();
+      const currentUser = await rxScanApiService.getCurrentUser();
       if (currentUser) {
         setUser(currentUser);
       }
@@ -58,8 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       setIsLoading(true);
 
-      await appwriteService.signIn(email, password);
-      const currentUser = await appwriteService.getCurrentUser();
+      await rxScanApiService.signIn(email, password);
+      const currentUser = await rxScanApiService.getCurrentUser();
 
       if (currentUser) {
         setUser(currentUser);
@@ -80,8 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       setIsLoading(true);
 
-      await appwriteService.createAccount(email, password, name);
-      const currentUser = await appwriteService.getCurrentUser();
+      await rxScanApiService.createAccount(email, password, name);
+      const currentUser = await rxScanApiService.getCurrentUser();
 
       if (currentUser) {
         setUser(currentUser);
@@ -100,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async (): Promise<void> => {
     try {
       setIsLoading(true);
-      await appwriteService.signOut();
+      await rxScanApiService.signOut();
       setUser(null);
     } catch (error) {
       console.log('Sign out error:', error);

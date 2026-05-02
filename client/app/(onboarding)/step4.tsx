@@ -1,6 +1,6 @@
 // app/(onboarding)/step4.tsx
 import { useUserHealth } from '@/context/UserHealthContext';
-import appwriteService from '@/lib/appwrite';
+import rxScanApiService from '@/lib/api';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -85,7 +85,7 @@ export default function Step4() {
                 additionalNotes: additionalNotes?.trim() || ''
             };
 
-            const currentUser = await appwriteService.getCurrentUser();
+            const currentUser = await rxScanApiService.getCurrentUser();
 
             if (!currentUser) {
                 Alert.alert(
@@ -104,13 +104,12 @@ export default function Step4() {
                 return;
             }
 
-            // Save to Appwrite database
-            const savedProfile = await appwriteService.createOrUpdateHealthProfile(
+            const savedProfile = await rxScanApiService.createOrUpdateHealthProfile(
                 currentUser.$id,
                 completeHealthData
             );
 
-            console.log('Health profile saved to Appwrite:', savedProfile);
+            console.log('Health profile saved:', savedProfile);
 
             // Update the context with the complete profile
             await setHealthProfile(completeHealthData);

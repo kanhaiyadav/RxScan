@@ -4,7 +4,7 @@
         "slug": "rxscan",
         "version": "1.0.0",
         "orientation": "portrait",
-        "icon": "./assets/images/logo.jpg",
+        "icon": "./assets/images/logo.png",
         "scheme": "jsmfirstproject",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
@@ -13,7 +13,7 @@
         },
         "android": {
             "adaptiveIcon": {
-                "foregroundImage": "./assets/images/logo.jpg",
+                "foregroundImage": "./assets/images/logo.png",
                 "backgroundColor": "#ffffff"
             },
             "edgeToEdgeEnabled": true,
@@ -25,7 +25,7 @@
         "web": {
             "bundler": "metro",
             "output": "static",
-            "favicon": "./assets/images/logo.jpg"
+            "favicon": "./assets/images/logo.png"
         },
         "plugins": [
             "expo-router",
@@ -54,7 +54,7 @@
             [
                 "expo-notifications",
                 {
-                    "icon": "./assets/images/logo.jpg",
+                    "icon": "./assets/images/logo.png",
                     "color": "#ffffff",
                     "defaultChannel": "default",
                     "sounds": [

@@ -17,7 +17,7 @@ import Preview from '@/components/scan/Preview';
 import Select from '@/components/scan/Select';
 import { useHealthProfile } from '@/context/HealthProfileContext';
 import { useUserHealth } from '@/context/UserHealthContext';
-import appwriteService from '@/lib/appwrite';
+import rxScanApiService from '@/lib/api';
 import { ApiResponse, MedicineSearchResult, Prescription, PrescriptionData, SelectedImage } from '@/types/prescription';
 import s3Service from '@/lib/AWSS3Service';
 import { openModal } from '@/Store/slices/modalSlice';
@@ -283,8 +283,9 @@ export default function EnhancedPrescriptionOCR() {
                             additionalNotes: healthProfile.additionalNotes || ""
                         }
                     });
-                    console.log(JSON.stringify(res, null, 2));
                     setResult(res);
+                } else {
+                    setResult(null);
                 }
             } else {
                 setOcrError(data.error || 'Failed to extract prescription data');
@@ -321,7 +322,7 @@ export default function EnhancedPrescriptionOCR() {
             return;
         }
 
-        const currentUser = await appwriteService.getCurrentUser();
+        const currentUser = await rxScanApiService.getCurrentUser();
 
         if (!currentUser) {
             dispatch(openModal({ name: "status", data: { type: "error" }, title: "error", description: "Please log in to save prescriptions" }));
@@ -333,8 +334,7 @@ export default function EnhancedPrescriptionOCR() {
             const res = await s3Service.uploadViaBackend(selectedImage.uri, selectedImage.fileName);
             console.log('Upload result:', res);
 
-            // Save prescription data to Appwrite with S3 URL
-            const doc = await appwriteService.createPrescription(currentUser.$id, ocrResult, result, res.fileUrl || "", res.key || "");
+            const doc = await rxScanApiService.createPrescription(currentUser.$id, ocrResult, result, res.fileUrl || "", res.key || "");
             //@ts-ignore
             dispatch(addPrescription({
                 ...doc,

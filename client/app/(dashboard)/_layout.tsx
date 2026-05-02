@@ -3,7 +3,7 @@ import { Tabs } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import appwriteService from '@/lib/appwrite';
+import rxScanApiService from '@/lib/api';
 import { addManyPrescriptions, setLoading } from '@/Store/slices/prescriptionSlice';
 import { useDispatch } from 'react-redux';
 import { NotificationService } from "@/lib/notificationService";
@@ -19,9 +19,9 @@ export default function TabLayout() {
 
     useEffect(() => {
         (async () => {
-            const currentUser = await appwriteService.getCurrentUser();
+            const currentUser = await rxScanApiService.getCurrentUser();
             if (currentUser) {
-                const res = await appwriteService.getPrescriptions(currentUser.$id);
+                const res = await rxScanApiService.getPrescriptions(currentUser.$id);
                 //@ts-ignore
                 dispatch(addManyPrescriptions(res));
                 dispatch(setLoading(false));

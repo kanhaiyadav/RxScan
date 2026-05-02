@@ -1,122 +1,73 @@
-import * as FileSystem from "expo-file-system";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-class AWSS3Service {
+const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  process.env.EXPO_PUBLIC_NODE_API_URL ||
+  'http://localhost:8000';
 
-    // Method 1: Direct upload using presigned URL (RECOMMENDED - Backend required)
-    async uploadWithPresignedUrl(
-        fileUri: string,
-        fileName?: string
-    ): Promise<string> {
-        try {
-            const finalFileName = fileName || `prescription_${Date.now()}.jpg`;
+const TOKEN_STORAGE_KEY = '@RxScan:accessToken';
 
-            // Step 1: Get presigned URL from your backend
-            const presignedUrlResponse = await fetch(
-                `${process.env.EXPO_PUBLIC_NODE_API_URL}/api/s3/presigned-url`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        fileName: finalFileName,
-                        fileType: "image/jpeg",
-                    }),
-                }
-            );
+class PrescriptionStorageService {
+  private async tokenHeaders(): Promise<Headers> {
+    const headers = new Headers();
+    const token = await AsyncStorage.getItem(TOKEN_STORAGE_KEY);
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  }
 
-            const { uploadUrl, fileUrl } = await presignedUrlResponse.json();
+  async uploadWithPresignedUrl(fileUri: string, fileName?: string) {
+    const result = await this.uploadViaBackend(fileUri, fileName);
+    return result.fileUrl;
+  }
 
-            // Step 2: Upload file using presigned URL
-            const fileInfo = await FileSystem.getInfoAsync(fileUri);
-            if (!fileInfo.exists) {
-                throw new Error("File does not exist");
-            }
+  async uploadViaBackend(
+    fileUri: string,
+    fileName?: string
+  ): Promise<{
+    fileUrl: string;
+    key: string;
+    size: number;
+    driveFileId?: string;
+  }> {
+    const formData = new FormData();
+    formData.append('file', {
+      uri: fileUri,
+      type: 'image/jpeg',
+      name: fileName || `prescription_${Date.now()}.jpg`,
+    } as any);
 
-            const uploadResponse = await FileSystem.uploadAsync(
-                uploadUrl,
-                fileUri,
-                {
-                    httpMethod: "PUT",
-                    headers: {
-                        "Content-Type": "image/jpeg",
-                    },
-                }
-            );
+    const response = await fetch(`${API_URL}/api/prescription/upload`, {
+      method: 'POST',
+      headers: await this.tokenHeaders(),
+      body: formData,
+    });
 
-            if (uploadResponse.status !== 200) {
-                throw new Error(
-                    `Upload failed with status: ${uploadResponse.status}`
-                );
-            }
+    const result = await response.json();
 
-            return fileUrl; // Return the public URL of uploaded file
-        } catch (error) {
-            console.error("S3 presigned upload error:", error);
-            throw error;
-        }
+    if (!response.ok) {
+      throw new Error(result.error || `Upload failed: ${response.status}`);
     }
 
-    // Method 2: Upload via your backend API (RECOMMENDED for security)
-    async uploadViaBackend(
-        fileUri: string,
-        fileName?: string
-    ): Promise<{
-        fileUrl: string;
-        key: string;
-        size: number;
-    }> {
-        try {
+    return result.data;
+  }
 
-            // Create FormData
-            const formData = new FormData();
-            formData.append("file", {
-                uri: fileUri,
-                type: "image/jpeg",
-                name: fileName,
-            } as any);
-
-            // Upload via your backend
-            const response = await fetch(
-                `${process.env.EXPO_PUBLIC_NODE_API_URL}/api/prescription/upload`,
-                {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error(`Backend upload failed: ${response.status}`);
-            }
-
-            const result = await response.json();
-            return result.data; // Your backend returns the S3 URL
-        } catch (error) {
-            console.error("Backend S3 upload error:", error);
-            throw error;
+  async deleteFile(fileId: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/drive/files/${encodeURIComponent(fileId)}`,
+        {
+          method: 'DELETE',
+          headers: await this.tokenHeaders(),
         }
-    }
+      );
 
-    // Delete file from S3 (requires backend implementation for security)
-    async deleteFile(fileName: string): Promise<boolean> {
-        try {
-            const response = await fetch(`${process.env.EXPO_PUBLIC_NODE_API_URL}/api/s3/delete`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ fileName }),
-            });
-
-            return response.ok;
-        } catch (error) {
-            console.error("S3 delete error:", error);
-            return false;
-        }
+      return response.ok;
+    } catch (error) {
+      return false;
     }
+  }
 }
 
-export default new AWSS3Service();
+export default new PrescriptionStorageService();

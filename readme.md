@@ -3,7 +3,8 @@
 [![React Native](https://img.shields.io/badge/React%20Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
-[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![Gemini AI](https://img.shields.io/badge/Gemini%20AI-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 
 ## 🌟 Overview
@@ -51,13 +52,14 @@ RxScan is an innovative healthcare application designed to bridge the gap in pre
 - ❖ **GluestackUI** - Modern UI component library
 
 ### Backend
-- ❖ **Flask** - Python web framework for model hosting
-- ❖ **Appwrite** - Backend-as-a-Service (BaaS)
+- ❖ **FastAPI** - API backend for auth, prescription management, Gemini, and Google Drive integration
+- ❖ **MongoDB** - Primary application database
+- ❖ **uv** - Python package and project manager
 
 ### APIs & Services
 - ❖ **Gemini 2.5 Flash** - OCR & Translation capabilities
 - ❖ **gTTS (Google Text-to-Speech)** - Voice synthesis
-- ❖ **AWS S3** - Cloud storage
+- ❖ **Google Drive API** - User-owned prescription image storage
 - ❖ **Azure Speech Service** - Advanced speech capabilities
 
 ## 🛠️ Installation & Setup
@@ -66,7 +68,9 @@ RxScan is an innovative healthcare application designed to bridge the gap in pre
 - Node.js (v16 or higher)
 - npm or yarn
 - Expo CLI
-- Python 3.8+
+- Python 3.11+
+- uv
+- MongoDB
 - Git
 - ngrok (for tunneling)
 
@@ -89,33 +93,26 @@ Start the Expo development server with tunneling:
 npx expo start --tunnel
 ```
 
-### 3. Backend Setup (Flask Server)
+### 3. Backend Setup (FastAPI Server)
 
-Navigate to the Flask server directory:
+Navigate to the backend directory:
 ```bash
-cd flask-server
+cd backend
 ```
 
-Create and activate a virtual environment:
+Install dependencies:
 ```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-source venv/bin/activate
+uv sync
 ```
 
-Install Python dependencies:
+Copy and configure environment variables:
 ```bash
-pip install -r requirements.txt
+cp .env.example .env
 ```
 
-Run the Flask server:
+Run the FastAPI server:
 ```bash
-flask run
+uv run uvicorn app.main:app --reload
 ```
 
 ### 4. ngrok Configuration
@@ -127,9 +124,9 @@ tunnels:
     proto: http
     addr: 3000
 
-  flask:
+  backend:
     proto: http
-    addr: 5000
+    addr: 8000
 ```
 
 Start ngrok tunneling:
@@ -139,17 +136,16 @@ ngrok start --all --config .\ngrok\ngrok.yml
 
 ### 5. Environment Configuration
 
-Copy the Node.js and Flask ports from ngrok to your environment variables:
-- Note the ngrok URLs for both webapp (port 3000) and flask (port 5000)
+Copy the web and backend URLs from ngrok to your environment variables:
+- Note the ngrok URLs for both webapp (port 3000) and backend (port 8000)
 - Update your `.env` files with the appropriate ngrok URLs
 
 ### 📱 Running the Application
 
-1. **Start the Flask server** (Terminal 1):
+1. **Start the FastAPI server** (Terminal 1):
    ```bash
-   cd flask-server
-   source venv/bin/activate  # or venv\Scripts\activate on Windows
-   flask run
+   cd backend
+   uv run uvicorn app.main:app --reload
    ```
 
 2. **Start ngrok tunneling** (Terminal 2):
